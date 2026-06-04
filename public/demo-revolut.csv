@@ -1,0 +1,23 @@
+Started Date,Completed Date,Description,Amount,Type,Product,State,Currency,Reference
+2026-01-03,2026-01-03,Payroll,8200,bank transfer,Current,COMPLETED,RON,salary-jan
+2026-01-04,2026-01-04,Kaufland,-245.30,card payment,Current,COMPLETED,RON,grocery-001
+2026-01-05,2026-01-05,Netflix,-49.99,card payment,Current,COMPLETED,RON,netflix-001
+2026-01-07,2026-01-07,Uber,-38.50,card payment,Current,COMPLETED,RON,uber-001
+2026-01-09,2026-01-09,Emergency Fund Top Up,-600,top up,Current,COMPLETED,RON,topup-001
+2026-01-14,2026-01-14,Orange Romania,-65,card payment,Current,COMPLETED,RON,orange-001
+2026-01-18,2026-01-18,Spotify,-29.99,card payment,Current,COMPLETED,RON,spotify-001
+2026-01-22,2026-01-22,Card Refund,49.99,refund,Current,COMPLETED,RON,refund-spotify
+2026-02-03,2026-02-03,Payroll,8200,bank transfer,Current,COMPLETED,RON,salary-feb
+2026-02-04,2026-02-04,Kaufland,-266.10,card payment,Current,COMPLETED,RON,grocery-002
+2026-02-05,2026-02-05,Netflix,-49.99,card payment,Current,COMPLETED,RON,netflix-002
+2026-02-06,2026-02-06,Uber,-42.20,card payment,Current,COMPLETED,RON,uber-002
+2026-02-09,2026-02-09,Emergency Fund Top Up,-600,top up,Current,COMPLETED,RON,topup-002
+2026-02-13,2026-02-13,Orange Romania,-65,card payment,Current,COMPLETED,RON,orange-002
+2026-02-18,2026-02-18,Spotify,-29.99,card payment,Current,COMPLETED,RON,spotify-002
+2026-03-03,2026-03-03,Payroll,8200,bank transfer,Current,COMPLETED,RON,salary-mar
+2026-03-04,2026-03-04,Kaufland,-251.40,card payment,Current,COMPLETED,RON,grocery-003
+2026-03-05,2026-03-05,Netflix,-49.99,card payment,Current,COMPLETED,RON,netflix-003
+2026-03-07,2026-03-07,Uber,-35.10,card payment,Current,COMPLETED,RON,uber-003
+2026-03-09,2026-03-09,Emergency Fund Top Up,-600,top up,Current,COMPLETED,RON,topup-003
+2026-03-13,2026-03-13,Orange Romania,-65,card payment,Current,COMPLETED,RON,orange-003
+2026-03-18,2026-03-18,Spotify,-29.99,card payment,Current,COMPLETED,RON,spotify-003
