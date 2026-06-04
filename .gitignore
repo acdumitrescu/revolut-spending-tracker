@@ -27,3 +27,30 @@ dist-ssr
 # Personal/local finance artifacts
 simple_safe_banking_backup_*.json
 simple_safe_banking_backup_*.xlsx
+simple_safe_banking_backup_*.xls
+
+# Real-world finance data and personal workspace files
+private-data/
+personal-data/
+backups/
+exports/
+imports/
+tmp-data/
+PRIVATE_NOTES.md
+*.numbers
+*.qfx
+*.ofx
+*.qif
+
+# Common local export/import naming patterns
+*revolut*.csv
+*revolut*.xlsx
+*transactions*.csv
+*transactions*.xlsx
+*statement*.csv
+*statement*.xlsx
+*banking*.csv
+*banking*.xlsx
+
+# Keep the public demo dataset
+!public/demo-revolut.csv
