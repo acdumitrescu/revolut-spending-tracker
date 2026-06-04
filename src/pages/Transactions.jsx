@@ -6,6 +6,7 @@ import { txKey } from '../lib/csvParser';
 export default function Transactions() {
   const { data } = useAppContext();
   const [search, setSearch] = useState('');
+  const displayCurrency = data.displayCurrency;
   
   const txns = data.transactions;
 
@@ -46,7 +47,7 @@ export default function Transactions() {
         <div className="tbl-wrap">
           <table>
             <thead>
-              <tr><th>Date</th><th>Description</th><th>Category</th><th style={{textAlign:'right'}}>Amount</th><th>Flow</th></tr>
+              <tr><th>Date</th><th>Description</th><th>Category</th><th>Source Currency</th><th style={{textAlign:'right'}}>Amount</th><th>Flow</th></tr>
             </thead>
             <tbody>
               {filtered.map((t) => (
@@ -54,8 +55,9 @@ export default function Transactions() {
                   <td style={{ color: 'var(--muted)' }}>{t.date}</td>
                   <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={t.desc}>{t.desc}</td>
                   <td><span style={{ color: getColorForCategory(t.cat), fontWeight: 600, fontSize: '11px' }}>{t.cat}</span></td>
+                  <td style={{ color: 'var(--muted)' }}>{t.currency || 'N/A'}</td>
                   <td style={{ textAlign: 'right', color: t.flow === 'Credit' ? 'var(--green)' : 'var(--red)' }}>
-                    {t.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(t.amt))}
+                    {t.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(t.amt), displayCurrency)}
                   </td>
                   <td><span className={`badge ${t.flow}`}>{t.flow}</span></td>
                 </tr>

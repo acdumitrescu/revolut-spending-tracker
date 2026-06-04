@@ -3,12 +3,14 @@ import { formatCurrency, getColorForCategory } from '../lib/utils';
 import { detectRecurringTransactions } from '../lib/recurring';
 import { getCategoryTotals, getLatestAccountTotal, getMonthlySummary, getVendorTotals } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
+import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Overview() {
-  const { data } = useAppContext();
+  const { data, currencySummary } = useAppContext();
   const txns = data.transactions;
   const recurring = detectRecurringTransactions(txns).slice(0, 3);
   const latestSavings = getLatestAccountTotal(data.accounts);
+  const displayCurrency = data.displayCurrency;
 
   if (txns.length === 0) return (
     <div className="empty-state">
@@ -123,13 +125,20 @@ export default function Overview() {
   return (
     <div>
       <h2 style={{ marginBottom: '20px' }}>Overview</h2>
+      {currencySummary.hasMixedCurrencies && (
+        <div style={{ marginBottom: '20px' }}>
+          <MixedCurrencyNotice currencies={currencySummary.currencies} />
+        </div>
+      )}
+      {!currencySummary.hasMixedCurrencies && (
+        <>
       <div className="kpi-grid">
-        <div className="kpi green"><div className="lbl">Total Income</div><div className="val">{formatCurrency(inc)}</div></div>
-        <div className="kpi red"><div className="lbl">Total Expenses</div><div className="val">{formatCurrency(exp)}</div></div>
-        <div className={`kpi ${net >= 0 ? 'blue' : 'red'}`}><div className="lbl">Net Balance</div><div className="val">{formatCurrency(net)}</div></div>
-        <div className="kpi amber"><div className="lbl">Avg Monthly Spend</div><div className="val">{formatCurrency(avg)}</div></div>
+        <div className="kpi green"><div className="lbl">Total Income</div><div className="val">{formatCurrency(inc, displayCurrency)}</div></div>
+        <div className="kpi red"><div className="lbl">Total Expenses</div><div className="val">{formatCurrency(exp, displayCurrency)}</div></div>
+        <div className={`kpi ${net >= 0 ? 'blue' : 'red'}`}><div className="lbl">Net Balance</div><div className="val">{formatCurrency(net, displayCurrency)}</div></div>
+        <div className="kpi amber"><div className="lbl">Avg Monthly Spend</div><div className="val">{formatCurrency(avg, displayCurrency)}</div></div>
         <div className="kpi blue"><div className="lbl">Savings Rate</div><div className="val">{savingsRate}%</div></div>
-        <div className="kpi blue"><div className="lbl">Tracked Savings</div><div className="val">{formatCurrency(latestSavings)}</div></div>
+        <div className="kpi blue"><div className="lbl">Tracked Savings</div><div className="val">{formatCurrency(latestSavings, displayCurrency)}</div></div>
         <div className={`kpi ${momChange <= 0 ? 'green' : 'red'}`}>
           <div className="lbl">MoM Expense Change</div>
           <div className="val">
@@ -141,24 +150,26 @@ export default function Overview() {
       <div className="grid2">
         <div className="card">
           <div className="card-title">Monthly Income vs Expenses</div>
-          <ChartWrapper type="bar" data={chartData} height={250} />
+          <ChartWrapper type="bar" data={chartData} height={250} currency={displayCurrency} />
         </div>
         <div className="card">
           <div className="card-title">Cumulative Savings Trajectory</div>
-          <ChartWrapper type="line" data={cumulativeChartData} height={250} />
+          <ChartWrapper type="line" data={cumulativeChartData} height={250} currency={displayCurrency} />
         </div>
       </div>
 
       <div className="grid2">
         <div className="card">
           <div className="card-title">Top Expense Categories</div>
-          <ChartWrapper type="doughnut" data={pieData} height={280} />
+          <ChartWrapper type="doughnut" data={pieData} height={280} currency={displayCurrency} />
         </div>
         <div className="card">
           <div className="card-title">Top 10 Vendors</div>
-          <ChartWrapper type="bar" data={vendorChartData} height={280} horizontal showLegend={false} />
+          <ChartWrapper type="bar" data={vendorChartData} height={280} horizontal showLegend={false} currency={displayCurrency} />
         </div>
       </div>
+        </>
+      )}
 
       <div className="grid2">
         <div className="card">
@@ -173,7 +184,7 @@ export default function Overview() {
                   <div key={goal.id}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                       <strong>{goal.name}</strong>
-                      <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{formatCurrency(latestSavings)} / {formatCurrency(goal.targetAmount)}</span>
+                      <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{formatCurrency(latestSavings, displayCurrency)} / {formatCurrency(goal.targetAmount, displayCurrency)}</span>
                     </div>
                     <div style={{ height: '8px', background: 'var(--surface3)', borderRadius: '999px', overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: 'var(--accent)' }} />
@@ -197,8 +208,8 @@ export default function Overview() {
                     <div style={{ fontSize: '12px', color: 'var(--muted)' }}>Every ~{bill.avgInterval} days</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 600 }}>{formatCurrency(bill.amount)}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{bill.nextExpectedDate}</div>
+                    <div style={{ fontWeight: 600 }}>{formatCurrency(bill.amount, bill.currency === 'N/A' ? displayCurrency : bill.currency)}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{bill.nextExpectedDate} · {bill.currency}</div>
                   </div>
                 </div>
               ))}

@@ -4,10 +4,12 @@ import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { getAccountTotalsByMonth, getLatestAccountTotal, getMonthlySummary } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
+import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Accounts() {
-  const { data, addAccount, updateAccountBalance, updateAccountContribution, removeAccount } = useAppContext();
+  const { data, addAccount, updateAccountBalance, updateAccountContribution, removeAccount, currencySummary } = useAppContext();
   const [newAccName, setNewAccName] = useState('');
+  const displayCurrency = data.displayCurrency;
 
   const handleAdd = () => {
     if (newAccName.trim()) {
@@ -60,11 +62,11 @@ export default function Accounts() {
       <div className="kpi-grid">
         <div className="kpi blue">
           <div className="lbl">Latest Tracked Balance</div>
-          <div className="val">{formatCurrency(latestBalance)}</div>
+          <div className="val">{formatCurrency(latestBalance, displayCurrency)}</div>
         </div>
         <div className="kpi green">
           <div className="lbl">Monthly Contributions</div>
-          <div className="val">{formatCurrency(data.accounts.reduce((sum, account) => sum + (account.monthlyContribution || 0), 0))}</div>
+          <div className="val">{formatCurrency(data.accounts.reduce((sum, account) => sum + (account.monthlyContribution || 0), 0), displayCurrency)}</div>
         </div>
       </div>
 
@@ -74,17 +76,19 @@ export default function Accounts() {
           {balanceSeries.length === 0 ? (
             <div style={{ color: 'var(--muted)', fontSize: '13px' }}>Enter at least one monthly balance to chart savings progress. This chart only shows values you explicitly entered.</div>
           ) : (
-            <ChartWrapper type="line" data={balanceChartData} height={300} />
+            <ChartWrapper type="line" data={balanceChartData} height={300} currency={displayCurrency} />
           )}
         </div>
 
         <div className="card">
           <div className="card-title">Revolut Cashflow Trend</div>
-          {monthlySummary.length === 0 ? (
+          {currencySummary.hasMixedCurrencies ? (
+            <MixedCurrencyNotice currencies={currencySummary.currencies} compact />
+          ) : monthlySummary.length === 0 ? (
             <div style={{ color: 'var(--muted)', fontSize: '13px' }}>Upload transactions to compare your monthly cashflow separately from tracked balances.</div>
           ) : (
             <>
-              <ChartWrapper type="bar" data={cashflowChartData} height={300} showLegend={false} />
+              <ChartWrapper type="bar" data={cashflowChartData} height={300} showLegend={false} currency={displayCurrency} />
               <p style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '12px' }}>
                 Cashflow is shown separately from account balances so the app does not imply a net worth number without opening balances.
               </p>

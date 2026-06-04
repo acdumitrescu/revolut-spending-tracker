@@ -36,6 +36,7 @@ describe('AppDataSchema', () => {
       accounts: [{ id: '1', name: 'Bank', balances: { '2024-01': 1000 }, monthlyContribution: 500 }],
       budgets: { '2024-01': { Groceries: 1200 } },
       goals: [{ id: 'goal-1', name: 'Emergency Fund', targetAmount: 10000, targetMonth: '2024-12' }],
+      displayCurrency: 'EUR',
       lastUpdated: 1705312800000,
     };
     expect(AppDataSchema.safeParse(data).success).toBe(true);
@@ -54,6 +55,7 @@ describe('sanitizeAppData', () => {
       accounts: [],
       budgets: {},
       goals: [],
+      displayCurrency: 'RON',
       lastUpdated: null,
     };
     expect(sanitizeAppData(data)).toEqual(data);
@@ -68,6 +70,7 @@ describe('sanitizeAppData', () => {
       customVendors: {},
       accounts: [],
       goals: [],
+      displayCurrency: 'RON',
       lastUpdated: null,
     };
     const result = sanitizeAppData(data);
@@ -87,10 +90,12 @@ describe('sanitizeAppData', () => {
       customVendors: { test: ['Cat', 'Sub'] },
       accounts: [],
       goals: [],
+      displayCurrency: 'USD',
       lastUpdated: 12345,
     };
     const result = sanitizeAppData(data);
     expect(result.lastUpdated).toBe(12345);
+    expect(result.displayCurrency).toBe('USD');
   });
 
   it('migrates legacy flat budgets to the latest month', () => {
@@ -115,6 +120,7 @@ describe('sanitizeAppData', () => {
       accounts: [{ id: '1', name: 'Bank', balances: {}, monthlyContribution: 250 }],
       budgets: {},
       goals: [],
+      displayCurrency: 'RON',
       lastUpdated: null,
     };
     const result = sanitizeAppData(data);

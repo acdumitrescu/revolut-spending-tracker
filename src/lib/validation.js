@@ -45,6 +45,7 @@ export const AppDataSchema = z.object({
   accounts: z.array(AccountSchema),
   budgets: z.record(z.string(), z.record(z.string(), z.number())).optional().default({}),
   goals: z.array(GoalSchema).optional().default([]),
+  displayCurrency: z.string().optional().default('RON'),
   lastUpdated: z.number().nullable(),
 });
 
@@ -64,6 +65,7 @@ export function sanitizeAppData(raw) {
     accounts: [],
     budgets: {},
     goals: [],
+    displayCurrency: 'RON',
     lastUpdated: null,
   };
 
@@ -107,6 +109,9 @@ export function sanitizeAppData(raw) {
         }, {});
       }
     }
+    fallback.displayCurrency = typeof raw.displayCurrency === 'string' && raw.displayCurrency.trim()
+      ? raw.displayCurrency.toUpperCase()
+      : 'RON';
     fallback.lastUpdated = typeof raw.lastUpdated === 'number' ? raw.lastUpdated : null;
   }
 

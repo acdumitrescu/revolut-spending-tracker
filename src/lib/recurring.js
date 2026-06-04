@@ -27,13 +27,15 @@ export function detectRecurringTransactions(transactions) {
     .forEach((txn) => {
       const vendor = normalizeVendor(txn.desc);
       const roundedAmount = Math.round(Math.abs(txn.amt));
-      const key = `${vendor}|${roundedAmount}`;
+      const currency = txn.currency || 'N/A';
+      const key = `${vendor}|${roundedAmount}|${currency}`;
       if (!groups[key]) {
         groups[key] = {
           vendor,
           label: txn.desc,
           amount: roundedAmount,
           cat: txn.cat,
+          currency,
           dates: [],
         };
       }

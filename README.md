@@ -15,6 +15,7 @@ SimpleSafeBanking turns Revolut CSV exports into a private dashboard for:
 - recurring transaction detection for subscriptions and bills
 - multi-month daily spending heatmaps
 - JSON and XLSX backup/export
+- user-selectable display currency for single-currency datasets
 
 ## Who it is for
 
@@ -47,6 +48,7 @@ Import behavior:
 - longer vendor rules win over shorter ones
 - duplicate detection uses date, description, amount, type, flow, currency, and reference
 - malformed and zero-value rows are skipped with tracked reasons
+- mixed-currency datasets are detected and flagged; v1 does not perform FX conversion
 
 ## Demo data
 
@@ -100,7 +102,7 @@ npm run build
 
 ## Limitations
 
-- Primary display currency is `RON`
+- Default display currency is `RON`, but users can switch the display preference in the UI
 - Recurring detection is heuristic, not guaranteed
 - Account-based goals depend on balances you enter manually
 - Revolut export formats can change, so parser support may need occasional updates

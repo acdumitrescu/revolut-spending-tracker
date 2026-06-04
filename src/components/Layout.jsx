@@ -1,14 +1,16 @@
 import { useRef } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { LayoutDashboard, CalendarDays, FolderTree, Store, List, Wallet, Upload, Download, Trash2, TrendingUp, PiggyBank, Flame, Target, Repeat, DatabaseBackup } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { parseCSV, mergeTransactions } from '../lib/csvParser';
 import { useAppContext } from '../lib/AppContext';
+import { SUPPORTED_DISPLAY_CURRENCIES } from '../lib/utils';
 import { useToast } from './Toast';
 import { FreshnessIndicator } from './FreshnessIndicator';
+import MixedCurrencyNotice from './MixedCurrencyNotice';
 
 export default function Layout() {
-  const { data, addTransactions, importBackup, clearData } = useAppContext();
+  const { data, addTransactions, importBackup, clearData, setDisplayCurrency, currencySummary } = useAppContext();
   const toast = useToast();
   const csvInputRef = useRef(null);
   const jsonInputRef = useRef(null);
@@ -71,31 +73,69 @@ export default function Layout() {
     URL.revokeObjectURL(url);
   };
 
-  const handleExportXLSX = () => {
-    const wb = XLSX.utils.book_new();
-    
-    // Sheet 1: Transactions
-    const wsTransactions = XLSX.utils.json_to_sheet(data.transactions);
-    XLSX.utils.book_append_sheet(wb, wsTransactions, "Transactions");
+  const handleExportWorkbook = async () => {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'SimpleSafeBanking';
+      workbook.created = new Date();
 
-    // Sheet 2: Accounts
-    const accountsData = data.accounts.map(acc => ({
-      Account: acc.name,
-      ...acc.balances
-    }));
-    const wsAccounts = XLSX.utils.json_to_sheet(accountsData);
-    XLSX.utils.book_append_sheet(wb, wsAccounts, "Accounts");
+      const transactionSheet = workbook.addWorksheet('Transactions');
+      transactionSheet.columns = [
+        { header: 'Date', key: 'date', width: 14 },
+        { header: 'Description', key: 'desc', width: 28 },
+        { header: 'Category', key: 'cat', width: 18 },
+        { header: 'Subcategory', key: 'sub', width: 18 },
+        { header: 'Amount', key: 'amt', width: 12 },
+        { header: 'Flow', key: 'flow', width: 12 },
+        { header: 'Type', key: 'type', width: 18 },
+        { header: 'YearMonth', key: 'ym', width: 12 },
+        { header: 'Currency', key: 'currency', width: 12 },
+        { header: 'Reference', key: 'ref', width: 20 },
+        { header: 'Source', key: 'source', width: 12 },
+      ];
+      data.transactions.forEach((txn) => transactionSheet.addRow(txn));
 
-    // Sheet 3: Custom Vendors
-    const vendorData = Object.entries(data.customVendors).map(([vendor, [cat, sub]]) => ({
-      Vendor: vendor,
-      Category: cat,
-      Subcategory: sub
-    }));
-    const wsVendors = XLSX.utils.json_to_sheet(vendorData);
-    XLSX.utils.book_append_sheet(wb, wsVendors, "Custom Vendors");
+      const accountsSheet = workbook.addWorksheet('Accounts');
+      const accountMonths = [...new Set(data.accounts.flatMap((acc) => Object.keys(acc.balances)))].sort();
+      accountsSheet.columns = [
+        { header: 'Account', key: 'name', width: 24 },
+        { header: 'MonthlyContribution', key: 'monthlyContribution', width: 18 },
+        ...accountMonths.map((month) => ({ header: month, key: month, width: 14 })),
+      ];
+      data.accounts.forEach((acc) => {
+        accountsSheet.addRow({
+          name: acc.name,
+          monthlyContribution: acc.monthlyContribution,
+          ...acc.balances,
+        });
+      });
 
-    XLSX.writeFile(wb, `simple_safe_banking_backup_${new Date().toISOString().split('T')[0]}.xlsx`);
+      const vendorSheet = workbook.addWorksheet('Custom Vendors');
+      vendorSheet.columns = [
+        { header: 'Vendor', key: 'vendor', width: 24 },
+        { header: 'Category', key: 'category', width: 18 },
+        { header: 'Subcategory', key: 'subcategory', width: 18 },
+      ];
+      Object.entries(data.customVendors).forEach(([vendor, [category, subcategory]]) => {
+        vendorSheet.addRow({ vendor, category, subcategory });
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `simple_safe_banking_backup_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      toast.error('Unable to export Excel workbook.');
+    }
   };
 
   return (
@@ -160,7 +200,7 @@ export default function Layout() {
                 <button className="btn" onClick={handleExportJSON} style={{ flex: 1, borderColor: 'var(--border)', fontSize: '12px' }}>
                   <Download size={14} /> JSON
                 </button>
-                <button className="btn" onClick={handleExportXLSX} style={{ flex: 1, borderColor: 'var(--border)', fontSize: '12px' }}>
+                <button className="btn" onClick={handleExportWorkbook} style={{ flex: 1, borderColor: 'var(--border)', fontSize: '12px' }}>
                   <Download size={14} /> Excel
                 </button>
               </div>
@@ -180,12 +220,26 @@ export default function Layout() {
       {/* Main Content */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ height: '60px', borderBottom: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', padding: '0 24px' }}>
-          {/* Topbar logic (e.g. year/month filter) can go here if moved to context, or handled in specific pages */}
           <div style={{ fontSize: '12px', color: 'var(--muted)', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <select
+              className="input"
+              value={data.displayCurrency}
+              onChange={(e) => setDisplayCurrency(e.target.value)}
+              style={{ fontSize: '12px', padding: '8px 10px' }}
+            >
+              {SUPPORTED_DISPLAY_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency}>{currency}</option>
+              ))}
+            </select>
             <FreshnessIndicator />
           </div>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+          {currencySummary.hasMixedCurrencies && (
+            <div style={{ marginBottom: '16px' }}>
+              <MixedCurrencyNotice currencies={currencySummary.currencies} />
+            </div>
+          )}
           <Outlet />
         </div>
       </main>

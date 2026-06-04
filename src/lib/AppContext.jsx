@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
+import { getCurrencySummary } from './selectors';
 import { sanitizeAppData } from './validation';
 
 const AppContext = createContext(null);
@@ -12,6 +13,7 @@ const initialState = {
   accounts: [],
   budgets: {},
   goals: [],
+  displayCurrency: 'RON',
   lastUpdated: null,
 };
 
@@ -39,6 +41,7 @@ export function AppProvider({ children }) {
   }, [data]);
 
   const updateTimestamp = (prev) => ({ ...prev, lastUpdated: Date.now() });
+  const currencySummary = getCurrencySummary(data.transactions);
 
   const addTransactions = (newTxns) => {
     setData((prev) => updateTimestamp({
@@ -152,6 +155,13 @@ export function AppProvider({ children }) {
     setData(updateTimestamp(sanitizeAppData(nextData)));
   };
 
+  const setDisplayCurrency = (currency) => {
+    setData((prev) => updateTimestamp({
+      ...prev,
+      displayCurrency: currency,
+    }));
+  };
+
   const clearData = () => {
     setData({ ...initialState, lastUpdated: Date.now() });
   };
@@ -172,6 +182,8 @@ export function AppProvider({ children }) {
         addGoal,
         removeGoal,
         importBackup,
+        setDisplayCurrency,
+        currencySummary,
         clearData,
       }}
     >

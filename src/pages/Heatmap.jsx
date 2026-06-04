@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { getDailySpend, getUniqueMonths } from '../lib/selectors';
+import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 function getColor(intensity) {
   if (intensity === 0) return 'var(--surface2)';
@@ -19,8 +20,9 @@ function buildCalendarGrid(days) {
 }
 
 export default function Heatmap() {
-  const { data } = useAppContext();
+  const { data, currencySummary } = useAppContext();
   const txns = data.transactions;
+  const displayCurrency = data.displayCurrency;
   const [windowIndex, setWindowIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -71,6 +73,15 @@ export default function Heatmap() {
     );
   }
 
+  if (currencySummary.hasMixedCurrencies) {
+    return (
+      <div>
+        <h2 style={{ marginBottom: '20px' }}>Spending Heatmap</h2>
+        <MixedCurrencyNotice currencies={currencySummary.currencies} />
+      </div>
+    );
+  }
+
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
@@ -94,7 +105,7 @@ export default function Heatmap() {
       <div className="kpi-grid" style={{ marginBottom: '20px' }}>
         <div className="kpi red">
           <div className="lbl">Visible Spend</div>
-          <div className="val">{formatCurrency(monthCards.reduce((sum, card) => sum + card.totalSpend, 0))}</div>
+          <div className="val">{formatCurrency(monthCards.reduce((sum, card) => sum + card.totalSpend, 0), displayCurrency)}</div>
         </div>
         <div className="kpi amber">
           <div className="lbl">Active Days</div>
@@ -125,7 +136,7 @@ export default function Heatmap() {
                     <button
                       key={cell.date}
                       type="button"
-                      title={`${cell.date}: ${formatCurrency(cell.spendNet)}`}
+                      title={`${cell.date}: ${formatCurrency(cell.spendNet, displayCurrency)}`}
                       onClick={() => setSelectedDate(cell.date)}
                       style={{
                         aspectRatio: '1',
@@ -153,9 +164,9 @@ export default function Heatmap() {
         {selectedDayDetails ? (
           <>
             <div style={{ display: 'flex', gap: '24px', marginBottom: '14px', color: 'var(--muted)', fontSize: '12px' }}>
-              <span>Net spend: <strong style={{ color: 'var(--red)' }}>{formatCurrency(selectedDayDetails.spendNet)}</strong></span>
-              <span>Income: <strong style={{ color: 'var(--green)' }}>{formatCurrency(selectedDayDetails.income)}</strong></span>
-              <span>Refunds: <strong>{formatCurrency(selectedDayDetails.refunds)}</strong></span>
+              <span>Net spend: <strong style={{ color: 'var(--red)' }}>{formatCurrency(selectedDayDetails.spendNet, displayCurrency)}</strong></span>
+              <span>Income: <strong style={{ color: 'var(--green)' }}>{formatCurrency(selectedDayDetails.income, displayCurrency)}</strong></span>
+              <span>Refunds: <strong>{formatCurrency(selectedDayDetails.refunds, displayCurrency)}</strong></span>
             </div>
             <div className="tbl-wrap">
               <table>
@@ -168,7 +179,7 @@ export default function Heatmap() {
                       <td>{txn.desc}</td>
                       <td>{txn.cat}</td>
                       <td style={{ textAlign: 'right', color: txn.flow === 'Credit' ? 'var(--green)' : 'var(--red)' }}>
-                        {txn.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(txn.amt))}
+                        {txn.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(txn.amt), displayCurrency)}
                       </td>
                     </tr>
                   ))}

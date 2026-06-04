@@ -1,56 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import Chart from 'chart.js/auto';
 import App from './App';
 import './index.css';
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  Filler
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  Filler
-);
-
 // High-Visibility Chart.js Defaults for Grey Theme
-ChartJS.defaults.color = '#333333'; // Dark text for labels
-ChartJS.defaults.font.family = "'Helvetica Neue', Helvetica, Arial, sans-serif";
-ChartJS.defaults.font.size = 12;
-ChartJS.defaults.font.weight = '500';
-ChartJS.defaults.plugins.legend.labels.usePointStyle = true;
-ChartJS.defaults.plugins.legend.labels.pointStyle = 'circle';
-ChartJS.defaults.plugins.legend.labels.padding = 16;
-ChartJS.defaults.plugins.tooltip.backgroundColor = '#000000';
-ChartJS.defaults.plugins.tooltip.titleColor = '#FFFFFF';
-ChartJS.defaults.plugins.tooltip.bodyColor = '#FFFFFF';
-ChartJS.defaults.plugins.tooltip.borderColor = 'rgba(0, 0, 0, 0.1)';
-ChartJS.defaults.plugins.tooltip.borderWidth = 0;
-ChartJS.defaults.plugins.tooltip.cornerRadius = 8;
-ChartJS.defaults.plugins.tooltip.padding = 12;
-ChartJS.defaults.plugins.tooltip.displayColors = true;
-ChartJS.defaults.scale.grid = {
+Chart.defaults.color = '#333333'; // Dark text for labels
+Chart.defaults.font.family = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.font.weight = '500';
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+Chart.defaults.plugins.legend.labels.padding = 16;
+Chart.defaults.plugins.tooltip.backgroundColor = '#000000';
+Chart.defaults.plugins.tooltip.titleColor = '#FFFFFF';
+Chart.defaults.plugins.tooltip.bodyColor = '#FFFFFF';
+Chart.defaults.plugins.tooltip.borderColor = 'rgba(0, 0, 0, 0.1)';
+Chart.defaults.plugins.tooltip.borderWidth = 0;
+Chart.defaults.plugins.tooltip.cornerRadius = 8;
+Chart.defaults.plugins.tooltip.padding = 12;
+Chart.defaults.plugins.tooltip.displayColors = true;
+Chart.defaults.scale.grid = {
   color: 'rgba(0, 0, 0, 0.08)', // More visible grid lines
   drawBorder: false,
 };
-ChartJS.defaults.scale.ticks = {
+Chart.defaults.scale.ticks = {
   padding: 8,
   color: '#333333', // Dark ticks
 };

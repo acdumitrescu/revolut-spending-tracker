@@ -3,37 +3,42 @@ import { formatCurrency, formatCurrencyK, formatPercentage, CAT_COLORS, EXPENSE_
 
 describe('formatCurrency', () => {
   it('formats positive numbers as RON currency', () => {
-    const result = formatCurrency(1500);
+    const result = formatCurrency(1500, 'RON');
     expect(result).toContain('1.500');
   });
 
   it('formats zero', () => {
-    const result = formatCurrency(0);
+    const result = formatCurrency(0, 'RON');
     expect(result).toContain('0');
   });
 
   it('formats negative numbers', () => {
-    const result = formatCurrency(-500);
+    const result = formatCurrency(-500, 'RON');
     expect(result).toContain('500');
   });
 
   it('handles decimal values with rounding', () => {
-    const result = formatCurrency(1234.56);
+    const result = formatCurrency(1234.56, 'RON');
     expect(result).toBeDefined();
+  });
+
+  it('supports alternate display currencies', () => {
+    const result = formatCurrency(100, 'USD');
+    expect(result).toContain('$');
   });
 });
 
 describe('formatCurrencyK', () => {
   it('formats values >= 1000 with k suffix', () => {
-    expect(formatCurrencyK(1500)).toBe('1.5k');
+    expect(formatCurrencyK(1500, 'RON')).toBe('1.5k RON');
   });
 
   it('formats values < 1000 as rounded integers', () => {
-    expect(formatCurrencyK(500)).toBe('500');
+    expect(formatCurrencyK(500, 'RON')).toBe('500 RON');
   });
 
   it('handles exactly 1000', () => {
-    expect(formatCurrencyK(1000)).toBe('1.0k');
+    expect(formatCurrencyK(1000, 'RON')).toBe('1.0k RON');
   });
 });
 

@@ -6,6 +6,7 @@ import { getLatestAccountTotal } from '../lib/selectors';
 
 export default function Goals() {
   const { data, addGoal, removeGoal } = useAppContext();
+  const displayCurrency = data.displayCurrency;
   const [name, setName] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [targetMonth, setTargetMonth] = useState('');
@@ -33,7 +34,7 @@ export default function Goals() {
       <div className="kpi-grid">
         <div className="kpi blue">
           <div className="lbl">Tracked Savings Base</div>
-          <div className="val">{formatCurrency(trackedSavings)}</div>
+          <div className="val">{formatCurrency(trackedSavings, displayCurrency)}</div>
         </div>
       </div>
 
@@ -70,7 +71,7 @@ export default function Goals() {
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '18px' }}>{goal.name}</div>
                     <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                      Target: {formatCurrency(goal.targetAmount)}{goal.targetMonth ? ` by ${goal.targetMonth}` : ''}
+                      Target: {formatCurrency(goal.targetAmount, displayCurrency)}{goal.targetMonth ? ` by ${goal.targetMonth}` : ''}
                     </div>
                   </div>
                   <button className="btn" onClick={() => removeGoal(goal.id)} style={{ padding: '4px 8px', color: 'var(--red)', borderColor: 'transparent' }}>
@@ -100,11 +101,11 @@ export default function Goals() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                   <span>Current tracked savings</span>
-                  <strong>{formatCurrency(trackedSavings)}</strong>
+                  <strong>{formatCurrency(trackedSavings, displayCurrency)}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginTop: '8px' }}>
                   <span>Remaining</span>
-                  <strong>{formatCurrency(Math.max(goal.targetAmount - trackedSavings, 0))}</strong>
+                  <strong>{formatCurrency(Math.max(goal.targetAmount - trackedSavings, 0), displayCurrency)}</strong>
                 </div>
               </div>
             );

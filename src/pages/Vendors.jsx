@@ -2,11 +2,13 @@ import { useState, useMemo } from 'react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency, EXPENSE_CATS, getColorForCategory } from '../lib/utils';
 import { Pencil, X, Plus, Trash2, Search } from 'lucide-react';
+import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Vendors() {
-  const { data, updateCustomVendor, removeCustomVendor } = useAppContext();
+  const { data, updateCustomVendor, removeCustomVendor, currencySummary } = useAppContext();
   const txns = data.transactions;
   const customVendors = data.customVendors || {};
+  const displayCurrency = data.displayCurrency;
   
   const [timeFilter, setTimeFilter] = useState('ALL TIME');
   const [yearFilter, setYearFilter] = useState('ALL');
@@ -229,37 +231,41 @@ export default function Vendors() {
       {/* Vendor Table */}
       <div className="card">
         <div className="card-title">Top 100 Vendors {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}</div>
-        <div className="tbl-wrap">
-          {sorted.length === 0 ? (
-            <div style={{ padding: '20px', textAlign: 'center', color: 'var(--muted)' }}>No vendors match the selected filters.</div>
-          ) : (
-            <table>
-              <thead>
-                <tr><th>#</th><th>Vendor</th><th>Category</th><th style={{textAlign:'right'}}>Total Spend</th><th style={{textAlign:'right'}}>Transactions</th><th></th></tr>
-              </thead>
-              <tbody>
-                {sorted.map((v, i) => (
-                  <tr key={v.v}>
-                    <td style={{ color: 'var(--muted)' }}>{i + 1}</td>
-                    <td style={{ fontWeight: 500 }}>{v.v}</td>
-                    <td><span style={{ color: getColorForCategory(v.cat), fontSize: '11px', fontWeight: 600 }}>{v.cat}</span></td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(v.total)}</td>
-                    <td style={{ textAlign: 'right', color: 'var(--muted)' }}>{v.count}</td>
-                    <td>
-                      <button
-                        className="btn"
-                        style={{ padding: '2px 6px', fontSize: '10px' }}
-                        onClick={() => handleStartEdit(v.v)}
-                      >
-                        <Pencil size={11} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+        {currencySummary.hasMixedCurrencies ? (
+          <MixedCurrencyNotice currencies={currencySummary.currencies} compact />
+        ) : (
+          <div className="tbl-wrap">
+            {sorted.length === 0 ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: 'var(--muted)' }}>No vendors match the selected filters.</div>
+            ) : (
+              <table>
+                <thead>
+                  <tr><th>#</th><th>Vendor</th><th>Category</th><th style={{textAlign:'right'}}>Total Spend</th><th style={{textAlign:'right'}}>Transactions</th><th></th></tr>
+                </thead>
+                <tbody>
+                  {sorted.map((v, i) => (
+                    <tr key={v.v}>
+                      <td style={{ color: 'var(--muted)' }}>{i + 1}</td>
+                      <td style={{ fontWeight: 500 }}>{v.v}</td>
+                      <td><span style={{ color: getColorForCategory(v.cat), fontSize: '11px', fontWeight: 600 }}>{v.cat}</span></td>
+                      <td style={{ textAlign: 'right' }}>{formatCurrency(v.total, displayCurrency)}</td>
+                      <td style={{ textAlign: 'right', color: 'var(--muted)' }}>{v.count}</td>
+                      <td>
+                        <button
+                          className="btn"
+                          style={{ padding: '2px 6px', fontSize: '10px' }}
+                          onClick={() => handleStartEdit(v.v)}
+                        >
+                          <Pencil size={11} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

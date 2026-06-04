@@ -2,6 +2,25 @@ import { EXPENSE_CATS } from './utils';
 
 export const REFUND_CATEGORY = 'Refunds';
 
+export function getTransactionCurrencies(transactions) {
+  return [...new Set(
+    transactions
+      .map((txn) => txn.currency)
+      .filter((currency) => typeof currency === 'string' && currency.trim())
+      .map((currency) => currency.toUpperCase())
+  )].sort();
+}
+
+export function getCurrencySummary(transactions) {
+  const currencies = getTransactionCurrencies(transactions);
+  return {
+    currencies,
+    hasCurrencies: currencies.length > 0,
+    hasMixedCurrencies: currencies.length > 1,
+    primaryCurrency: currencies.length === 1 ? currencies[0] : null,
+  };
+}
+
 export function sortMonths(months) {
   return [...months].sort((a, b) => a.localeCompare(b));
 }

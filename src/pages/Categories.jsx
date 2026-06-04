@@ -2,10 +2,12 @@ import { useAppContext } from '../lib/AppContext';
 import { getColorForCategory } from '../lib/utils';
 import { getCategoryTotals } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
+import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Categories() {
-  const { data } = useAppContext();
+  const { data, currencySummary } = useAppContext();
   const txns = data.transactions;
+  const displayCurrency = data.displayCurrency;
   
   if (txns.length === 0) {
     return (
@@ -23,6 +25,15 @@ export default function Categories() {
   const catTotals = getCategoryTotals(txns);
 
   const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+
+  if (currencySummary.hasMixedCurrencies) {
+    return (
+      <div>
+        <h2 style={{ marginBottom: '20px' }}>Categories</h2>
+        <MixedCurrencyNotice currencies={currencySummary.currencies} />
+      </div>
+    );
+  }
 
   if (sortedCats.length === 0) {
     return (
@@ -55,7 +66,7 @@ export default function Categories() {
       <h2 style={{ marginBottom: '20px' }}>Categories</h2>
       <div className="card">
         <div className="card-title">Total Spend by Category</div>
-        <ChartWrapper type="bar" data={chartData} height={400} horizontal showLegend={false} />
+        <ChartWrapper type="bar" data={chartData} height={400} horizontal showLegend={false} currency={displayCurrency} />
       </div>
     </div>
   );

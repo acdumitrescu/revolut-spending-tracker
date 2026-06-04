@@ -2,9 +2,11 @@ import { useMemo } from 'react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { detectRecurringTransactions } from '../lib/recurring';
+import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Recurring() {
-  const { data } = useAppContext();
+  const { data, currencySummary } = useAppContext();
+  const displayCurrency = data.displayCurrency;
   const recurring = useMemo(() => detectRecurringTransactions(data.transactions), [data.transactions]);
 
   return (
@@ -26,6 +28,11 @@ export default function Recurring() {
         </div>
       ) : (
         <>
+          {currencySummary.hasMixedCurrencies && (
+            <div style={{ marginBottom: '20px' }}>
+              <MixedCurrencyNotice currencies={currencySummary.currencies} compact />
+            </div>
+          )}
           <div className="kpi-grid">
             <div className="kpi blue">
               <div className="lbl">Detected Recurring Charges</div>
@@ -33,7 +40,9 @@ export default function Recurring() {
             </div>
             <div className="kpi red">
               <div className="lbl">Estimated Next 30 Days</div>
-              <div className="val">{formatCurrency(recurring.reduce((sum, item) => sum + item.amount, 0))}</div>
+              <div className="val">
+                {currencySummary.hasMixedCurrencies ? 'Unavailable' : formatCurrency(recurring.reduce((sum, item) => sum + item.amount, 0), displayCurrency)}
+              </div>
             </div>
           </div>
 
@@ -45,6 +54,7 @@ export default function Recurring() {
                   <tr>
                     <th>Vendor</th>
                     <th>Category</th>
+                    <th>Source Currency</th>
                     <th style={{ textAlign: 'right' }}>Typical Amount</th>
                     <th style={{ textAlign: 'right' }}>Interval</th>
                     <th>Next Expected Date</th>
@@ -53,10 +63,11 @@ export default function Recurring() {
                 </thead>
                 <tbody>
                   {recurring.map((item) => (
-                    <tr key={`${item.vendor}-${item.amount}`}>
+                    <tr key={`${item.vendor}-${item.amount}-${item.currency}`}>
                       <td>{item.label}</td>
                       <td>{item.cat}</td>
-                      <td style={{ textAlign: 'right', color: 'var(--red)' }}>{formatCurrency(item.amount)}</td>
+                      <td>{item.currency}</td>
+                      <td style={{ textAlign: 'right', color: 'var(--red)' }}>{formatCurrency(item.amount, item.currency === 'N/A' ? displayCurrency : item.currency)}</td>
                       <td style={{ textAlign: 'right' }}>{item.avgInterval} days</td>
                       <td>{item.nextExpectedDate}</td>
                       <td style={{ textAlign: 'right', color: 'var(--muted)' }}>{item.occurrences}</td>

@@ -3,11 +3,13 @@ import { useAppContext } from '../lib/AppContext';
 import { formatCurrency, EXPENSE_CATS } from '../lib/utils';
 import { getBudgetEntries, getUniqueMonths } from '../lib/selectors';
 import { X, Plus } from 'lucide-react';
+import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Budget() {
-  const { data, setBudget, removeBudget } = useAppContext();
+  const { data, setBudget, removeBudget, currencySummary } = useAppContext();
   const txns = data.transactions;
   const budgets = data.budgets || {};
+  const displayCurrency = data.displayCurrency;
 
   const [newCat, setNewCat] = useState('');
   const [newAmount, setNewAmount] = useState('');
@@ -61,6 +63,15 @@ export default function Budget() {
     );
   }
 
+  if (currencySummary.hasMixedCurrencies) {
+    return (
+      <div>
+        <h2 style={{ marginBottom: '20px' }}>Monthly Budget</h2>
+        <MixedCurrencyNotice currencies={currencySummary.currencies} />
+      </div>
+    );
+  }
+
   return (
     <div>
       <h2 style={{ marginBottom: '20px' }}>Monthly Budget</h2>
@@ -83,15 +94,15 @@ export default function Budget() {
         <div className="kpi-grid" style={{ marginBottom: '20px' }}>
           <div className="kpi blue">
             <div className="lbl">Total Budgeted</div>
-            <div className="val">{formatCurrency(totalBudgeted)}</div>
+            <div className="val">{formatCurrency(totalBudgeted, displayCurrency)}</div>
           </div>
           <div className="kpi red">
             <div className="lbl">Total Spent</div>
-            <div className="val">{formatCurrency(totalSpent)}</div>
+            <div className="val">{formatCurrency(totalSpent, displayCurrency)}</div>
           </div>
           <div className={`kpi ${totalBudgeted - totalSpent >= 0 ? 'green' : 'red'}`}>
             <div className="lbl">Remaining</div>
-            <div className="val">{formatCurrency(totalBudgeted - totalSpent)}</div>
+            <div className="val">{formatCurrency(totalBudgeted - totalSpent, displayCurrency)}</div>
           </div>
           {overBudgetCount > 0 && (
             <div className="kpi amber">
@@ -131,7 +142,7 @@ export default function Budget() {
             )}
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>Monthly Limit (RON)</label>
+            <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>{`Monthly Limit (${displayCurrency})`}</label>
             <input
               type="number"
               className="input"
@@ -164,7 +175,7 @@ export default function Budget() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                        {formatCurrency(b.spent)} / {formatCurrency(b.budgeted)}
+                        {formatCurrency(b.spent, displayCurrency)} / {formatCurrency(b.budgeted, displayCurrency)}
                       </span>
                       <button
                         className="btn"
@@ -193,8 +204,8 @@ export default function Budget() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
                     <span style={{ fontSize: '11px', color: b.over ? 'var(--red)' : 'var(--muted)' }}>
                       {b.over
-                        ? `Over by ${formatCurrency(Math.abs(b.remaining))}`
-                        : `${formatCurrency(b.remaining)} remaining`}
+                        ? `Over by ${formatCurrency(Math.abs(b.remaining), displayCurrency)}`
+                        : `${formatCurrency(b.remaining, displayCurrency)} remaining`}
                     </span>
                     <span style={{ fontSize: '11px', color: 'var(--muted)' }}>
                       {b.pct.toFixed(0)}% used

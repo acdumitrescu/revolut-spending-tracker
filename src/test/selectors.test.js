@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getAccountTotalsByMonth,
   getBudgetEntries,
+  getCurrencySummary,
   getDailySpend,
   getLatestMonth,
   getMonthlyExpense,
@@ -61,5 +62,15 @@ describe('selectors', () => {
       remaining: 400,
       over: false,
     });
+  });
+
+  it('detects mixed currencies safely', () => {
+    const summary = getCurrencySummary([
+      { currency: 'RON' },
+      { currency: 'EUR' },
+      { currency: 'RON' },
+    ]);
+    expect(summary.hasMixedCurrencies).toBe(true);
+    expect(summary.currencies).toEqual(['EUR', 'RON']);
   });
 });

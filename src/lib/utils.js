@@ -1,15 +1,28 @@
-export const formatCurrency = (value) => {
-  return new Intl.NumberFormat('ro-RO', {
+export const SUPPORTED_DISPLAY_CURRENCIES = ['RON', 'EUR', 'USD', 'GBP'];
+
+const CURRENCY_LOCALES = {
+  RON: 'ro-RO',
+  EUR: 'de-DE',
+  USD: 'en-US',
+  GBP: 'en-GB',
+};
+
+function getCurrencyLocale(currency) {
+  return CURRENCY_LOCALES[currency] || 'en-US';
+}
+
+export const formatCurrency = (value, currency = 'RON') => {
+  return new Intl.NumberFormat(getCurrencyLocale(currency), {
     style: 'currency',
-    currency: 'RON',
+    currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
 };
 
-export const formatCurrencyK = (value) => {
-  if (value >= 1000) return (value / 1000).toFixed(1) + 'k';
-  return Math.round(value).toString();
+export const formatCurrencyK = (value, currency = 'RON') => {
+  if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(1)}k ${currency}`;
+  return `${Math.round(value)} ${currency}`;
 };
 
 export const formatPercentage = (value, total) => {

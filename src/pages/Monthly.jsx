@@ -3,10 +3,12 @@ import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { getDailySpend, getLatestMonth, getMonthlySummary, getUniqueMonths } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
+import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Monthly() {
-  const { data } = useAppContext();
+  const { data, currencySummary } = useAppContext();
   const txns = data.transactions;
+  const displayCurrency = data.displayCurrency;
   
   const lastUpdated = data.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : 'Never';
 
@@ -43,6 +45,15 @@ export default function Monthly() {
           <div className="empty-state-desc">Upload a CSV to view monthly breakdowns.</div>
         </div>
         <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '10px' }}>Last data update: {lastUpdated}</div>
+      </div>
+    );
+  }
+
+  if (currencySummary.hasMixedCurrencies) {
+    return (
+      <div>
+        <h2 style={{ marginBottom: '20px' }}>Monthly Breakdown</h2>
+        <MixedCurrencyNotice currencies={currencySummary.currencies} />
       </div>
     );
   }
@@ -112,9 +123,9 @@ export default function Monthly() {
         
         {currentMonthStats && (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '24px', fontSize: '14px' }}>
-            <span>Income: <strong style={{ color: 'var(--green)' }}>{formatCurrency(currentMonthStats.inc)}</strong></span>
-            <span>Expenses: <strong style={{ color: 'var(--red)' }}>{formatCurrency(currentMonthStats.exp)}</strong></span>
-            <span>Net: <strong style={{ color: currentMonthStats.net >= 0 ? 'var(--accent)' : 'var(--red)' }}>{formatCurrency(currentMonthStats.net)}</strong></span>
+            <span>Income: <strong style={{ color: 'var(--green)' }}>{formatCurrency(currentMonthStats.inc, displayCurrency)}</strong></span>
+            <span>Expenses: <strong style={{ color: 'var(--red)' }}>{formatCurrency(currentMonthStats.exp, displayCurrency)}</strong></span>
+            <span>Net: <strong style={{ color: currentMonthStats.net >= 0 ? 'var(--accent)' : 'var(--red)' }}>{formatCurrency(currentMonthStats.net, displayCurrency)}</strong></span>
           </div>
         )}
       </div>
@@ -125,6 +136,7 @@ export default function Monthly() {
           type={effectiveSelectedMonth === 'All' ? 'line' : 'bar'}
           data={chartData}
           height={300}
+          currency={displayCurrency}
         />
       </div>
 
@@ -139,9 +151,9 @@ export default function Monthly() {
               {monthlySummary.map(row => (
                 <tr key={row.month} style={{ background: row.month === effectiveSelectedMonth ? 'var(--blue-glow)' : 'transparent' }}>
                   <td>{row.month}</td>
-                  <td style={{textAlign:'right', color:'var(--green)'}}>{formatCurrency(row.inc)}</td>
-                  <td style={{textAlign:'right', color:'var(--red)'}}>{formatCurrency(row.exp)}</td>
-                  <td style={{textAlign:'right', fontWeight:600, color: row.net >= 0 ? 'var(--accent)' : 'var(--red)'}}>{formatCurrency(row.net)}</td>
+                  <td style={{textAlign:'right', color:'var(--green)'}}>{formatCurrency(row.inc, displayCurrency)}</td>
+                  <td style={{textAlign:'right', color:'var(--red)'}}>{formatCurrency(row.exp, displayCurrency)}</td>
+                  <td style={{textAlign:'right', fontWeight:600, color: row.net >= 0 ? 'var(--accent)' : 'var(--red)'}}>{formatCurrency(row.net, displayCurrency)}</td>
                 </tr>
               ))}
             </tbody>
