@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
-import { getLatestAccountTotal, getMonthlySummary } from '../lib/selectors';
+import { BASE_CURRENCY, convertAmountToDisplay } from '../lib/fx';
+import { getLatestAccountTotal, getMonthlySummary, getTotalAccountContributions } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
@@ -19,14 +20,14 @@ export default function Forecast() {
   const analysis = useMemo(() => {
     if (txns.length === 0 || accounts.length === 0) return null;
 
-    const monthlyStats = getMonthlySummary(txns);
+    const monthlyStats = getMonthlySummary(txns, { displayCurrency: BASE_CURRENCY, fxRates: data.fxRates });
     const mostRecentMonth = monthlyStats.at(-1)?.month;
-    const currentTotalBalance = getLatestAccountTotal(accounts);
+    const currentTotalBalance = getLatestAccountTotal(accounts, { displayCurrency: BASE_CURRENCY, fxRates: data.fxRates });
 
     const avgMonthlyExp = monthlyStats.reduce((s, m) => s + m.exp, 0) / monthlyStats.length;
     const avgMonthlyNet = monthlyStats.reduce((s, m) => s + m.net, 0) / monthlyStats.length;
 
-    const totalAccountContributions = accounts.reduce((sum, acc) => sum + (acc.monthlyContribution || 0), 0);
+    const totalAccountContributions = getTotalAccountContributions(accounts, { displayCurrency: BASE_CURRENCY, fxRates: data.fxRates });
     const baselineMonthlySavings = totalAccountContributions > 0 ? totalAccountContributions : avgMonthlyNet;
     const effectiveMonthlySavings = customMonthlySavings !== null ? customMonthlySavings : baselineMonthlySavings;
 
@@ -65,7 +66,7 @@ export default function Forecast() {
       projectionLabels,
       runningBalance
     };
-  }, [txns, accounts, customMonthlySavings, expenseReduction, emergencyMonths]);
+  }, [txns, accounts, customMonthlySavings, expenseReduction, emergencyMonths, data.fxRates]);
 
   if (!analysis) {
     return (
@@ -75,21 +76,12 @@ export default function Forecast() {
     );
   }
 
-  if (currencySummary.hasMixedCurrencies) {
-    return (
-      <div>
-        <h2 style={{ marginBottom: '20px' }}>Expense & Account Forecast</h2>
-        <MixedCurrencyNotice currencies={currencySummary.currencies} />
-      </div>
-    );
-  }
-
   const chartData = {
     labels: analysis.projectionLabels,
     datasets: [
       {
         label: 'Projected Total Account Balance',
-        data: analysis.runningBalance,
+        data: analysis.runningBalance.map((value) => convertAmountToDisplay(value, BASE_CURRENCY, displayCurrency, data.fxRates)),
         borderColor: '#007AFF',
         backgroundColor: 'rgba(0, 122, 255, 0.2)',
         borderWidth: 3,
@@ -126,24 +118,29 @@ export default function Forecast() {
   return (
     <div>
       <h2 style={{ marginBottom: '20px' }}>Expense & Account Forecast</h2>
+      {currencySummary.hasMixedCurrencies && (
+        <div style={{ marginBottom: '20px' }}>
+          <MixedCurrencyNotice currencies={currencySummary.currencies} />
+        </div>
+      )}
       
       {/* Top Level KPIs */}
       <div className="kpi-grid">
         <div className="kpi blue">
           <div className="lbl">Current Total Balance</div>
-          <div className="val">{formatCurrency(analysis.currentTotalBalance, displayCurrency)}</div>
+          <div className="val">{formatCurrency(convertAmountToDisplay(analysis.currentTotalBalance, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</div>
         </div>
         <div className="kpi amber">
           <div className="lbl">Projected Monthly Expenses</div>
-          <div className="val">{formatCurrency(analysis.projectedMonthlyExp, displayCurrency)}</div>
+          <div className="val">{formatCurrency(convertAmountToDisplay(analysis.projectedMonthlyExp, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</div>
         </div>
         <div className="kpi green">
           <div className="lbl">Effective Monthly Savings</div>
-          <div className="val">{formatCurrency(analysis.effectiveMonthlySavings, displayCurrency)}</div>
+          <div className="val">{formatCurrency(convertAmountToDisplay(analysis.effectiveMonthlySavings, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</div>
         </div>
         <div className="kpi blue">
           <div className="lbl">Emergency Fund Target ({emergencyMonths}mo)</div>
-          <div className="val">{formatCurrency(analysis.emergencyFundTarget, displayCurrency)}</div>
+          <div className="val">{formatCurrency(convertAmountToDisplay(analysis.emergencyFundTarget, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</div>
         </div>
       </div>
 
@@ -164,10 +161,10 @@ export default function Forecast() {
           <div className="card-title">💰 Monthly Savings Configuration</div>
           <div style={{ marginBottom: '16px' }}>
             <label style={labelStyle}>
-              Total from Accounts: <strong>{formatCurrency(analysis.totalAccountContributions, displayCurrency)}</strong>
+              Total from Accounts: <strong>{formatCurrency(convertAmountToDisplay(analysis.totalAccountContributions, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</strong>
             </label>
-            <label style={labelStyle}>Baseline monthly savings: <strong>{formatCurrency(analysis.baselineMonthlySavings, displayCurrency)}</strong></label>
-            <label style={labelStyle}>{`Override with Custom Monthly Savings Amount (${displayCurrency})`}</label>
+            <label style={labelStyle}>Baseline monthly savings: <strong>{formatCurrency(convertAmountToDisplay(analysis.baselineMonthlySavings, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</strong></label>
+            <label style={labelStyle}>Override with Custom Monthly Savings Amount (stored in RON)</label>
             <input 
               type="number" 
               placeholder="Leave blank to use account totals"
@@ -180,7 +177,7 @@ export default function Forecast() {
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--muted)' }}>Balance in 12 Months:</span>
               <strong style={{ color: 'var(--green)' }}>
-                {formatCurrency(analysis.currentTotalBalance + (analysis.effectiveMonthlySavings * 12), displayCurrency)}
+                {formatCurrency(convertAmountToDisplay(analysis.currentTotalBalance + (analysis.effectiveMonthlySavings * 12), BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}
               </strong>
             </div>
           </div>
@@ -190,7 +187,7 @@ export default function Forecast() {
         <div className="card">
           <div className="card-title">✂️ Expense Reduction Impact</div>
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>{`If I reduce monthly expenses by (${displayCurrency})`}</label>
+            <label style={labelStyle}>If I reduce monthly expenses by (stored in RON)</label>
             <input 
               type="number" 
               value={expenseReduction} 
@@ -201,15 +198,15 @@ export default function Forecast() {
           <div style={{ background: 'var(--surface)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ color: 'var(--muted)' }}>New Projected Monthly Expenses:</span>
-              <strong>{formatCurrency(analysis.projectedMonthlyExp, displayCurrency)}</strong>
+              <strong>{formatCurrency(convertAmountToDisplay(analysis.projectedMonthlyExp, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ color: 'var(--muted)' }}>New Projected Monthly Net:</span>
-              <strong style={{ color: 'var(--green)' }}>{formatCurrency(analysis.projectedMonthlyNet, displayCurrency)}</strong>
+              <strong style={{ color: 'var(--green)' }}>{formatCurrency(convertAmountToDisplay(analysis.projectedMonthlyNet, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
               <span style={{ color: 'var(--muted)' }}>Extra Yearly Savings:</span>
-              <strong style={{ color: 'var(--green)' }}>+{formatCurrency(expenseReduction * 12, displayCurrency)}</strong>
+              <strong style={{ color: 'var(--green)' }}>+{formatCurrency(convertAmountToDisplay(expenseReduction * 12, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</strong>
             </div>
           </div>
         </div>
@@ -233,7 +230,7 @@ export default function Forecast() {
           <div style={{ background: 'var(--surface)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ color: 'var(--muted)' }}>Avg. Monthly Expenses:</span>
-              <strong>{formatCurrency(analysis.avgMonthlyExp, displayCurrency)}</strong>
+              <strong>{formatCurrency(convertAmountToDisplay(analysis.avgMonthlyExp, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
               <span style={{ color: 'var(--muted)' }}>Time to Reach Target:</span>

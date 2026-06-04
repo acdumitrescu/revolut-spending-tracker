@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BASE_CURRENCY, DEFAULT_FX_RATES, SUPPORTED_DISPLAY_CURRENCIES } from './fx';
 
 export const TransactionSchema = z.object({
   date: z.string().min(1),
@@ -28,6 +29,7 @@ export const ParsedCSVSchema = z.object({
 export const AccountSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
+  currency: z.enum(SUPPORTED_DISPLAY_CURRENCIES).optional().default(BASE_CURRENCY),
   balances: z.record(z.string(), z.number()),
   monthlyContribution: z.number().nonnegative().default(0),
 });
@@ -45,7 +47,14 @@ export const AppDataSchema = z.object({
   accounts: z.array(AccountSchema),
   budgets: z.record(z.string(), z.record(z.string(), z.number())).optional().default({}),
   goals: z.array(GoalSchema).optional().default([]),
-  displayCurrency: z.string().optional().default('RON'),
+  baseCurrency: z.string().optional().default(BASE_CURRENCY),
+  displayCurrency: z.enum(SUPPORTED_DISPLAY_CURRENCIES).optional().default(BASE_CURRENCY),
+  fxRates: z.object({
+    EUR: z.number().positive(),
+    USD: z.number().positive(),
+  }).optional().default(DEFAULT_FX_RATES),
+  fxUpdatedAt: z.number().nullable().optional().default(null),
+  fxSource: z.string().optional().default('manual-default'),
   lastUpdated: z.number().nullable(),
 });
 
@@ -65,7 +74,11 @@ export function sanitizeAppData(raw) {
     accounts: [],
     budgets: {},
     goals: [],
-    displayCurrency: 'RON',
+    baseCurrency: BASE_CURRENCY,
+    displayCurrency: BASE_CURRENCY,
+    fxRates: DEFAULT_FX_RATES,
+    fxUpdatedAt: null,
+    fxSource: 'manual-default',
     lastUpdated: null,
   };
 
@@ -82,7 +95,10 @@ export function sanitizeAppData(raw) {
       fallback.customVendors = raw.customVendors;
     }
     if (Array.isArray(raw.accounts)) {
-      fallback.accounts = raw.accounts.filter((a) => AccountSchema.safeParse(a).success);
+      fallback.accounts = raw.accounts
+        .map((account) => AccountSchema.safeParse(account))
+        .filter((result) => result.success)
+        .map((result) => result.data);
     }
     if (Array.isArray(raw.goals)) {
       fallback.goals = raw.goals.filter((goal) => GoalSchema.safeParse(goal).success);
@@ -109,9 +125,22 @@ export function sanitizeAppData(raw) {
         }, {});
       }
     }
-    fallback.displayCurrency = typeof raw.displayCurrency === 'string' && raw.displayCurrency.trim()
-      ? raw.displayCurrency.toUpperCase()
-      : 'RON';
+    fallback.baseCurrency = BASE_CURRENCY;
+    fallback.displayCurrency = typeof raw.displayCurrency === 'string' && SUPPORTED_DISPLAY_CURRENCIES.includes(raw.displayCurrency.trim().toUpperCase())
+      ? raw.displayCurrency.trim().toUpperCase()
+      : BASE_CURRENCY;
+    fallback.fxRates = {
+      EUR: typeof raw.fxRates?.EUR === 'number' && Number.isFinite(raw.fxRates.EUR) && raw.fxRates.EUR > 0
+        ? raw.fxRates.EUR
+        : DEFAULT_FX_RATES.EUR,
+      USD: typeof raw.fxRates?.USD === 'number' && Number.isFinite(raw.fxRates.USD) && raw.fxRates.USD > 0
+        ? raw.fxRates.USD
+        : DEFAULT_FX_RATES.USD,
+    };
+    fallback.fxUpdatedAt = typeof raw.fxUpdatedAt === 'number' ? raw.fxUpdatedAt : null;
+    fallback.fxSource = typeof raw.fxSource === 'string' && raw.fxSource.trim()
+      ? raw.fxSource.trim()
+      : 'manual-default';
     fallback.lastUpdated = typeof raw.lastUpdated === 'number' ? raw.lastUpdated : null;
   }
 

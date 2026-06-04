@@ -1,10 +1,11 @@
-export const SUPPORTED_DISPLAY_CURRENCIES = ['RON', 'EUR', 'USD', 'GBP'];
+import { convertAmountToDisplay, DEFAULT_FX_RATES } from './fx';
+
+export const SUPPORTED_DISPLAY_CURRENCIES = ['RON', 'EUR', 'USD'];
 
 const CURRENCY_LOCALES = {
   RON: 'ro-RO',
   EUR: 'de-DE',
   USD: 'en-US',
-  GBP: 'en-GB',
 };
 
 function getCurrencyLocale(currency) {
@@ -24,6 +25,13 @@ export const formatCurrencyK = (value, currency = 'RON') => {
   if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(1)}k ${currency}`;
   return `${Math.round(value)} ${currency}`;
 };
+
+export const formatDisplayAmount = (
+  value,
+  fromCurrency = 'RON',
+  displayCurrency = 'RON',
+  fxRates = DEFAULT_FX_RATES
+) => formatCurrency(convertAmountToDisplay(value, fromCurrency, displayCurrency, fxRates), displayCurrency);
 
 export const formatPercentage = (value, total) => {
   if (!total) return '0%';

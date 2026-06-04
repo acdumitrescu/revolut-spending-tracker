@@ -20,14 +20,6 @@ Chart.defaults.plugins.tooltip.borderWidth = 0;
 Chart.defaults.plugins.tooltip.cornerRadius = 8;
 Chart.defaults.plugins.tooltip.padding = 12;
 Chart.defaults.plugins.tooltip.displayColors = true;
-Chart.defaults.scale.grid = {
-  color: 'rgba(0, 0, 0, 0.08)', // More visible grid lines
-  drawBorder: false,
-};
-Chart.defaults.scale.ticks = {
-  padding: 8,
-  color: '#333333', // Dark ticks
-};
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

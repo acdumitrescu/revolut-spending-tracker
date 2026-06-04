@@ -23,18 +23,6 @@ const DEFAULT_OPTIONS = {
       padding: 12,
     },
   },
-  scales: {
-    x: {
-      beginAtZero: true,
-      ticks: { color: '#333333', font: { size: 11 } },
-      grid: { color: 'rgba(0, 0, 0, 0.08)', drawBorder: false },
-    },
-    y: {
-      beginAtZero: true,
-      ticks: { color: '#333333', font: { size: 11 } },
-      grid: { color: 'rgba(0, 0, 0, 0.08)', drawBorder: false },
-    },
-  },
 };
 
 const DOUGHNUT_OPTIONS = {
@@ -97,6 +85,60 @@ export default function ChartWrapper({
       },
     };
   } else {
+    const verticalScales = {
+      x: {
+        type: 'category',
+        offset: true,
+        ticks: {
+          color: '#333333',
+          font: { size: 11 },
+        },
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        type: 'linear',
+        beginAtZero: true,
+        ticks: {
+          color: '#333333',
+          font: { size: 11 },
+          callback: (value) => formatCurrencyK(Number(value), currency),
+        },
+        grid: {
+          color: 'rgba(0, 0, 0, 0.08)',
+          drawBorder: false,
+        },
+      },
+    };
+
+    const horizontalScales = {
+      x: {
+        type: 'linear',
+        beginAtZero: true,
+        ticks: {
+          color: '#333333',
+          font: { size: 11 },
+          callback: (value) => formatCurrencyK(Number(value), currency),
+        },
+        grid: {
+          color: 'rgba(0, 0, 0, 0.08)',
+          drawBorder: false,
+        },
+      },
+      y: {
+        type: 'category',
+        offset: true,
+        ticks: {
+          color: '#333333',
+          font: { size: 11 },
+        },
+        grid: {
+          display: false,
+        },
+      },
+    };
+
     mergedOptions = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -120,36 +162,53 @@ export default function ChartWrapper({
       scales: horizontal
         ? {
             x: {
-              ...DEFAULT_OPTIONS.scales.x,
+              ...horizontalScales.x,
               ...(options.scales?.x || {}),
-              beginAtZero: true,
               ticks: {
-                color: '#333333',
-                font: { size: 11 },
-                callback: (value) => formatCurrencyK(Number(value), currency),
+                ...horizontalScales.x.ticks,
                 ...(options.scales?.x?.ticks || {}),
               },
-              grid: { color: 'rgba(0, 0, 0, 0.08)', drawBorder: false },
+              grid: {
+                ...horizontalScales.x.grid,
+                ...(options.scales?.x?.grid || {}),
+              },
             },
             y: {
-              ...DEFAULT_OPTIONS.scales.y,
+              ...horizontalScales.y,
               ...(options.scales?.y || {}),
-              grid: { display: false },
-              ticks: { color: '#333333', font: { size: 11 } },
+              ticks: {
+                ...horizontalScales.y.ticks,
+                ...(options.scales?.y?.ticks || {}),
+              },
+              grid: {
+                ...horizontalScales.y.grid,
+                ...(options.scales?.y?.grid || {}),
+              },
             },
           }
         : {
-            ...DEFAULT_OPTIONS.scales,
-            ...(options.scales || {}),
-            y: {
-              ...DEFAULT_OPTIONS.scales.y,
-              ...(options.scales?.y || {}),
-              beginAtZero: true,
+            x: {
+              ...verticalScales.x,
+              ...(options.scales?.x || {}),
               ticks: {
-                color: '#333333',
-                font: { size: 11 },
-                callback: (value) => formatCurrencyK(Number(value), currency),
+                ...verticalScales.x.ticks,
+                ...(options.scales?.x?.ticks || {}),
+              },
+              grid: {
+                ...verticalScales.x.grid,
+                ...(options.scales?.x?.grid || {}),
+              },
+            },
+            y: {
+              ...verticalScales.y,
+              ...(options.scales?.y || {}),
+              ticks: {
+                ...verticalScales.y.ticks,
                 ...(options.scales?.y?.ticks || {}),
+              },
+              grid: {
+                ...verticalScales.y.grid,
+                ...(options.scales?.y?.grid || {}),
               },
             },
           },

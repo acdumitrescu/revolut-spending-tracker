@@ -11,7 +11,7 @@ export default function MixedCurrencyNotice({ currencies, compact = false }) {
       }}
     >
       <strong>Mixed currencies detected.</strong>{' '}
-      This dataset contains {currencies.join(', ')}. v1 does not convert exchange rates, so aggregate totals and some charts are hidden to avoid misleading results.
+      This dataset contains {currencies.join(', ')}. Totals are converted using your latest saved FX rates, while transaction rows keep their original source currency for traceability.
     </div>
   );
 }

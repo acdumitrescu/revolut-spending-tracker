@@ -2,26 +2,30 @@ import { useMemo, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
-import { getAccountTotalsByMonth, getLatestAccountTotal, getMonthlySummary } from '../lib/selectors';
+import { BASE_CURRENCY, SUPPORTED_DISPLAY_CURRENCIES } from '../lib/fx';
+import { getAccountCurrency, getAccountTotalsByMonth, getLatestAccountTotal, getMonthlySummary, getTotalAccountContributions } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Accounts() {
-  const { data, addAccount, updateAccountBalance, updateAccountContribution, removeAccount, currencySummary } = useAppContext();
+  const { data, addAccount, updateAccountCurrency, updateAccountBalance, updateAccountContribution, removeAccount, currencySummary } = useAppContext();
   const [newAccName, setNewAccName] = useState('');
+  const [newAccCurrency, setNewAccCurrency] = useState(BASE_CURRENCY);
   const displayCurrency = data.displayCurrency;
 
   const handleAdd = () => {
     if (newAccName.trim()) {
-      addAccount(newAccName.trim());
+      addAccount(newAccName.trim(), newAccCurrency);
       setNewAccName('');
+      setNewAccCurrency(BASE_CURRENCY);
     }
   };
 
   const txns = data.transactions;
-  const monthlySummary = useMemo(() => getMonthlySummary(txns), [txns]);
-  const balanceSeries = useMemo(() => getAccountTotalsByMonth(data.accounts), [data.accounts]);
-  const latestBalance = getLatestAccountTotal(data.accounts);
+  const monthlySummary = useMemo(() => getMonthlySummary(txns, { displayCurrency, fxRates: data.fxRates }), [txns, displayCurrency, data.fxRates]);
+  const balanceSeries = useMemo(() => getAccountTotalsByMonth(data.accounts, { displayCurrency, fxRates: data.fxRates }), [data.accounts, displayCurrency, data.fxRates]);
+  const latestBalance = getLatestAccountTotal(data.accounts, { displayCurrency, fxRates: data.fxRates });
+  const monthlyContributions = getTotalAccountContributions(data.accounts, { displayCurrency, fxRates: data.fxRates });
 
   const balanceChartData = {
     labels: balanceSeries.map((point) => point.month),
@@ -66,9 +70,14 @@ export default function Accounts() {
         </div>
         <div className="kpi green">
           <div className="lbl">Monthly Contributions</div>
-          <div className="val">{formatCurrency(data.accounts.reduce((sum, account) => sum + (account.monthlyContribution || 0), 0), displayCurrency)}</div>
+          <div className="val">{formatCurrency(monthlyContributions, displayCurrency)}</div>
         </div>
       </div>
+      {currencySummary.hasMixedCurrencies && (
+        <div style={{ marginBottom: '20px' }}>
+          <MixedCurrencyNotice currencies={currencySummary.currencies} />
+        </div>
+      )}
 
       <div className="grid2">
         <div className="card">
@@ -82,9 +91,7 @@ export default function Accounts() {
 
         <div className="card">
           <div className="card-title">Revolut Cashflow Trend</div>
-          {currencySummary.hasMixedCurrencies ? (
-            <MixedCurrencyNotice currencies={currencySummary.currencies} compact />
-          ) : monthlySummary.length === 0 ? (
+          {monthlySummary.length === 0 ? (
             <div style={{ color: 'var(--muted)', fontSize: '13px' }}>Upload transactions to compare your monthly cashflow separately from tracked balances.</div>
           ) : (
             <>
@@ -108,6 +115,16 @@ export default function Accounts() {
             onChange={e => setNewAccName(e.target.value)}
             style={{ flex: 1 }}
           />
+          <select
+            className="input"
+            value={newAccCurrency}
+            onChange={(e) => setNewAccCurrency(e.target.value)}
+            style={{ width: '100px' }}
+          >
+            {SUPPORTED_DISPLAY_CURRENCIES.map((currency) => (
+              <option key={currency} value={currency}>{currency}</option>
+            ))}
+          </select>
           <button className="btn btn-primary" onClick={handleAdd}><Plus size={16} /> Add</button>
         </div>
 
@@ -119,13 +136,32 @@ export default function Accounts() {
             return (
               <div key={acc.id} style={{ background: 'var(--surface2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <div style={{ fontWeight: 600, fontSize: '14px' }}>{acc.name}</div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '14px' }}>{acc.name}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>
+                      Stored in {getAccountCurrency(acc)} and converted into {displayCurrency} for totals.
+                    </div>
+                  </div>
                   <button className="btn" onClick={() => removeAccount(acc.id)} style={{ padding: '4px 8px', color: 'var(--red)', borderColor: 'transparent' }}><Trash2 size={14} /></button>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '12px' }}>
                   <div>
+                    <div style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Account Currency</div>
+                    <select
+                      className="input"
+                      value={getAccountCurrency(acc)}
+                      onChange={(e) => updateAccountCurrency(acc.id, e.target.value)}
+                      style={{ width: '100%' }}
+                    >
+                      {SUPPORTED_DISPLAY_CURRENCIES.map((currency) => (
+                        <option key={currency} value={currency}>{currency}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
                     <div style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Monthly Contribution</div>
+                    <div style={{ fontSize: '11px', color: 'var(--muted)', marginBottom: '6px' }}>{`Stored in ${getAccountCurrency(acc)}, displayed elsewhere using FX conversion.`}</div>
                     <input
                       type="number"
                       className="input"

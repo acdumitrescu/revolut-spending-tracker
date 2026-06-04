@@ -33,10 +33,14 @@ describe('AppDataSchema', () => {
     const data = {
       transactions: [],
       customVendors: { uber: ['Transport', 'Taxi'] },
-      accounts: [{ id: '1', name: 'Bank', balances: { '2024-01': 1000 }, monthlyContribution: 500 }],
+      accounts: [{ id: '1', name: 'Bank', currency: 'EUR', balances: { '2024-01': 1000 }, monthlyContribution: 500 }],
       budgets: { '2024-01': { Groceries: 1200 } },
       goals: [{ id: 'goal-1', name: 'Emergency Fund', targetAmount: 10000, targetMonth: '2024-12' }],
+      baseCurrency: 'RON',
       displayCurrency: 'EUR',
+      fxRates: { EUR: 5, USD: 4.6 },
+      fxUpdatedAt: 1705312801000,
+      fxSource: 'Frankfurter',
       lastUpdated: 1705312800000,
     };
     expect(AppDataSchema.safeParse(data).success).toBe(true);
@@ -55,7 +59,11 @@ describe('sanitizeAppData', () => {
       accounts: [],
       budgets: {},
       goals: [],
+      baseCurrency: 'RON',
       displayCurrency: 'RON',
+      fxRates: { EUR: 5, USD: 4.6 },
+      fxUpdatedAt: null,
+      fxSource: 'manual-default',
       lastUpdated: null,
     };
     expect(sanitizeAppData(data)).toEqual(data);
@@ -70,6 +78,7 @@ describe('sanitizeAppData', () => {
       customVendors: {},
       accounts: [],
       goals: [],
+      baseCurrency: 'RON',
       displayCurrency: 'RON',
       lastUpdated: null,
     };
@@ -90,12 +99,17 @@ describe('sanitizeAppData', () => {
       customVendors: { test: ['Cat', 'Sub'] },
       accounts: [],
       goals: [],
+      baseCurrency: 'RON',
       displayCurrency: 'USD',
+      fxRates: { EUR: 4.95, USD: 4.55 },
+      fxUpdatedAt: 123456,
+      fxSource: 'manual',
       lastUpdated: 12345,
     };
     const result = sanitizeAppData(data);
     expect(result.lastUpdated).toBe(12345);
     expect(result.displayCurrency).toBe('USD');
+    expect(result.fxRates).toEqual({ EUR: 4.95, USD: 4.55 });
   });
 
   it('migrates legacy flat budgets to the latest month', () => {
@@ -117,13 +131,41 @@ describe('sanitizeAppData', () => {
     const data = {
       transactions: [],
       customVendors: {},
-      accounts: [{ id: '1', name: 'Bank', balances: {}, monthlyContribution: 250 }],
+      accounts: [{ id: '1', name: 'Bank', currency: 'USD', balances: {}, monthlyContribution: 250 }],
       budgets: {},
       goals: [],
+      baseCurrency: 'RON',
       displayCurrency: 'RON',
       lastUpdated: null,
     };
     const result = sanitizeAppData(data);
     expect(result.accounts[0].monthlyContribution).toBe(250);
+    expect(result.accounts[0].currency).toBe('USD');
+  });
+
+  it('adds default fx settings to legacy payloads', () => {
+    const result = sanitizeAppData({
+      transactions: [],
+      customVendors: {},
+      accounts: [],
+      budgets: {},
+      goals: [],
+      lastUpdated: null,
+    });
+    expect(result.baseCurrency).toBe('RON');
+    expect(result.displayCurrency).toBe('RON');
+    expect(result.fxRates).toEqual({ EUR: 5, USD: 4.6 });
+  });
+
+  it('defaults legacy accounts to RON currency during sanitization', () => {
+    const result = sanitizeAppData({
+      transactions: [],
+      customVendors: {},
+      accounts: [{ id: '1', name: 'Legacy Bank', balances: { '2024-01': 1000 }, monthlyContribution: 200 }],
+      budgets: {},
+      goals: [],
+      lastUpdated: null,
+    });
+    expect(result.accounts[0].currency).toBe('RON');
   });
 }); 

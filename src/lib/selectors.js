@@ -1,13 +1,13 @@
 import { EXPENSE_CATS } from './utils';
+import { BASE_CURRENCY, convertAmountToDisplay, getEffectiveCurrency } from './fx';
 
 export const REFUND_CATEGORY = 'Refunds';
 
 export function getTransactionCurrencies(transactions) {
   return [...new Set(
     transactions
-      .map((txn) => txn.currency)
+      .map((txn) => getEffectiveCurrency(txn))
       .filter((currency) => typeof currency === 'string' && currency.trim())
-      .map((currency) => currency.toUpperCase())
   )].sort();
 }
 
@@ -19,6 +19,10 @@ export function getCurrencySummary(transactions) {
     hasMixedCurrencies: currencies.length > 1,
     primaryCurrency: currencies.length === 1 ? currencies[0] : null,
   };
+}
+
+function convertTxnAmount(txn, displayCurrency = BASE_CURRENCY, fxRates) {
+  return convertAmountToDisplay(txn.amt, getEffectiveCurrency(txn), displayCurrency, fxRates);
 }
 
 export function sortMonths(months) {
@@ -49,32 +53,35 @@ export function isTransferLikeTransaction(txn) {
   return txn.cat === 'Transfers' || txn.cat === 'Savings';
 }
 
-export function getMonthlyIncome(transactions, month) {
+export function getMonthlyIncome(transactions, month, options = {}) {
+  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
   return transactions
     .filter((txn) => txn.ym === month && isIncomeTransaction(txn))
-    .reduce((sum, txn) => sum + txn.amt, 0);
+    .reduce((sum, txn) => sum + convertTxnAmount(txn, displayCurrency, fxRates), 0);
 }
 
-export function getMonthlyExpense(transactions, month) {
+export function getMonthlyExpense(transactions, month, options = {}) {
+  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
   const monthTransactions = transactions.filter((txn) => txn.ym === month);
   const expenses = monthTransactions
     .filter(isExpenseTransaction)
-    .reduce((sum, txn) => sum + Math.abs(txn.amt), 0);
+    .reduce((sum, txn) => sum + Math.abs(convertTxnAmount(txn, displayCurrency, fxRates)), 0);
   const refunds = monthTransactions
     .filter(isRefundTransaction)
-    .reduce((sum, txn) => sum + Math.abs(txn.amt), 0);
+    .reduce((sum, txn) => sum + Math.abs(convertTxnAmount(txn, displayCurrency, fxRates)), 0);
   return Math.max(0, expenses - refunds);
 }
 
-export function getMonthlySummary(transactions) {
+export function getMonthlySummary(transactions, options = {}) {
   return getUniqueMonths(transactions).map((month) => {
-    const inc = getMonthlyIncome(transactions, month);
-    const exp = getMonthlyExpense(transactions, month);
+    const inc = getMonthlyIncome(transactions, month, options);
+    const exp = getMonthlyExpense(transactions, month, options);
     return { month, inc, exp, net: inc - exp };
   });
 }
 
-export function getDailySpend(transactions, month) {
+export function getDailySpend(transactions, month, options = {}) {
+  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
   const monthTxns = transactions.filter((txn) => txn.ym === month);
   const [year, monthNumber] = month.split('-').map(Number);
   const daysInMonth = new Date(year, monthNumber, 0).getDate();
@@ -90,9 +97,10 @@ export function getDailySpend(transactions, month) {
   monthTxns.forEach((txn) => {
     const bucket = byDate[txn.date];
     if (!bucket) return;
-    if (isExpenseTransaction(txn)) bucket.spend += Math.abs(txn.amt);
-    if (isIncomeTransaction(txn)) bucket.income += txn.amt;
-    if (isRefundTransaction(txn)) bucket.refunds += Math.abs(txn.amt);
+    const convertedAmount = convertTxnAmount(txn, displayCurrency, fxRates);
+    if (isExpenseTransaction(txn)) bucket.spend += Math.abs(convertedAmount);
+    if (isIncomeTransaction(txn)) bucket.income += convertedAmount;
+    if (isRefundTransaction(txn)) bucket.refunds += Math.abs(convertedAmount);
   });
 
   return daily.map((entry) => ({
@@ -101,37 +109,45 @@ export function getDailySpend(transactions, month) {
   }));
 }
 
-export function getCategoryTotals(transactions, month = null) {
+export function getCategoryTotals(transactions, month = null, options = {}) {
+  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
   return transactions
     .filter((txn) => (month ? txn.ym === month : true))
     .reduce((totals, txn) => {
       if (isExpenseTransaction(txn)) {
-        totals[txn.cat] = (totals[txn.cat] || 0) + Math.abs(txn.amt);
+        totals[txn.cat] = (totals[txn.cat] || 0) + Math.abs(convertTxnAmount(txn, displayCurrency, fxRates));
       }
       if (isRefundTransaction(txn)) {
-        totals[REFUND_CATEGORY] = (totals[REFUND_CATEGORY] || 0) + Math.abs(txn.amt);
+        totals[REFUND_CATEGORY] = (totals[REFUND_CATEGORY] || 0) + Math.abs(convertTxnAmount(txn, displayCurrency, fxRates));
       }
       return totals;
     }, {});
 }
 
-export function getVendorTotals(transactions, month = null) {
+export function getVendorTotals(transactions, month = null, options = {}) {
+  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
   return transactions
     .filter((txn) => (month ? txn.ym === month : true))
     .reduce((vendors, txn) => {
       if (!isExpenseTransaction(txn)) return vendors;
       if (!vendors[txn.desc]) vendors[txn.desc] = { total: 0, count: 0, cat: txn.cat };
-      vendors[txn.desc].total += Math.abs(txn.amt);
+      vendors[txn.desc].total += Math.abs(convertTxnAmount(txn, displayCurrency, fxRates));
       vendors[txn.desc].count += 1;
       return vendors;
     }, {});
 }
 
-export function getAccountTotalsByMonth(accounts) {
+export function getAccountCurrency(account) {
+  return account?.currency || BASE_CURRENCY;
+}
+
+export function getAccountTotalsByMonth(accounts, options = {}) {
+  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
   const monthTotals = {};
   accounts.forEach((account) => {
+    const accountCurrency = getAccountCurrency(account);
     Object.entries(account.balances).forEach(([month, balance]) => {
-      monthTotals[month] = (monthTotals[month] || 0) + balance;
+      monthTotals[month] = (monthTotals[month] || 0) + convertAmountToDisplay(balance, accountCurrency, displayCurrency, fxRates);
     });
   });
 
@@ -141,25 +157,35 @@ export function getAccountTotalsByMonth(accounts) {
   }));
 }
 
-export function getLatestAccountTotal(accounts) {
-  const totals = getAccountTotalsByMonth(accounts);
+export function getLatestAccountTotal(accounts, options = {}) {
+  const totals = getAccountTotalsByMonth(accounts, options);
   return totals.at(-1)?.total || 0;
 }
 
-export function getBudgetEntries(budgetsByMonth, month, transactions) {
+export function getTotalAccountContributions(accounts, options = {}) {
+  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
+  return accounts.reduce(
+    (sum, account) => sum + convertAmountToDisplay(account.monthlyContribution || 0, getAccountCurrency(account), displayCurrency, fxRates),
+    0
+  );
+}
+
+export function getBudgetEntries(budgetsByMonth, month, transactions, options = {}) {
+  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
   const monthBudgets = budgetsByMonth[month] || {};
-  const categorySpend = getCategoryTotals(transactions, month);
+  const categorySpend = getCategoryTotals(transactions, month, options);
   return Object.entries(monthBudgets).map(([cat, budgeted]) => {
+    const convertedBudget = convertAmountToDisplay(budgeted, BASE_CURRENCY, displayCurrency, fxRates);
     const spent = categorySpend[cat] || 0;
-    const remaining = budgeted - spent;
-    const pct = budgeted > 0 ? Math.min((spent / budgeted) * 100, 100) : 0;
+    const remaining = convertedBudget - spent;
+    const pct = convertedBudget > 0 ? Math.min((spent / convertedBudget) * 100, 100) : 0;
     return {
       cat,
-      budgeted,
+      budgeted: convertedBudget,
       spent,
       remaining,
       pct,
-      over: spent > budgeted,
+      over: spent > convertedBudget,
     };
   });
 }

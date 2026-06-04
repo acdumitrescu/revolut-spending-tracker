@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   getAccountTotalsByMonth,
+  getAccountCurrency,
   getBudgetEntries,
   getCurrencySummary,
   getDailySpend,
@@ -8,6 +9,7 @@ import {
   getMonthlyExpense,
   getMonthlyIncome,
   getMonthlySummary,
+  getTotalAccountContributions,
 } from '../lib/selectors';
 
 const transactions = [
@@ -44,13 +46,35 @@ describe('selectors', () => {
 
   it('aggregates account balances by month', () => {
     const balances = getAccountTotalsByMonth([
-      { id: '1', name: 'A', balances: { '2024-01': 1000, '2024-02': 1200 }, monthlyContribution: 100 },
-      { id: '2', name: 'B', balances: { '2024-02': 400 }, monthlyContribution: 50 },
+      { id: '1', name: 'A', currency: 'RON', balances: { '2024-01': 1000, '2024-02': 1200 }, monthlyContribution: 100 },
+      { id: '2', name: 'B', currency: 'RON', balances: { '2024-02': 400 }, monthlyContribution: 50 },
     ]);
     expect(balances).toEqual([
       { month: '2024-01', total: 1000 },
       { month: '2024-02', total: 1600 },
     ]);
+  });
+
+  it('converts multicurrency account balances into the selected display currency', () => {
+    const balances = getAccountTotalsByMonth([
+      { id: '1', name: 'RON Savings', currency: 'RON', balances: { '2024-02': 1000 }, monthlyContribution: 0 },
+      { id: '2', name: 'EUR Vault', currency: 'EUR', balances: { '2024-02': 100 }, monthlyContribution: 0 },
+    ], { displayCurrency: 'RON', fxRates: { EUR: 5, USD: 4.6 } });
+    expect(balances).toEqual([
+      { month: '2024-02', total: 1500 },
+    ]);
+  });
+
+  it('converts multicurrency account contributions through shared helpers', () => {
+    const total = getTotalAccountContributions([
+      { id: '1', name: 'USD Savings', currency: 'USD', balances: {}, monthlyContribution: 10 },
+      { id: '2', name: 'RON Savings', currency: 'RON', balances: {}, monthlyContribution: 100 },
+    ], { displayCurrency: 'RON', fxRates: { EUR: 5, USD: 4 } });
+    expect(total).toBe(140);
+  });
+
+  it('defaults missing account currency to RON', () => {
+    expect(getAccountCurrency({ name: 'Legacy', balances: {} })).toBe('RON');
   });
 
   it('builds month-aware budget entries', () => {
@@ -72,5 +96,31 @@ describe('selectors', () => {
     ]);
     expect(summary.hasMixedCurrencies).toBe(true);
     expect(summary.currencies).toEqual(['EUR', 'RON']);
+  });
+
+  it('converts transaction summaries into the selected display currency', () => {
+    const mixedTransactions = [
+      { date: '2024-01-01', ym: '2024-01', desc: 'Salary', cat: 'Income', sub: 'Income', amt: 5000, flow: 'Credit', type: 'Bank Transfer', currency: 'RON' },
+      { date: '2024-01-02', ym: '2024-01', desc: 'Freelance', cat: 'Income', sub: 'Income', amt: 100, flow: 'Credit', type: 'Bank Transfer', currency: 'EUR' },
+      { date: '2024-01-03', ym: '2024-01', desc: 'Groceries', cat: 'Groceries', sub: 'Food', amt: -50, flow: 'Debit', type: 'Card Payment', currency: 'USD' },
+    ];
+    const summary = getMonthlySummary(mixedTransactions, { displayCurrency: 'RON', fxRates: { EUR: 5, USD: 4 } });
+    expect(summary).toEqual([
+      { month: '2024-01', inc: 5500, exp: 200, net: 5300 },
+    ]);
+  });
+
+  it('converts RON budgets into the selected display currency', () => {
+    const entries = getBudgetEntries(
+      { '2024-02': { Groceries: 500 } },
+      '2024-02',
+      transactions,
+      { displayCurrency: 'EUR', fxRates: { EUR: 5, USD: 4.6 } }
+    );
+    expect(entries[0]).toMatchObject({
+      budgeted: 100,
+      spent: 20,
+      remaining: 80,
+    });
   });
 });

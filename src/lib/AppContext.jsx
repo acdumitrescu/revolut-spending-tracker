@@ -2,10 +2,12 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { getCurrencySummary } from './selectors';
 import { sanitizeAppData } from './validation';
+import { BASE_CURRENCY, DEFAULT_FX_RATES, normalizeFxRates, SUPPORTED_DISPLAY_CURRENCIES } from './fx';
 
 const AppContext = createContext(null);
 
 const LS_KEY = 'simple_safe_banking_data';
+const FX_API_URL = 'https://api.frankfurter.dev/v2/rates?base=RON&quotes=EUR,USD';
 
 const initialState = {
   transactions: [],
@@ -13,9 +15,28 @@ const initialState = {
   accounts: [],
   budgets: {},
   goals: [],
-  displayCurrency: 'RON',
+  baseCurrency: BASE_CURRENCY,
+  displayCurrency: BASE_CURRENCY,
+  fxRates: DEFAULT_FX_RATES,
+  fxUpdatedAt: null,
+  fxSource: 'manual-default',
   lastUpdated: null,
 };
+
+async function fetchLatestFxRates() {
+  const response = await fetch(FX_API_URL);
+  if (!response.ok) {
+    throw new Error(`FX refresh failed with status ${response.status}`);
+  }
+
+  const payload = await response.json();
+  const nextRates = normalizeFxRates(payload?.rates);
+  return {
+    fxRates: nextRates,
+    fxUpdatedAt: Date.now(),
+    fxSource: 'Frankfurter',
+  };
+}
 
 export function AppProvider({ children }) {
   const [data, setData] = useState(() => {
@@ -42,6 +63,11 @@ export function AppProvider({ children }) {
 
   const updateTimestamp = (prev) => ({ ...prev, lastUpdated: Date.now() });
   const currencySummary = getCurrencySummary(data.transactions);
+  const fxStatus = {
+    source: data.fxSource || 'manual-default',
+    updatedAt: data.fxUpdatedAt,
+    hasManualRates: Boolean(data.fxRates?.EUR && data.fxRates?.USD),
+  };
 
   const addTransactions = (newTxns) => {
     setData((prev) => updateTimestamp({
@@ -71,13 +97,25 @@ export function AppProvider({ children }) {
     });
   };
 
-  const addAccount = (name, monthlyContribution = 0) => {
+  const addAccount = (name, currency = BASE_CURRENCY, monthlyContribution = 0) => {
     setData((prev) => updateTimestamp({
       ...prev,
       accounts: [
         ...prev.accounts,
-        { id: Date.now().toString(), name, balances: {}, monthlyContribution: Number(monthlyContribution) || 0 },
+        { id: Date.now().toString(), name, currency, balances: {}, monthlyContribution: Number(monthlyContribution) || 0 },
       ],
+    }));
+  };
+
+  const updateAccountCurrency = (accountId, currency) => {
+    if (!SUPPORTED_DISPLAY_CURRENCIES.includes(currency)) return;
+    setData((prev) => updateTimestamp({
+      ...prev,
+      accounts: prev.accounts.map((acc) =>
+        acc.id === accountId
+          ? { ...acc, currency }
+          : acc
+      ),
     }));
   };
 
@@ -156,15 +194,60 @@ export function AppProvider({ children }) {
   };
 
   const setDisplayCurrency = (currency) => {
-    setData((prev) => updateTimestamp({
+    if (!SUPPORTED_DISPLAY_CURRENCIES.includes(currency)) return;
+    setData((prev) => ({
       ...prev,
       displayCurrency: currency,
     }));
   };
 
+  const setFxRates = (rates, source = 'manual') => {
+    setData((prev) => ({
+      ...prev,
+      fxRates: normalizeFxRates({
+        ...prev.fxRates,
+        ...rates,
+      }),
+      fxUpdatedAt: Date.now(),
+      fxSource: source,
+    }));
+  };
+
+  const refreshFxRates = async () => {
+    const nextFxState = await fetchLatestFxRates();
+    setData((prev) => ({
+      ...prev,
+      ...nextFxState,
+    }));
+    return nextFxState;
+  };
+
   const clearData = () => {
     setData({ ...initialState, lastUpdated: Date.now() });
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshOnLoad() {
+      try {
+        const nextFxState = await fetchLatestFxRates();
+        if (cancelled) return;
+        setData((prev) => ({
+          ...prev,
+          ...nextFxState,
+        }));
+      } catch (error) {
+        console.warn('Failed to refresh FX rates on load', error);
+      }
+    }
+
+    void refreshOnLoad();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <AppContext.Provider
@@ -174,6 +257,7 @@ export function AppProvider({ children }) {
         updateCustomVendor,
         removeCustomVendor,
         addAccount,
+        updateAccountCurrency,
         updateAccountBalance,
         updateAccountContribution,
         removeAccount,
@@ -183,7 +267,10 @@ export function AppProvider({ children }) {
         removeGoal,
         importBackup,
         setDisplayCurrency,
+        setFxRates,
+        refreshFxRates,
         currencySummary,
+        fxStatus,
         clearData,
       }}
     >

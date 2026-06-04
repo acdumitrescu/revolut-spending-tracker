@@ -1,5 +1,6 @@
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency, getColorForCategory } from '../lib/utils';
+import { BASE_CURRENCY, convertAmountToDisplay } from '../lib/fx';
 import { detectRecurringTransactions } from '../lib/recurring';
 import { getCategoryTotals, getLatestAccountTotal, getMonthlySummary, getVendorTotals } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
@@ -9,8 +10,10 @@ export default function Overview() {
   const { data, currencySummary } = useAppContext();
   const txns = data.transactions;
   const recurring = detectRecurringTransactions(txns).slice(0, 3);
-  const latestSavings = getLatestAccountTotal(data.accounts);
   const displayCurrency = data.displayCurrency;
+  const selectorOptions = { displayCurrency, fxRates: data.fxRates };
+  const latestSavings = getLatestAccountTotal(data.accounts, selectorOptions);
+  const latestSavingsBase = getLatestAccountTotal(data.accounts, { displayCurrency: BASE_CURRENCY, fxRates: data.fxRates });
 
   if (txns.length === 0) return (
     <div className="empty-state">
@@ -20,7 +23,7 @@ export default function Overview() {
     </div>
   );
 
-  const monthlySummary = getMonthlySummary(txns);
+  const monthlySummary = getMonthlySummary(txns, selectorOptions);
   const inc = monthlySummary.reduce((sum, month) => sum + month.inc, 0);
   const exp = monthlySummary.reduce((sum, month) => sum + month.exp, 0);
   const net = inc - exp;
@@ -93,7 +96,7 @@ export default function Overview() {
   };
 
   // Pie Chart
-  const catTotals = getCategoryTotals(txns);
+  const catTotals = getCategoryTotals(txns, null, selectorOptions);
   const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 10);
   const pieData = {
     labels: sortedCats.map(c => c[0]),
@@ -107,7 +110,7 @@ export default function Overview() {
   };
 
   // Top Vendors Chart
-  const vendors = getVendorTotals(txns);
+  const vendors = getVendorTotals(txns, null, selectorOptions);
   const sortedVendors = Object.entries(vendors).sort((a, b) => b[1].total - a[1].total).slice(0, 10);
   const vendorChartData = {
     labels: sortedVendors.map(v => v[0]),
@@ -130,8 +133,6 @@ export default function Overview() {
           <MixedCurrencyNotice currencies={currencySummary.currencies} />
         </div>
       )}
-      {!currencySummary.hasMixedCurrencies && (
-        <>
       <div className="kpi-grid">
         <div className="kpi green"><div className="lbl">Total Income</div><div className="val">{formatCurrency(inc, displayCurrency)}</div></div>
         <div className="kpi red"><div className="lbl">Total Expenses</div><div className="val">{formatCurrency(exp, displayCurrency)}</div></div>
@@ -168,8 +169,6 @@ export default function Overview() {
           <ChartWrapper type="bar" data={vendorChartData} height={280} horizontal showLegend={false} currency={displayCurrency} />
         </div>
       </div>
-        </>
-      )}
 
       <div className="grid2">
         <div className="card">
@@ -179,12 +178,13 @@ export default function Overview() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {data.goals.slice(0, 3).map((goal) => {
-                const pct = Math.min((latestSavings / goal.targetAmount) * 100, 100);
+                const convertedGoalTarget = convertAmountToDisplay(goal.targetAmount, BASE_CURRENCY, displayCurrency, data.fxRates);
+                const pct = Math.min((latestSavingsBase / goal.targetAmount) * 100, 100);
                 return (
                   <div key={goal.id}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                       <strong>{goal.name}</strong>
-                      <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{formatCurrency(latestSavings, displayCurrency)} / {formatCurrency(goal.targetAmount, displayCurrency)}</span>
+                      <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{formatCurrency(latestSavings, displayCurrency)} / {formatCurrency(convertedGoalTarget, displayCurrency)}</span>
                     </div>
                     <div style={{ height: '8px', background: 'var(--surface3)', borderRadius: '999px', overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: 'var(--accent)' }} />
@@ -208,7 +208,7 @@ export default function Overview() {
                     <div style={{ fontSize: '12px', color: 'var(--muted)' }}>Every ~{bill.avgInterval} days</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 600 }}>{formatCurrency(bill.amount, bill.currency === 'N/A' ? displayCurrency : bill.currency)}</div>
+                    <div style={{ fontWeight: 600 }}>{formatCurrency(convertAmountToDisplay(bill.amount, bill.currency === 'N/A' ? 'RON' : bill.currency, displayCurrency, data.fxRates), displayCurrency)}</div>
                     <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{bill.nextExpectedDate} · {bill.currency}</div>
                   </div>
                 </div>

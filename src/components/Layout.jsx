@@ -1,19 +1,25 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, FolderTree, Store, List, Wallet, Upload, Download, Trash2, TrendingUp, PiggyBank, Flame, Target, Repeat, DatabaseBackup } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, FolderTree, Store, List, Wallet, Upload, Download, Trash2, TrendingUp, PiggyBank, Flame, Target, Repeat, DatabaseBackup, RefreshCw, Settings2, Save } from 'lucide-react';
 import ExcelJS from 'exceljs';
 import { parseCSV, mergeTransactions } from '../lib/csvParser';
 import { useAppContext } from '../lib/AppContext';
+import { BASE_CURRENCY } from '../lib/fx';
 import { SUPPORTED_DISPLAY_CURRENCIES } from '../lib/utils';
 import { useToast } from './Toast';
 import { FreshnessIndicator } from './FreshnessIndicator';
 import MixedCurrencyNotice from './MixedCurrencyNotice';
 
 export default function Layout() {
-  const { data, addTransactions, importBackup, clearData, setDisplayCurrency, currencySummary } = useAppContext();
+  const { data, addTransactions, importBackup, clearData, setDisplayCurrency, setFxRates, refreshFxRates, currencySummary } = useAppContext();
   const toast = useToast();
   const csvInputRef = useRef(null);
   const jsonInputRef = useRef(null);
+  const [showFxPanel, setShowFxPanel] = useState(false);
+  const [manualRates, setManualRates] = useState({
+    EUR: String(data.fxRates?.EUR || ''),
+    USD: String(data.fxRates?.USD || ''),
+  });
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -99,12 +105,14 @@ export default function Layout() {
       const accountMonths = [...new Set(data.accounts.flatMap((acc) => Object.keys(acc.balances)))].sort();
       accountsSheet.columns = [
         { header: 'Account', key: 'name', width: 24 },
+        { header: 'Currency', key: 'currency', width: 12 },
         { header: 'MonthlyContribution', key: 'monthlyContribution', width: 18 },
         ...accountMonths.map((month) => ({ header: month, key: month, width: 14 })),
       ];
       data.accounts.forEach((acc) => {
         accountsSheet.addRow({
           name: acc.name,
+          currency: acc.currency || BASE_CURRENCY,
           monthlyContribution: acc.monthlyContribution,
           ...acc.balances,
         });
@@ -119,6 +127,20 @@ export default function Layout() {
       Object.entries(data.customVendors).forEach(([vendor, [category, subcategory]]) => {
         vendorSheet.addRow({ vendor, category, subcategory });
       });
+
+      const settingsSheet = workbook.addWorksheet('Settings');
+      settingsSheet.columns = [
+        { header: 'Key', key: 'key', width: 20 },
+        { header: 'Value', key: 'value', width: 26 },
+      ];
+      settingsSheet.addRows([
+        { key: 'BaseCurrency', value: data.baseCurrency },
+        { key: 'DisplayCurrency', value: data.displayCurrency },
+        { key: 'RonPerEur', value: data.fxRates?.EUR },
+        { key: 'RonPerUsd', value: data.fxRates?.USD },
+        { key: 'FxUpdatedAt', value: data.fxUpdatedAt ? new Date(data.fxUpdatedAt).toISOString() : '' },
+        { key: 'FxSource', value: data.fxSource || '' },
+      ]);
 
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
@@ -137,6 +159,39 @@ export default function Layout() {
       toast.error('Unable to export Excel workbook.');
     }
   };
+
+  const handleSaveRates = () => {
+    const nextRates = {
+      EUR: Number(manualRates.EUR),
+      USD: Number(manualRates.USD),
+    };
+
+    if (!Number.isFinite(nextRates.EUR) || nextRates.EUR <= 0 || !Number.isFinite(nextRates.USD) || nextRates.USD <= 0) {
+      toast.error('Enter valid positive EUR and USD rates.');
+      return;
+    }
+
+    setFxRates(nextRates, 'manual');
+    toast.success('FX rates saved locally.');
+  };
+
+  const handleRefreshRates = async () => {
+    try {
+      const refreshed = await refreshFxRates();
+      setManualRates({
+        EUR: String(refreshed.fxRates.EUR),
+        USD: String(refreshed.fxRates.USD),
+      });
+      toast.success('FX rates refreshed from Frankfurter.');
+    } catch (error) {
+      console.error(error);
+      toast.warning('Could not refresh FX rates. Keeping your saved local values.');
+    }
+  };
+
+  const fxUpdatedLabel = data.fxUpdatedAt
+    ? new Date(data.fxUpdatedAt).toLocaleString()
+    : 'Not refreshed yet';
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
@@ -219,7 +274,11 @@ export default function Layout() {
 
       {/* Main Content */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ height: '60px', borderBottom: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', padding: '0 24px' }}>
+        <div style={{ minHeight: '60px', borderBottom: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '10px 24px' }}>
+          <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
+              Base currency: <strong style={{ color: 'var(--text)' }}>{BASE_CURRENCY}</strong>
+            </div>
           <div style={{ fontSize: '12px', color: 'var(--muted)', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <select
               className="input"
@@ -231,8 +290,73 @@ export default function Layout() {
                 <option key={currency} value={currency}>{currency}</option>
               ))}
             </select>
+            <button
+              className="btn"
+              onClick={() => {
+                setManualRates({
+                  EUR: String(data.fxRates?.EUR || ''),
+                  USD: String(data.fxRates?.USD || ''),
+                });
+                setShowFxPanel((current) => !current);
+              }}
+              style={{ fontSize: '12px' }}
+            >
+              <Settings2 size={14} /> FX Rates
+            </button>
             <FreshnessIndicator />
           </div>
+        </div>
+          {showFxPanel && (
+            <div style={{ width: '100%', marginTop: '12px', padding: '14px 16px', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--bg)', display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'flex-end' }}>
+              <div style={{ minWidth: '180px' }}>
+                <div style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Latest saved rates</div>
+                <div style={{ fontSize: '12px', color: 'var(--text)', marginTop: '6px', lineHeight: 1.5 }}>
+                  <div>1 EUR = {Number(data.fxRates?.EUR || 0).toFixed(4)} RON</div>
+                  <div>1 USD = {Number(data.fxRates?.USD || 0).toFixed(4)} RON</div>
+                </div>
+              </div>
+              <div style={{ minWidth: '190px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.5 }}>
+                <div>Source: {data.fxSource || 'manual-default'}</div>
+                <div>Updated: {fxUpdatedLabel}</div>
+                <div style={{ color: data.fxUpdatedAt ? 'var(--muted)' : 'var(--amber)' }}>
+                  {data.fxUpdatedAt ? 'Using the latest saved rate snapshot.' : 'Rates are still using local defaults until you refresh or edit them.'}
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>RON per EUR</label>
+                <input
+                  className="input"
+                  type="number"
+                  step="0.0001"
+                  value={manualRates.EUR}
+                  onChange={(e) => setManualRates((prev) => ({ ...prev, EUR: e.target.value }))}
+                  style={{ minWidth: '120px' }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>RON per USD</label>
+                <input
+                  className="input"
+                  type="number"
+                  step="0.0001"
+                  value={manualRates.USD}
+                  onChange={(e) => setManualRates((prev) => ({ ...prev, USD: e.target.value }))}
+                  style={{ minWidth: '120px' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                <button className="btn" onClick={handleRefreshRates} style={{ fontSize: '12px' }}>
+                  <RefreshCw size={14} /> Refresh
+                </button>
+                <button className="btn btn-primary" onClick={handleSaveRates} style={{ fontSize: '12px' }}>
+                  <Save size={14} /> Save Rates
+                </button>
+              </div>
+              <div style={{ width: '100%', fontSize: '12px', color: 'var(--muted)' }}>
+                Stored balances, budgets, goals, and forecast inputs remain in RON. The selector only changes the displayed equivalent values using your latest saved rates.
+              </div>
+            </div>
+          )}
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           {currencySummary.hasMixedCurrencies && (

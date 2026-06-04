@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency, getColorForCategory } from '../lib/utils';
+import { convertAmountToDisplay } from '../lib/fx';
 import { txKey } from '../lib/csvParser';
 
 export default function Transactions() {
@@ -57,7 +58,7 @@ export default function Transactions() {
                   <td><span style={{ color: getColorForCategory(t.cat), fontWeight: 600, fontSize: '11px' }}>{t.cat}</span></td>
                   <td style={{ color: 'var(--muted)' }}>{t.currency || 'N/A'}</td>
                   <td style={{ textAlign: 'right', color: t.flow === 'Credit' ? 'var(--green)' : 'var(--red)' }}>
-                    {t.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(t.amt), displayCurrency)}
+                    {t.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(convertAmountToDisplay(t.amt, t.currency || 'RON', displayCurrency, data.fxRates)), displayCurrency)}
                   </td>
                   <td><span className={`badge ${t.flow}`}>{t.flow}</span></td>
                 </tr>

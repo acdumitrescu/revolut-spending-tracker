@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { formatCurrency, formatCurrencyK, formatPercentage, CAT_COLORS, EXPENSE_CATS, getColorForCategory } from '../lib/utils';
+import { convertAmount, convertAmountToDisplay, getEffectiveCurrency } from '../lib/fx';
 
 describe('formatCurrency', () => {
   it('formats positive numbers as RON currency', () => {
@@ -79,5 +80,24 @@ describe('getColorForCategory', () => {
   it('returns a default color for unknown categories', () => {
     const color = getColorForCategory('UnknownCategory');
     expect(color).toBe('#64748B');
+  });
+});
+
+describe('fx helpers', () => {
+  it('converts RON to EUR through the shared rates table', () => {
+    expect(convertAmount(500, 'RON', 'EUR', { EUR: 5, USD: 4.6 })).toBe(100);
+  });
+
+  it('converts EUR to USD through RON', () => {
+    expect(convertAmount(10, 'EUR', 'USD', { EUR: 5, USD: 4 })).toBe(12.5);
+  });
+
+  it('defaults missing transaction currency to RON', () => {
+    expect(getEffectiveCurrency({ amt: 10 })).toBe('RON');
+  });
+
+  it('formats converted display amounts', () => {
+    const result = formatCurrency(convertAmountToDisplay(500, 'RON', 'EUR', { EUR: 5, USD: 4.6 }), 'EUR');
+    expect(result).toContain('100');
   });
 });

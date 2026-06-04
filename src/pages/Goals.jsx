@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
+import { BASE_CURRENCY, convertAmountToDisplay } from '../lib/fx';
 import { getLatestAccountTotal } from '../lib/selectors';
 
 export default function Goals() {
@@ -11,7 +12,8 @@ export default function Goals() {
   const [targetAmount, setTargetAmount] = useState('');
   const [targetMonth, setTargetMonth] = useState('');
 
-  const trackedSavings = getLatestAccountTotal(data.accounts);
+  const trackedSavings = getLatestAccountTotal(data.accounts, { displayCurrency, fxRates: data.fxRates });
+  const trackedSavingsBase = getLatestAccountTotal(data.accounts, { displayCurrency: BASE_CURRENCY, fxRates: data.fxRates });
 
   const handleAddGoal = () => {
     const amount = Number(targetAmount);
@@ -42,12 +44,12 @@ export default function Goals() {
         <div className="card-title">Create Goal</div>
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '8px' }}>
           <input className="input" placeholder="Emergency fund, travel, taxes..." value={name} onChange={(e) => setName(e.target.value)} />
-          <input className="input" type="number" placeholder="Target amount" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} />
+          <input className="input" type="number" placeholder="Target amount in RON" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} />
           <input className="input" type="month" value={targetMonth} onChange={(e) => setTargetMonth(e.target.value)} />
           <button className="btn btn-primary" onClick={handleAddGoal}><Plus size={16} /> Add</button>
         </div>
         <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '10px' }}>
-          Goal progress is based on your explicitly entered account balances, not estimated cashflow.
+          Goal targets are stored in RON. Progress is based on your explicitly entered account balances, then converted for display.
         </div>
       </div>
 
@@ -62,7 +64,8 @@ export default function Goals() {
           </div>
         ) : (
           data.goals.map((goal) => {
-            const progress = Math.min((trackedSavings / goal.targetAmount) * 100, 100);
+            const convertedTargetAmount = convertAmountToDisplay(goal.targetAmount, BASE_CURRENCY, displayCurrency, data.fxRates);
+            const progress = Math.min((trackedSavingsBase / goal.targetAmount) * 100, 100);
             const circumference = 2 * Math.PI * 42;
             const offset = circumference * (1 - progress / 100);
             return (
@@ -71,7 +74,7 @@ export default function Goals() {
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '18px' }}>{goal.name}</div>
                     <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                      Target: {formatCurrency(goal.targetAmount, displayCurrency)}{goal.targetMonth ? ` by ${goal.targetMonth}` : ''}
+                      Target: {formatCurrency(convertedTargetAmount, displayCurrency)}{goal.targetMonth ? ` by ${goal.targetMonth}` : ''}
                     </div>
                   </div>
                   <button className="btn" onClick={() => removeGoal(goal.id)} style={{ padding: '4px 8px', color: 'var(--red)', borderColor: 'transparent' }}>
@@ -105,7 +108,7 @@ export default function Goals() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginTop: '8px' }}>
                   <span>Remaining</span>
-                  <strong>{formatCurrency(Math.max(goal.targetAmount - trackedSavings, 0), displayCurrency)}</strong>
+                  <strong>{formatCurrency(Math.max(convertedTargetAmount - trackedSavings, 0), displayCurrency)}</strong>
                 </div>
               </div>
             );

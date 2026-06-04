@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
+import { convertAmountToDisplay } from '../lib/fx';
 import { getDailySpend, getUniqueMonths } from '../lib/selectors';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
@@ -23,6 +24,7 @@ export default function Heatmap() {
   const { data, currencySummary } = useAppContext();
   const txns = data.transactions;
   const displayCurrency = data.displayCurrency;
+  const selectorOptions = { displayCurrency, fxRates: data.fxRates };
   const [windowIndex, setWindowIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -39,7 +41,7 @@ export default function Heatmap() {
   const visibleMonths = monthWindows[safeWindowIndex] || [];
 
   const monthCards = visibleMonths.map((month) => {
-    const days = getDailySpend(txns, month);
+    const days = getDailySpend(txns, month, selectorOptions);
     const maxSpend = Math.max(...days.map((day) => day.spendNet), 0);
     return {
       month,
@@ -73,15 +75,6 @@ export default function Heatmap() {
     );
   }
 
-  if (currencySummary.hasMixedCurrencies) {
-    return (
-      <div>
-        <h2 style={{ marginBottom: '20px' }}>Spending Heatmap</h2>
-        <MixedCurrencyNotice currencies={currencySummary.currencies} />
-      </div>
-    );
-  }
-
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
@@ -101,6 +94,11 @@ export default function Heatmap() {
           </button>
         </div>
       </div>
+      {currencySummary.hasMixedCurrencies && (
+        <div style={{ marginBottom: '20px' }}>
+          <MixedCurrencyNotice currencies={currencySummary.currencies} />
+        </div>
+      )}
 
       <div className="kpi-grid" style={{ marginBottom: '20px' }}>
         <div className="kpi red">
@@ -179,7 +177,7 @@ export default function Heatmap() {
                       <td>{txn.desc}</td>
                       <td>{txn.cat}</td>
                       <td style={{ textAlign: 'right', color: txn.flow === 'Credit' ? 'var(--green)' : 'var(--red)' }}>
-                        {txn.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(txn.amt), displayCurrency)}
+                        {txn.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(convertAmountToDisplay(txn.amt, txn.currency || 'RON', displayCurrency, data.fxRates)), displayCurrency)}
                       </td>
                     </tr>
                   ))}

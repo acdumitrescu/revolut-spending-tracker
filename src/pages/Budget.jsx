@@ -10,6 +10,7 @@ export default function Budget() {
   const txns = data.transactions;
   const budgets = data.budgets || {};
   const displayCurrency = data.displayCurrency;
+  const selectorOptions = { displayCurrency, fxRates: data.fxRates };
 
   const [newCat, setNewCat] = useState('');
   const [newAmount, setNewAmount] = useState('');
@@ -21,7 +22,7 @@ export default function Budget() {
   const latestMonth = allBudgetMonths.at(-1) || new Date().toISOString().slice(0, 7);
   const effectiveMonth = selectedMonth && allBudgetMonths.includes(selectedMonth) ? selectedMonth : latestMonth;
 
-  const budgetEntries = getBudgetEntries(budgets, effectiveMonth, txns);
+  const budgetEntries = getBudgetEntries(budgets, effectiveMonth, txns, selectorOptions);
 
   const totalBudgeted = budgetEntries.reduce((s, b) => s + b.budgeted, 0);
   const totalSpent = budgetEntries.reduce((s, b) => s + b.spent, 0);
@@ -63,18 +64,14 @@ export default function Budget() {
     );
   }
 
-  if (currencySummary.hasMixedCurrencies) {
-    return (
-      <div>
-        <h2 style={{ marginBottom: '20px' }}>Monthly Budget</h2>
-        <MixedCurrencyNotice currencies={currencySummary.currencies} />
-      </div>
-    );
-  }
-
   return (
     <div>
       <h2 style={{ marginBottom: '20px' }}>Monthly Budget</h2>
+      {currencySummary.hasMixedCurrencies && (
+        <div style={{ marginBottom: '20px' }}>
+          <MixedCurrencyNotice currencies={currencySummary.currencies} />
+        </div>
+      )}
       <div className="card" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
         <div>
           <div style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Budget Month</div>
@@ -85,10 +82,10 @@ export default function Budget() {
             {!allBudgetMonths.includes(effectiveMonth) && <option value={effectiveMonth}>{effectiveMonth}</option>}
           </select>
         </div>
-        <div style={{ color: 'var(--muted)', fontSize: '12px' }}>
-          Budgets are saved per month so rollovers do not overwrite earlier plans.
+          <div style={{ color: 'var(--muted)', fontSize: '12px' }}>
+          Budgets are saved per month in RON so rollovers do not overwrite earlier plans.
+          </div>
         </div>
-      </div>
 
       {budgetEntries.length > 0 && (
         <div className="kpi-grid" style={{ marginBottom: '20px' }}>
@@ -142,7 +139,7 @@ export default function Budget() {
             )}
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>{`Monthly Limit (${displayCurrency})`}</label>
+            <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>Monthly Limit (stored in RON)</label>
             <input
               type="number"
               className="input"
