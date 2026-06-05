@@ -37,6 +37,7 @@ exports/
 imports/
 tmp-data/
 PRIVATE_NOTES.md
+REPORT-20*.md
 *.numbers
 *.qfx
 *.ofx
