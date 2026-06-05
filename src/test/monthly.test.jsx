@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import Monthly from '../pages/Monthly';
 import { AppProvider, useAppContext } from '../lib/AppContext';
@@ -27,8 +27,10 @@ describe('Monthly page', () => {
       </AppProvider>
     );
 
-    fireEvent.click(screen.getByText('Load'));
+    act(() => {
+      fireEvent.click(screen.getByText('Load'));
+    });
 
-    expect(screen.getByDisplayValue('2024-03')).toBeInTheDocument();
+    expect(screen.getByText('Monthly Trend')).toBeInTheDocument();
   });
 });

@@ -1,85 +1,145 @@
 # SimpleSafeBanking
 
-Local-first budgeting and expense tracking for people who use Revolut as their main spending card.
+Privacy-first, local-first expense tracking for people who use Revolut as their main spending card.
+
+SimpleSafeBanking turns Revolut CSV exports into a personal finance dashboard that stays on your machine. It is built for people who want a practical budgeting and spending tool without handing banking data to a SaaS backend.
 
 ![SimpleSafeBanking preview](./src/assets/hero.png)
 
-## What it does
+## Why this exists
 
-SimpleSafeBanking turns Revolut CSV exports into a private dashboard for:
+Most personal finance apps ask for account connections, cloud sync, or a full “all your money in one platform” commitment.
 
-- monthly income, spend, and trend tracking
-- category and vendor analysis
-- month-aware budgets
-- savings goals based on tracked account balances
-- recurring transaction detection for subscriptions and bills
-- multi-month daily spending heatmaps
-- JSON and XLSX backup/export
-- user-selectable display currency for single-currency datasets
+SimpleSafeBanking takes the opposite approach:
+
+- import your Revolut CSV
+- keep your data in the browser on your own device
+- track spending, budgets, vendors, savings, and trends
+- export your own backups whenever you want
+
+It is intentionally simple, private, and easy to fork or adapt.
 
 ## Who it is for
 
-This project is aimed at people who:
+This app is a strong fit if you:
 
-- spend mostly through Revolut
-- want a lightweight personal finance tool without a server
-- prefer keeping their banking exports on their own machine
-- want something easy to publish, fork, and adapt
+- use Revolut as your main spending card
+- want to understand spending patterns quickly
+- prefer local ownership over cloud sync
+- want a lightweight personal finance tool that can be published, forked, and extended
+
+## What makes it different
+
+- Local-first by default: no backend, no forced sync, no account-linking flow
+- Revolut-focused import workflow: optimized around CSV exports instead of open banking integrations
+- Privacy-oriented data model: your runtime data stays in browser storage unless you choose to export it
+- Multi-currency aware: supports FX-based display conversion and per-account currencies without changing the app’s local-first model
+
+## Feature highlights
+
+- Revolut CSV import with validation and dedupe
+- Monthly income and expense tracking
+- Category and vendor analysis
+- Multi-month daily spending heatmap
+- Month-aware budgets
+- Savings goals based on tracked balances
+- Recurring bill detection
+- Multi-currency account tracking
+- Display currency switching for `RON`, `EUR`, and `USD`
+- JSON backup/restore
+- Excel workbook export for spreadsheet review
+
+## How it works
+
+1. Export transactions from Revolut as CSV.
+2. Import the file into SimpleSafeBanking.
+3. Review monthly trends, vendors, categories, budgets, and recurring charges.
+4. Add tracked accounts, balances, and savings goals.
+5. Export JSON backups to keep your own private restore points.
 
 ## Privacy and local-first promise
 
 - No backend
 - No analytics
-- No third-party data sync
+- No forced account connection
+- No third-party sync requirement
 - Data is stored in browser `localStorage`
-- You can export a JSON backup anytime and restore it later
+- Backup and restore are controlled by the user
+
+For public vs private workflow guidance, see [docs/local-workflow.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/local-workflow.md).
 
 ## Supported imports
 
-The app currently supports:
+Current supported import paths:
 
-- raw Revolut CSV exports with columns like `Started Date`, `Completed Date`, `Description`, `Amount`, `Type`, and `Currency`
-- normalized/master CSV exports created by this app or manually cleaned to include `Date`, `Description`, `Category`, `Subcategory`, `Amount`, `Flow`, and `Type`
+- raw Revolut CSV exports
+- Revolut business transaction statement CSV exports
+- Revolut business expense CSV exports
+- normalized CSV files using the app’s cleaned transaction shape
+- app backup restore through JSON
 
-Import behavior:
+Current import behavior:
 
-- transactions are normalized before categorization
+- dates, amounts, flow, and currency are normalized before analytics
+- format detection is profile-based rather than one fixed CSV assumption
+- localized and expanded Revolut header sets are supported where known
 - vendor overrides are case-insensitive and punctuation-tolerant
-- longer vendor rules win over shorter ones
+- stronger and longer vendor rules win over broader ones
 - duplicate detection uses date, description, amount, type, flow, currency, and reference
-- malformed and zero-value rows are skipped with tracked reasons
-- mixed-currency datasets are detected and flagged; v1 does not perform FX conversion
+- malformed rows and zero-value rows are skipped with tracked reasons
+- source transaction currency is preserved where available
+- import summaries include detected profile, skip reasons, and warnings
 
-## Demo data
+## Currency support
 
-A synthetic sample file is included at [public/demo-revolut.csv](/Users/user/Desktop/IT/SimpleSafeBanking/public/demo-revolut.csv). It is safe to publish and useful for quick manual testing.
+- Base currency for app-managed calculations is `RON`
+- Supported display currencies are `RON`, `EUR`, and `USD`
+- Accounts can each have their own stored currency
+- FX conversion uses the latest saved rates, not historical transaction-day rates
+- Mixed-currency datasets are converted through saved FX rates while keeping source currency visible in transaction-level views
+
+## Screens
+
+- `Overview`: top KPIs, spending trends, category mix, vendors, savings snapshot, upcoming bills
+- `Monthly`: monthly bar trend or daily bar breakdown, with income/expense series filters
+- `Categories`: expense totals by category
+- `Vendors`: top merchants plus custom category mapping management
+- `Transactions`: searchable transaction history with source currency visibility
+- `Accounts`: tracked balances, per-account currency, and cashflow kept separate from implied net worth
+- `Budget`: month-aware budgets with progress and over-budget visibility
+- `Heatmap`: multi-month spending intensity with daily drilldown
+- `Forecast`: savings and expense planning based on tracked balances and current assumptions
+- `Goals`: savings targets based on entered balances
+- `Recurring`: repeating charges and bill estimates
+
+## Demo data and screenshots
+
+- Public demo CSV: [public/demo-revolut.csv](/Users/user/Desktop/IT/SimpleSafeBanking/public/demo-revolut.csv)
+- Current preview image: [src/assets/hero.png](/Users/user/Desktop/IT/SimpleSafeBanking/src/assets/hero.png)
+
+Recommended future screenshot set for GitHub:
+
+- import flow
+- overview dashboard
+- monthly analysis
+- accounts + FX settings
+- backup/export flow
 
 ## Backup flow
 
 Use the sidebar to:
 
 - import a Revolut CSV
-- export a JSON backup for personal restore
-- export XLSX for spreadsheet review
-- restore a previous JSON backup
+- restore a JSON backup
+- export a JSON backup
+- export an Excel workbook
 
 Recommended personal workflow:
 
-1. Import your newest Revolut CSV.
-2. Adjust custom vendor mappings, budgets, accounts, and goals.
-3. Export JSON after major updates.
-4. Keep the JSON somewhere private as your local backup snapshot.
-
-## Screens and features
-
-- `Overview`: top KPIs, category mix, vendors, savings snapshot, upcoming bills
-- `Monthly`: month trend or daily breakdown for a selected month
-- `Vendors`: top merchants plus custom category mapping management
-- `Budget`: budgets saved by month, with rollover-safe history
-- `Heatmap`: multi-month daily spend intensity with day drilldown
-- `Accounts`: tracked account balances and cashflow kept separate to avoid misleading “net worth” math
-- `Goals`: savings targets based on entered balances
-- `Recurring`: detected repeating charges and upcoming bill estimates
+1. Import your latest Revolut CSV.
+2. Review vendor mappings, budgets, accounts, and goals.
+3. Export JSON after important updates.
+4. Keep your exported backups in a private local location.
 
 ## Development
 
@@ -88,7 +148,7 @@ npm install
 npm run dev
 ```
 
-Quality checks:
+Checks:
 
 ```bash
 npm run check
@@ -100,18 +160,33 @@ Production build:
 npm run build
 ```
 
-## Limitations
+## Current limitations
 
-- Default display currency is `RON`, but users can switch the display preference in the UI
+- Import is optimized for Revolut-first workflows, not every bank format
+- Revolut export formats and localized headers can still evolve, so parser coverage will continue to improve
+- FX conversion uses latest saved rates, not historical rates
+- Savings goals depend on balances you enter manually
 - Recurring detection is heuristic, not guaranteed
-- Account-based goals depend on balances you enter manually
-- Revolut export formats can change, so parser support may need occasional updates
-- Browser storage can be cleared by the user or the browser, which is why JSON backups matter
+- Browser storage can be cleared, so backups still matter
+- The app is intentionally local-first and does not yet provide encrypted sync
 
-## Next roadmap candidates
+## Next up
 
-- richer budget history comparisons
-- split transactions
-- mobile sidebar improvements
-- tags and advanced filters
-- liability/debt tracking
+- stronger Revolut parser coverage and import summaries
+- better normalized CSV import documentation
+- budgeting v2 polish and richer monthly comparisons
+- better filtering, search, and recurring transaction refinement
+- clearer forecast assumptions and UX wording
+
+## Later / possible expansions
+
+- optional adapters for more banks or cards
+- split transactions and tags
+- stocks tracking module
+- crypto tracking module
+- advanced reporting/export packs
+- optional encrypted backup or sync workflows
+
+## Product direction
+
+Longer-term roadmap and monetization notes are documented in [docs/product-direction.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/product-direction.md).

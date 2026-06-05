@@ -43,6 +43,12 @@ describe('categorizeTransaction', () => {
     expect(cat).toBe('Subscriptions');
   });
 
+  it('matches expanded built-in US/EU vendors', () => {
+    const [cat, sub] = categorizeTransaction('Walmart Supercenter', -70);
+    expect(cat).toBe('Shopping');
+    expect(sub).toBe('General');
+  });
+
   it('falls back to Other for unknown vendors', () => {
     const [cat, sub] = categorizeTransaction('unknown vendor xyz', -50);
     expect(cat).toBe('Other');
@@ -82,6 +88,7 @@ describe('parseCSV', () => {
     const result = await parseCSV(file);
 
     expect(result.summary.processedRows).toBe(5);
+    expect(result.summary.detectedProfileId).toBe('revolut-personal-raw');
     expect(result.transactions[0].cat).toBe('Transfers');
     expect(result.transactions[2].cat).toBe('Refunds');
     expect(result.transactions[3].cat).toBe('Savings');
@@ -101,6 +108,7 @@ describe('parseCSV', () => {
 
     expect(result.summary.processedRows).toBe(1);
     expect(result.summary.skippedRows).toBe(3);
+    expect(result.summary.detectedProfileLabel).toBe('Revolut Personal CSV');
     expect(result.summary.skippedReasonCounts['invalid amount']).toBe(1);
     expect(result.summary.skippedReasonCounts['missing or invalid date']).toBe(1);
     expect(result.summary.skippedReasonCounts['zero-value transaction skipped']).toBe(1);
@@ -116,8 +124,52 @@ describe('parseCSV', () => {
     const result = await parseCSV(file);
 
     expect(result.summary.processedRows).toBe(2);
+    expect(result.summary.detectedProfileId).toBe('normalized-csv');
     expect(result.transactions[0].source).toBe('master');
     expect(result.transactions[1].cat).toBe('Income');
+  });
+
+  it('parses a Revolut business transaction statement like CSV', async () => {
+    const csv = [
+      'Transaction started (UTC),Transaction completed (UTC),Transaction Description,Transaction Type,Payment Currency,Amount (Payment Currency),Transaction ID,Account',
+      '2024-03-01T08:00:00Z,2024-03-01T08:05:00Z,Amazon Marketplace,card payment,USD,-19.99,tx-1,Main',
+      '2024-03-02T08:00:00Z,2024-03-02T08:05:00Z,Salary,bank transfer,RON,5000,tx-2,Main',
+    ].join('\n');
+    const file = new File([csv], 'business-transactions.csv', { type: 'text/csv' });
+    const result = await parseCSV(file);
+
+    expect(result.summary.detectedProfileId).toBe('revolut-business-transaction');
+    expect(result.summary.processedRows).toBe(2);
+    expect(result.transactions[0].currency).toBe('USD');
+    expect(result.transactions[0].cat).toBe('Shopping');
+    expect(result.transactions[1].cat).toBe('Transfers');
+  });
+
+  it('parses a localized Revolut business expense CSV and prefers payment amount/currency', async () => {
+    const csv = [
+      'Tranzacție inițiată (UTC),Tranzacție finalizată (UTC),ID tranzacție,Tipul tranzacției,Descriere tranzacție,Monedă origine,Sumă inițială (monedă inițială),Moneda de plată,Sumă (monedă plată)',
+      '2024-04-01T10:00:00Z,2024-04-01T10:10:00Z,ro-1,card payment,Starbucks,USD,-5.00,RON,-24.50',
+    ].join('\n');
+    const file = new File([csv], 'business-expense-ro.csv', { type: 'text/csv' });
+    const result = await parseCSV(file);
+
+    expect(result.summary.detectedProfileId).toBe('revolut-business-expense');
+    expect(result.summary.warnings.some((warning) => warning.includes('payment and original amount'))).toBe(true);
+    expect(result.transactions[0].currency).toBe('RON');
+    expect(result.transactions[0].amt).toBe(-24.5);
+    expect(result.transactions[0].cat).toBe('Food & Dining');
+  });
+
+  it('warns on partially recognized headers while still parsing supported columns', async () => {
+    const csv = [
+      'Started Date,Description,Amount,Type,Currency,Unexpected Internal Note',
+      '2024-05-01,Uber,-12,card payment,RON,test',
+    ].join('\n');
+    const file = new File([csv], 'partial.csv', { type: 'text/csv' });
+    const result = await parseCSV(file);
+
+    expect(result.summary.processedRows).toBe(1);
+    expect(result.summary.warnings.some((warning) => warning.includes('Partially recognized header set'))).toBe(true);
   });
 });
 

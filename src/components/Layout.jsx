@@ -33,12 +33,15 @@ export default function Layout() {
       const merged = mergeTransactions(data.transactions, newTxns);
       addTransactions(merged);
       
-      let msg = `Processed ${summary.processedRows} transactions.`;
+      let msg = `${summary.detectedProfileLabel}: processed ${summary.processedRows} transactions.`;
       if (summary.skippedRows > 0) {
         msg += ` Skipped ${summary.skippedRows} rows.`;
       }
       msg += ` Total: ${merged.length}.`;
       toast.success(msg);
+      if (summary.warnings.length > 0) {
+        toast.warning(summary.warnings[0]);
+      }
     } catch (err) {
       console.error(err);
       toast.error('Error parsing CSV: ' + err.message);

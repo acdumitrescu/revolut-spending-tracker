@@ -18,9 +18,12 @@ export const TransactionSchema = z.object({
 export const ParsedCSVSchema = z.object({
   transactions: z.array(TransactionSchema),
   summary: z.object({
+    detectedProfileId: z.string(),
+    detectedProfileLabel: z.string(),
     totalRows: z.number().int().nonnegative(),
     processedRows: z.number().int().nonnegative(),
     skippedRows: z.number().int().nonnegative(),
+    warnings: z.array(z.string()).default([]),
     skippedReasonCounts: z.record(z.string(), z.number().int().nonnegative()).default({}),
     skippedDetails: z.array(z.string()).default([]),
   }),
