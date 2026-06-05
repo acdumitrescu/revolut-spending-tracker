@@ -260,8 +260,10 @@ function getBuiltInVendorMatchers() {
       precedence: rule.precedence || 0,
     })))
     .sort((a, b) => {
+      const aliasLengthDiff = normalizeVendorKey(b.alias).length - normalizeVendorKey(a.alias).length;
+      if (aliasLengthDiff !== 0) return aliasLengthDiff;
       if (b.precedence !== a.precedence) return b.precedence - a.precedence;
-      return normalizeVendorKey(b.alias).length - normalizeVendorKey(a.alias).length;
+      return a.alias.localeCompare(b.alias);
     });
 }
 

@@ -21,6 +21,36 @@ export function getCurrencySummary(transactions) {
   };
 }
 
+export function getUniqueYears(transactions) {
+  return [...new Set(
+    transactions
+      .map((txn) => String(txn.date || '').substring(0, 4))
+      .filter((year) => /^\d{4}$/.test(year))
+  )].sort((a, b) => b.localeCompare(a));
+}
+
+export function filterTransactionsByPeriod(transactions, timeFilter = 'ALL TIME', yearFilter = 'ALL') {
+  const now = new Date();
+  const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  return transactions.filter((txn) => {
+    if (yearFilter !== 'ALL' && !txn.date.startsWith(yearFilter)) return false;
+
+    if (timeFilter !== 'ALL TIME') {
+      const txDate = new Date(txn.date);
+      const diffTime = now.getTime() - txDate.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (timeFilter === 'Today' && txn.date !== todayLocal) return false;
+      if (timeFilter === 'Last Week' && diffDays > 7) return false;
+      if (timeFilter === 'Last Month' && diffDays > 30) return false;
+      if (timeFilter === 'Last Year' && diffDays > 365) return false;
+    }
+
+    return true;
+  });
+}
+
 function convertTxnAmount(txn, displayCurrency = BASE_CURRENCY, fxRates) {
   return convertAmountToDisplay(txn.amt, getEffectiveCurrency(txn), displayCurrency, fxRates);
 }

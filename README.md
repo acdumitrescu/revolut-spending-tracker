@@ -67,6 +67,7 @@ This app is a strong fit if you:
 - Backup and restore are controlled by the user
 
 For public vs private workflow guidance, see [docs/local-workflow.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/local-workflow.md).
+For a publishing and backup safety checklist, see [docs/security-checklist.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/security-checklist.md).
 
 ## Supported imports
 
@@ -89,6 +90,8 @@ Current import behavior:
 - malformed rows and zero-value rows are skipped with tracked reasons
 - source transaction currency is preserved where available
 - import summaries include detected profile, skip reasons, and warnings
+
+The normalized CSV fallback format is documented in [docs/normalized-csv.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/normalized-csv.md).
 
 ## Currency support
 
@@ -169,6 +172,7 @@ npm run build
 - Recurring detection is heuristic, not guaranteed
 - Browser storage can be cleared, so backups still matter
 - The app is intentionally local-first and does not yet provide encrypted sync
+- FX refresh uses a latest-rate request and is optional; the app keeps working with saved local rates if that request fails
 
 ## Next up
 

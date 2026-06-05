@@ -30,6 +30,12 @@ describe('categorizeTransaction', () => {
     expect(sub).toBe('CustomSub');
   });
 
+  it('lets custom vendor overrides win over strong built-in aliases', () => {
+    const [cat, sub] = categorizeTransaction('Uber Eats', -22, { 'uber eats': ['CustomFood', 'Manual'] });
+    expect(cat).toBe('CustomFood');
+    expect(sub).toBe('Manual');
+  });
+
   it('prefers longer custom vendor rules first', () => {
     const [cat] = categorizeTransaction('Netflix family plan', -50, {
       netflix: ['Subscriptions', 'Streaming'],
@@ -47,6 +53,18 @@ describe('categorizeTransaction', () => {
     const [cat, sub] = categorizeTransaction('Walmart Supercenter', -70);
     expect(cat).toBe('Shopping');
     expect(sub).toBe('General');
+  });
+
+  it('prefers stronger food-delivery aliases over broader rideshare vendors', () => {
+    const [cat, sub] = categorizeTransaction('Uber Eats', -55);
+    expect(cat).toBe('Food & Dining');
+    expect(sub).toBe('Delivery');
+  });
+
+  it('maps Bolt Food separately from Bolt rides', () => {
+    const [cat, sub] = categorizeTransaction('Bolt Food', -32);
+    expect(cat).toBe('Food & Dining');
+    expect(sub).toBe('Delivery');
   });
 
   it('falls back to Other for unknown vendors', () => {

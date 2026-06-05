@@ -56,3 +56,8 @@ Rule:
 Only `public/demo-revolut.csv` is intended to stay public.
 
 If you need more test data, create it from synthetic values and place it in clearly named public demo files.
+
+## Related docs
+
+- [security-checklist.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/security-checklist.md)
+- [normalized-csv.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/normalized-csv.md)

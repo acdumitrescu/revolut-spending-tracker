@@ -17,6 +17,7 @@ const initialState = {
   goals: [],
   baseCurrency: BASE_CURRENCY,
   displayCurrency: BASE_CURRENCY,
+  themeMode: 'light',
   fxRates: DEFAULT_FX_RATES,
   fxUpdatedAt: null,
   fxSource: 'manual-default',
@@ -60,6 +61,11 @@ export function AppProvider({ children }) {
       // Optionally, we could trigger a UI warning here in the future
     }
   }, [data]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = data.themeMode || 'light';
+    document.documentElement.style.colorScheme = data.themeMode === 'dark' ? 'dark' : 'light';
+  }, [data.themeMode]);
 
   const updateTimestamp = (prev) => ({ ...prev, lastUpdated: Date.now() });
   const currencySummary = getCurrencySummary(data.transactions);
@@ -201,6 +207,14 @@ export function AppProvider({ children }) {
     }));
   };
 
+  const setThemeMode = (themeMode) => {
+    if (!['light', 'dark'].includes(themeMode)) return;
+    setData((prev) => ({
+      ...prev,
+      themeMode,
+    }));
+  };
+
   const setFxRates = (rates, source = 'manual') => {
     setData((prev) => ({
       ...prev,
@@ -267,6 +281,7 @@ export function AppProvider({ children }) {
         removeGoal,
         importBackup,
         setDisplayCurrency,
+        setThemeMode,
         setFxRates,
         refreshFxRates,
         currencySummary,

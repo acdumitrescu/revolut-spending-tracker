@@ -1,6 +1,6 @@
 [
-  { "canonicalName": "Uber", "aliases": ["uber", "uber trip", "uber eats"], "category": "Transport", "subcategory": "Taxi", "geography": "Global", "precedence": 100 },
-  { "canonicalName": "Bolt", "aliases": ["bolt", "bolt eu", "bolt food"], "category": "Transport", "subcategory": "Taxi", "geography": "EU", "precedence": 100 },
+  { "canonicalName": "Uber", "aliases": ["uber", "uber trip"], "category": "Transport", "subcategory": "Taxi", "geography": "Global", "precedence": 100 },
+  { "canonicalName": "Bolt", "aliases": ["bolt", "bolt eu"], "category": "Transport", "subcategory": "Taxi", "geography": "EU", "precedence": 100 },
   { "canonicalName": "Lyft", "aliases": ["lyft", "lyft ride"], "category": "Transport", "subcategory": "Taxi", "geography": "US", "precedence": 98 },
   { "canonicalName": "Wizz Air", "aliases": ["wizz air", "wizzair"], "category": "Travel", "subcategory": "Flights", "geography": "EU", "precedence": 98 },
   { "canonicalName": "Ryanair", "aliases": ["ryanair"], "category": "Travel", "subcategory": "Flights", "geography": "EU", "precedence": 98 },
@@ -46,9 +46,14 @@
   { "canonicalName": "Starbucks", "aliases": ["starbucks"], "category": "Food & Dining", "subcategory": "Coffee", "geography": "Global", "precedence": 95 },
   { "canonicalName": "Glovo", "aliases": ["glovo"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "EU", "precedence": 95 },
   { "canonicalName": "Tazz", "aliases": ["tazz"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "EU", "precedence": 95 },
+  { "canonicalName": "Wolt", "aliases": ["wolt"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "EU", "precedence": 95 },
+  { "canonicalName": "Deliveroo", "aliases": ["deliveroo"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "EU", "precedence": 95 },
   { "canonicalName": "DoorDash", "aliases": ["doordash"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "US", "precedence": 95 },
   { "canonicalName": "Uber Eats", "aliases": ["uber eats"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "Global", "precedence": 94 },
+  { "canonicalName": "Bolt Food", "aliases": ["bolt food"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "EU", "precedence": 94 },
   { "canonicalName": "Grubhub", "aliases": ["grubhub"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "US", "precedence": 92 },
+  { "canonicalName": "Instacart", "aliases": ["instacart"], "category": "Groceries", "subcategory": "Delivery", "geography": "US", "precedence": 90 },
+  { "canonicalName": "Seamless", "aliases": ["seamless"], "category": "Food & Dining", "subcategory": "Delivery", "geography": "US", "precedence": 90 },
   { "canonicalName": "Vodafone", "aliases": ["vodafone"], "category": "Telecom", "subcategory": "Mobile", "geography": "EU", "precedence": 80 },
   { "canonicalName": "Orange", "aliases": ["orange"], "category": "Telecom", "subcategory": "Mobile", "geography": "EU", "precedence": 80 },
   { "canonicalName": "Digi", "aliases": ["digi", "rcs rds"], "category": "Telecom", "subcategory": "Internet & TV", "geography": "EU", "precedence": 80 },
@@ -66,5 +71,9 @@
   { "canonicalName": "Enel", "aliases": ["enel"], "category": "Utilities", "subcategory": "Electricity", "geography": "EU", "precedence": 70 },
   { "canonicalName": "E.ON", "aliases": ["e.on", "eon"], "category": "Utilities", "subcategory": "Gas & Electricity", "geography": "EU", "precedence": 70 },
   { "canonicalName": "Engie", "aliases": ["engie"], "category": "Utilities", "subcategory": "Gas", "geography": "EU", "precedence": 70 },
-  { "canonicalName": "Radet", "aliases": ["radet"], "category": "Utilities", "subcategory": "Heating", "geography": "EU", "precedence": 70 }
+  { "canonicalName": "Radet", "aliases": ["radet"], "category": "Utilities", "subcategory": "Heating", "geography": "EU", "precedence": 70 },
+  { "canonicalName": "IKEA", "aliases": ["ikea"], "category": "Shopping", "subcategory": "Home", "geography": "Global", "precedence": 76 },
+  { "canonicalName": "Decathlon", "aliases": ["decathlon"], "category": "Sports & Fitness", "subcategory": "Equipment", "geography": "Global", "precedence": 76 },
+  { "canonicalName": "Notino", "aliases": ["notino"], "category": "Shopping", "subcategory": "Beauty", "geography": "EU", "precedence": 74 },
+  { "canonicalName": "DM", "aliases": ["dm drogerie", "dm"], "category": "Shopping", "subcategory": "Household & Beauty", "geography": "EU", "precedence": 72 }
 ]

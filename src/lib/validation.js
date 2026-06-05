@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { BASE_CURRENCY, DEFAULT_FX_RATES, SUPPORTED_DISPLAY_CURRENCIES } from './fx';
 
+export const THEME_MODES = ['light', 'dark'];
+
 export const TransactionSchema = z.object({
   date: z.string().min(1),
   desc: z.string(),
@@ -52,6 +54,7 @@ export const AppDataSchema = z.object({
   goals: z.array(GoalSchema).optional().default([]),
   baseCurrency: z.string().optional().default(BASE_CURRENCY),
   displayCurrency: z.enum(SUPPORTED_DISPLAY_CURRENCIES).optional().default(BASE_CURRENCY),
+  themeMode: z.enum(THEME_MODES).optional().default('light'),
   fxRates: z.object({
     EUR: z.number().positive(),
     USD: z.number().positive(),
@@ -79,6 +82,7 @@ export function sanitizeAppData(raw) {
     goals: [],
     baseCurrency: BASE_CURRENCY,
     displayCurrency: BASE_CURRENCY,
+    themeMode: 'light',
     fxRates: DEFAULT_FX_RATES,
     fxUpdatedAt: null,
     fxSource: 'manual-default',
@@ -132,6 +136,9 @@ export function sanitizeAppData(raw) {
     fallback.displayCurrency = typeof raw.displayCurrency === 'string' && SUPPORTED_DISPLAY_CURRENCIES.includes(raw.displayCurrency.trim().toUpperCase())
       ? raw.displayCurrency.trim().toUpperCase()
       : BASE_CURRENCY;
+    fallback.themeMode = typeof raw.themeMode === 'string' && THEME_MODES.includes(raw.themeMode.trim().toLowerCase())
+      ? raw.themeMode.trim().toLowerCase()
+      : 'light';
     fallback.fxRates = {
       EUR: typeof raw.fxRates?.EUR === 'number' && Number.isFinite(raw.fxRates.EUR) && raw.fxRates.EUR > 0
         ? raw.fxRates.EUR

@@ -1,19 +1,23 @@
+import { useMemo, useState } from 'react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency, getColorForCategory } from '../lib/utils';
 import { BASE_CURRENCY, convertAmountToDisplay } from '../lib/fx';
 import { detectRecurringTransactions } from '../lib/recurring';
-import { getCategoryTotals, getLatestAccountTotal, getMonthlySummary, getVendorTotals } from '../lib/selectors';
+import { filterTransactionsByPeriod, getCategoryTotals, getLatestAccountTotal, getMonthlySummary, getUniqueYears, getVendorTotals } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 
 export default function Overview() {
   const { data, currencySummary } = useAppContext();
   const txns = data.transactions;
-  const recurring = detectRecurringTransactions(txns).slice(0, 3);
   const displayCurrency = data.displayCurrency;
   const selectorOptions = { displayCurrency, fxRates: data.fxRates };
+  const [timeFilter, setTimeFilter] = useState('ALL TIME');
+  const [yearFilter, setYearFilter] = useState('ALL');
   const latestSavings = getLatestAccountTotal(data.accounts, selectorOptions);
   const latestSavingsBase = getLatestAccountTotal(data.accounts, { displayCurrency: BASE_CURRENCY, fxRates: data.fxRates });
+  const uniqueYears = useMemo(() => getUniqueYears(txns), [txns]);
+  const filteredTxns = useMemo(() => filterTransactionsByPeriod(txns, timeFilter, yearFilter), [txns, timeFilter, yearFilter]);
 
   if (txns.length === 0) return (
     <div className="empty-state">
@@ -23,7 +27,8 @@ export default function Overview() {
     </div>
   );
 
-  const monthlySummary = getMonthlySummary(txns, selectorOptions);
+  const recurring = detectRecurringTransactions(filteredTxns).slice(0, 3);
+  const monthlySummary = getMonthlySummary(filteredTxns, selectorOptions);
   const inc = monthlySummary.reduce((sum, month) => sum + month.inc, 0);
   const exp = monthlySummary.reduce((sum, month) => sum + month.exp, 0);
   const net = inc - exp;
@@ -96,7 +101,7 @@ export default function Overview() {
   };
 
   // Pie Chart
-  const catTotals = getCategoryTotals(txns, null, selectorOptions);
+  const catTotals = getCategoryTotals(filteredTxns, null, selectorOptions);
   const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 10);
   const pieData = {
     labels: sortedCats.map(c => c[0]),
@@ -110,7 +115,7 @@ export default function Overview() {
   };
 
   // Top Vendors Chart
-  const vendors = getVendorTotals(txns, null, selectorOptions);
+  const vendors = getVendorTotals(filteredTxns, null, selectorOptions);
   const sortedVendors = Object.entries(vendors).sort((a, b) => b[1].total - a[1].total).slice(0, 10);
   const vendorChartData = {
     labels: sortedVendors.map(v => v[0]),
@@ -127,7 +132,30 @@ export default function Overview() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: '20px' }}>Overview</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2 style={{ margin: 0 }}>Overview</h2>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <select
+            className="input"
+            value={timeFilter}
+            onChange={(e) => setTimeFilter(e.target.value)}
+          >
+            <option value="ALL TIME">All Time</option>
+            <option value="Today">Today</option>
+            <option value="Last Week">Last 7 Days</option>
+            <option value="Last Month">Last 30 Days</option>
+            <option value="Last Year">Last 365 Days</option>
+          </select>
+          <select
+            className="input"
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+          >
+            <option value="ALL">All Years</option>
+            {uniqueYears.map((year) => <option key={year} value={year}>{year}</option>)}
+          </select>
+        </div>
+      </div>
       {currencySummary.hasMixedCurrencies && (
         <div style={{ marginBottom: '20px' }}>
           <MixedCurrencyNotice currencies={currencySummary.currencies} />
@@ -150,22 +178,22 @@ export default function Overview() {
       
       <div className="grid2">
         <div className="card">
-          <div className="card-title">Monthly Income vs Expenses</div>
+          <div className="card-title">Monthly Income vs Expenses {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}</div>
           <ChartWrapper type="bar" data={chartData} height={250} currency={displayCurrency} />
         </div>
         <div className="card">
-          <div className="card-title">Cumulative Savings Trajectory</div>
+          <div className="card-title">Cumulative Savings Trajectory {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}</div>
           <ChartWrapper type="line" data={cumulativeChartData} height={250} currency={displayCurrency} />
         </div>
       </div>
 
       <div className="grid2">
         <div className="card">
-          <div className="card-title">Top Expense Categories</div>
+          <div className="card-title">Top Expense Categories {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}</div>
           <ChartWrapper type="doughnut" data={pieData} height={280} currency={displayCurrency} />
         </div>
         <div className="card">
-          <div className="card-title">Top 10 Vendors</div>
+          <div className="card-title">Top 10 Vendors {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}</div>
           <ChartWrapper type="bar" data={vendorChartData} height={280} horizontal showLegend={false} currency={displayCurrency} />
         </div>
       </div>
@@ -196,7 +224,7 @@ export default function Overview() {
           )}
         </div>
         <div className="card">
-          <div className="card-title">Upcoming Bills</div>
+          <div className="card-title">Upcoming Bills {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}</div>
           {recurring.length === 0 ? (
             <div style={{ color: 'var(--muted)', fontSize: '13px' }}>No reliable recurring transactions detected yet. Once you have 3 similar charges with a steady interval, they will appear here.</div>
           ) : (

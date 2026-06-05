@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, FolderTree, Store, List, Wallet, Upload, Download, Trash2, TrendingUp, PiggyBank, Flame, Target, Repeat, DatabaseBackup, RefreshCw, Settings2, Save } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, FolderTree, Store, List, Wallet, Upload, Download, Trash2, TrendingUp, PiggyBank, Flame, Target, Repeat, DatabaseBackup, RefreshCw, Settings2, Save, Sun, Moon } from 'lucide-react';
 import ExcelJS from 'exceljs';
 import { parseCSV, mergeTransactions } from '../lib/csvParser';
 import { useAppContext } from '../lib/AppContext';
@@ -9,13 +9,15 @@ import { SUPPORTED_DISPLAY_CURRENCIES } from '../lib/utils';
 import { useToast } from './Toast';
 import { FreshnessIndicator } from './FreshnessIndicator';
 import MixedCurrencyNotice from './MixedCurrencyNotice';
+import ImportSummaryModal from './ImportSummaryModal';
 
 export default function Layout() {
-  const { data, addTransactions, importBackup, clearData, setDisplayCurrency, setFxRates, refreshFxRates, currencySummary } = useAppContext();
+  const { data, addTransactions, importBackup, clearData, setDisplayCurrency, setThemeMode, setFxRates, refreshFxRates, currencySummary } = useAppContext();
   const toast = useToast();
   const csvInputRef = useRef(null);
   const jsonInputRef = useRef(null);
   const [showFxPanel, setShowFxPanel] = useState(false);
+  const [importSummary, setImportSummary] = useState(null);
   const [manualRates, setManualRates] = useState({
     EUR: String(data.fxRates?.EUR || ''),
     USD: String(data.fxRates?.USD || ''),
@@ -39,9 +41,10 @@ export default function Layout() {
       }
       msg += ` Total: ${merged.length}.`;
       toast.success(msg);
-      if (summary.warnings.length > 0) {
-        toast.warning(summary.warnings[0]);
-      }
+      setImportSummary({
+        fileName: file.name,
+        ...summary,
+      });
     } catch (err) {
       console.error(err);
       toast.error('Error parsing CSV: ' + err.message);
@@ -58,7 +61,7 @@ export default function Layout() {
       const text = await file.text();
       const parsed = JSON.parse(text);
       importBackup(parsed);
-      toast.success('Backup restored successfully.');
+      toast.success('Backup restored successfully. Review totals and export a fresh private backup if needed.');
     } catch (err) {
       console.error(err);
       toast.error('Unable to restore backup JSON.');
@@ -80,6 +83,7 @@ export default function Layout() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    toast.info('JSON backup exported. Keep this file in a private local folder.');
   };
 
   const handleExportWorkbook = async () => {
@@ -157,6 +161,7 @@ export default function Layout() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      toast.info('Excel workbook exported. Treat it as private personal finance data.');
     } catch (err) {
       console.error(err);
       toast.error('Unable to export Excel workbook.');
@@ -198,6 +203,11 @@ export default function Layout() {
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
+      <ImportSummaryModal
+        summary={importSummary}
+        fileName={importSummary?.fileName}
+        onClose={() => setImportSummary(null)}
+      />
       {/* Sidebar */}
       <aside className="app-sidebar" style={{ width: '240px', background: 'var(--surface)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '20px', borderBottom: '1px solid var(--border)' }}>
@@ -252,6 +262,10 @@ export default function Layout() {
             </div>
           )}
 
+          <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.55, padding: '10px 12px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--surface2)' }}>
+            CSV and JSON files are parsed locally. The only optional network call is FX refresh for EUR/USD rates. Keep exports and real CSVs in ignored folders like <code>imports/</code>, <code>exports/</code>, or <code>backups/</code>.
+          </div>
+
           {hasData && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -283,6 +297,15 @@ export default function Layout() {
               Base currency: <strong style={{ color: 'var(--text)' }}>{BASE_CURRENCY}</strong>
             </div>
           <div style={{ fontSize: '12px', color: 'var(--muted)', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              className="btn"
+              onClick={() => setThemeMode(data.themeMode === 'dark' ? 'light' : 'dark')}
+              style={{ fontSize: '12px' }}
+              aria-label={`Switch to ${data.themeMode === 'dark' ? 'light' : 'dark'} theme`}
+            >
+              {data.themeMode === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+              {data.themeMode === 'dark' ? 'Light Theme' : 'Dark Theme'}
+            </button>
             <select
               className="input"
               value={data.displayCurrency}

@@ -38,6 +38,7 @@ describe('AppDataSchema', () => {
       goals: [{ id: 'goal-1', name: 'Emergency Fund', targetAmount: 10000, targetMonth: '2024-12' }],
       baseCurrency: 'RON',
       displayCurrency: 'EUR',
+      themeMode: 'dark',
       fxRates: { EUR: 5, USD: 4.6 },
       fxUpdatedAt: 1705312801000,
       fxSource: 'Frankfurter',
@@ -61,6 +62,7 @@ describe('sanitizeAppData', () => {
       goals: [],
       baseCurrency: 'RON',
       displayCurrency: 'RON',
+      themeMode: 'light',
       fxRates: { EUR: 5, USD: 4.6 },
       fxUpdatedAt: null,
       fxSource: 'manual-default',
@@ -101,6 +103,7 @@ describe('sanitizeAppData', () => {
       goals: [],
       baseCurrency: 'RON',
       displayCurrency: 'USD',
+      themeMode: 'dark',
       fxRates: { EUR: 4.95, USD: 4.55 },
       fxUpdatedAt: 123456,
       fxSource: 'manual',
@@ -109,6 +112,7 @@ describe('sanitizeAppData', () => {
     const result = sanitizeAppData(data);
     expect(result.lastUpdated).toBe(12345);
     expect(result.displayCurrency).toBe('USD');
+    expect(result.themeMode).toBe('dark');
     expect(result.fxRates).toEqual({ EUR: 4.95, USD: 4.55 });
   });
 
@@ -154,6 +158,7 @@ describe('sanitizeAppData', () => {
     });
     expect(result.baseCurrency).toBe('RON');
     expect(result.displayCurrency).toBe('RON');
+    expect(result.themeMode).toBe('light');
     expect(result.fxRates).toEqual({ EUR: 5, USD: 4.6 });
   });
 

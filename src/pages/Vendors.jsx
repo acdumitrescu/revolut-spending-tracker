@@ -4,6 +4,7 @@ import { formatCurrency, EXPENSE_CATS, getColorForCategory } from '../lib/utils'
 import { convertAmountToDisplay } from '../lib/fx';
 import { Pencil, X, Plus, Trash2, Search } from 'lucide-react';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
+import { filterTransactionsByPeriod, getUniqueYears } from '../lib/selectors';
 
 export default function Vendors() {
   const { data, updateCustomVendor, removeCustomVendor, currencySummary } = useAppContext();
@@ -22,33 +23,12 @@ export default function Vendors() {
   const [newVendorSub, setNewVendorSub] = useState('');
   const [mappingSearch, setMappingSearch] = useState('');
 
-  const uniqueYears = useMemo(() => {
-    const years = new Set(txns.map(t => t.date.substring(0, 4)));
-    return [...years].sort((a, b) => b.localeCompare(a));
-  }, [txns]);
+  const uniqueYears = useMemo(() => getUniqueYears(txns), [txns]);
 
   const filteredTxns = useMemo(() => {
-    const now = new Date();
-    const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-    return txns.filter(t => {
-      if (t.flow !== 'Debit' || !EXPENSE_CATS.has(t.cat)) return false;
-
-      if (yearFilter !== 'ALL' && !t.date.startsWith(yearFilter)) return false;
-
-      if (timeFilter !== 'ALL TIME') {
-        const txDate = new Date(t.date);
-        const diffTime = now.getTime() - txDate.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (timeFilter === 'Today' && t.date !== todayLocal) return false;
-        if (timeFilter === 'Last Week' && diffDays > 7) return false;
-        if (timeFilter === 'Last Month' && diffDays > 30) return false;
-        if (timeFilter === 'Last Year' && diffDays > 365) return false;
-      }
-
-      return true;
-    });
+    return filterTransactionsByPeriod(txns, timeFilter, yearFilter).filter(
+      (txn) => txn.flow === 'Debit' && EXPENSE_CATS.has(txn.cat)
+    );
   }, [txns, timeFilter, yearFilter]);
 
   const vendors = {};
