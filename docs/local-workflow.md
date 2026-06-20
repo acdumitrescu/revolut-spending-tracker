@@ -48,6 +48,7 @@ Rule:
 
 - never place real CSV exports in tracked folders like `src/`, `public/`, or the repo root
 - never commit JSON backups created from your real app usage
+- never commit private-sync volume dumps or copied server-state files
 - browser `localStorage` is private runtime data and is not part of git
 - before every push, run `git status` and `git diff --cached --stat`
 
@@ -59,5 +60,7 @@ If you need more test data, create it from synthetic values and place it in clea
 
 ## Related docs
 
-- [security-checklist.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/security-checklist.md)
-- [normalized-csv.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/normalized-csv.md)
+- [security-checklist.md](security-checklist.md)
+- [normalized-csv.md](normalized-csv.md)
+- [deployment.md](deployment.md)
+- [backup-runbook.md](backup-runbook.md)

@@ -1,0 +1,3809 @@
+{
+  "schemaVersion": 2,
+  "records": [
+    {
+      "id": "eu-bolt-food",
+      "canonicalName": "Bolt Food",
+      "aliases": [
+        "bolt food",
+        "Bolt Food"
+      ],
+      "normalizedAliases": [
+        "bolt food"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "EU"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Delivery",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 110,
+      "confidenceHint": "high",
+      "tags": [
+        "delivery",
+        "food"
+      ],
+      "family": "bolt",
+      "familyAliases": [
+        "bolt food"
+      ],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "bolt food"
+      ]
+    },
+    {
+      "id": "global-uber-eats",
+      "canonicalName": "Uber Eats",
+      "aliases": [
+        "uber eats",
+        "Uber Eats"
+      ],
+      "normalizedAliases": [
+        "uber eats"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Delivery",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 110,
+      "confidenceHint": "high",
+      "tags": [
+        "delivery",
+        "food"
+      ],
+      "family": "uber",
+      "familyAliases": [
+        "uber eats"
+      ],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "uber eats"
+      ]
+    },
+    {
+      "id": "ro-carrefour-express",
+      "canonicalName": "Carrefour Express",
+      "aliases": [
+        "carrefour express",
+        "Carrefour Express"
+      ],
+      "normalizedAliases": [
+        "carrefour express"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Convenience",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 104,
+      "confidenceHint": "high",
+      "tags": [
+        "convenience",
+        "grocery"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "carrefour express"
+      ]
+    },
+    {
+      "id": "ro-profi-city",
+      "canonicalName": "Profi City",
+      "aliases": [
+        "profi city",
+        "Profi City"
+      ],
+      "normalizedAliases": [
+        "profi city"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Convenience",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 104,
+      "confidenceHint": "high",
+      "tags": [
+        "convenience",
+        "grocery"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "profi city"
+      ]
+    },
+    {
+      "id": "ro-carrefour-market",
+      "canonicalName": "Carrefour Market",
+      "aliases": [
+        "carrefour market",
+        "Carrefour Market"
+      ],
+      "normalizedAliases": [
+        "carrefour market"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Supermarket",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 102,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "supermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "carrefour market"
+      ]
+    },
+    {
+      "id": "ro-shop-go",
+      "canonicalName": "Shop&Go",
+      "aliases": [
+        "shop go",
+        "shop&go",
+        "Shop&Go"
+      ],
+      "normalizedAliases": [
+        "shop go"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Convenience",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 102,
+      "confidenceHint": "high",
+      "tags": [
+        "convenience",
+        "grocery"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "shop go"
+      ]
+    },
+    {
+      "id": "ro-kaufland",
+      "canonicalName": "Kaufland",
+      "aliases": [
+        "kaufland",
+        "Kaufland",
+        "kaufland ro",
+        "kaufland romania"
+      ],
+      "normalizedAliases": [
+        "kaufland",
+        "kaufland ro",
+        "kaufland romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Hypermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 101,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "hypermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "kaufland",
+        "kaufland ro",
+        "kaufland romania"
+      ]
+    },
+    {
+      "id": "ro-petrom",
+      "canonicalName": "Petrom",
+      "aliases": [
+        "petrom",
+        "Petrom",
+        "petrom ro",
+        "petrom romania"
+      ],
+      "normalizedAliases": [
+        "petrom",
+        "petrom ro",
+        "petrom romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 101,
+      "confidenceHint": "high",
+      "tags": [
+        "fuel",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "petrom",
+        "petrom ro",
+        "petrom romania"
+      ]
+    },
+    {
+      "id": "ro-lidl",
+      "canonicalName": "Lidl",
+      "aliases": [
+        "lidl",
+        "Lidl"
+      ],
+      "normalizedAliases": [
+        "lidl"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Supermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 100,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "supermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "lidl"
+      ]
+    },
+    {
+      "id": "ro-myauchan",
+      "canonicalName": "MyAuchan",
+      "aliases": [
+        "my auchan",
+        "myauchan",
+        "MyAuchan"
+      ],
+      "normalizedAliases": [
+        "my auchan",
+        "myauchan"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Convenience",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 100,
+      "confidenceHint": "high",
+      "tags": [
+        "convenience",
+        "grocery"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "my auchan",
+        "myauchan"
+      ]
+    },
+    {
+      "id": "eu-bolt",
+      "canonicalName": "Bolt",
+      "aliases": [
+        "bolt",
+        "Bolt",
+        "bolt eu",
+        "bolt ride"
+      ],
+      "normalizedAliases": [
+        "bolt",
+        "bolt eu",
+        "bolt ride"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "EU"
+      ],
+      "category": "Transport",
+      "subcategory": "Taxi",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 100,
+      "confidenceHint": "high",
+      "tags": [
+        "taxi",
+        "transport"
+      ],
+      "family": "bolt",
+      "familyAliases": [
+        "bolt operations ou"
+      ],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "bolt",
+        "bolt eu",
+        "bolt operations ou",
+        "bolt ride"
+      ]
+    },
+    {
+      "id": "global-netflix",
+      "canonicalName": "Netflix",
+      "aliases": [
+        "netflix",
+        "Netflix",
+        "netflix family"
+      ],
+      "normalizedAliases": [
+        "netflix",
+        "netflix family"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Subscriptions",
+      "subcategory": "Entertainment",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 100,
+      "confidenceHint": "high",
+      "tags": [
+        "streaming",
+        "subscription"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "netflix",
+        "netflix family"
+      ]
+    },
+    {
+      "id": "global-spotify",
+      "canonicalName": "Spotify",
+      "aliases": [
+        "spotify",
+        "Spotify",
+        "spotify family"
+      ],
+      "normalizedAliases": [
+        "spotify",
+        "spotify family"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Subscriptions",
+      "subcategory": "Music",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 100,
+      "confidenceHint": "high",
+      "tags": [
+        "music",
+        "subscription"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "spotify",
+        "spotify family"
+      ]
+    },
+    {
+      "id": "global-uber",
+      "canonicalName": "Uber",
+      "aliases": [
+        "uber",
+        "Uber",
+        "uber trip"
+      ],
+      "normalizedAliases": [
+        "uber",
+        "uber trip"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Transport",
+      "subcategory": "Taxi",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 100,
+      "confidenceHint": "high",
+      "tags": [
+        "taxi",
+        "transport"
+      ],
+      "family": "uber",
+      "familyAliases": [
+        "uber"
+      ],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "uber",
+        "uber trip"
+      ]
+    },
+    {
+      "id": "ro-carrefour",
+      "canonicalName": "Carrefour",
+      "aliases": [
+        "carrefour",
+        "Carrefour"
+      ],
+      "normalizedAliases": [
+        "carrefour"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Hypermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 98,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "hypermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "carrefour"
+      ]
+    },
+    {
+      "id": "ro-penny",
+      "canonicalName": "Penny",
+      "aliases": [
+        "penny",
+        "Penny",
+        "penny market"
+      ],
+      "normalizedAliases": [
+        "penny",
+        "penny market"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Supermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 96,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "supermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "penny",
+        "penny market"
+      ]
+    },
+    {
+      "id": "global-airbnb",
+      "canonicalName": "Airbnb",
+      "aliases": [
+        "airbnb",
+        "Airbnb",
+        "airbnb payments"
+      ],
+      "normalizedAliases": [
+        "airbnb",
+        "airbnb payments"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Travel",
+      "subcategory": "Accommodation",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 96,
+      "confidenceHint": "high",
+      "tags": [
+        "accommodation",
+        "travel"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "airbnb",
+        "airbnb payments"
+      ]
+    },
+    {
+      "id": "global-booking",
+      "canonicalName": "Booking.com",
+      "aliases": [
+        "booking",
+        "booking.com",
+        "Booking.com"
+      ],
+      "normalizedAliases": [
+        "booking",
+        "booking com"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Travel",
+      "subcategory": "Accommodation",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 96,
+      "confidenceHint": "high",
+      "tags": [
+        "accommodation",
+        "travel"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "booking",
+        "booking com"
+      ]
+    },
+    {
+      "id": "eu-ryanair",
+      "canonicalName": "Ryanair",
+      "aliases": [
+        "ryanair",
+        "Ryanair"
+      ],
+      "normalizedAliases": [
+        "ryanair"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "EU"
+      ],
+      "category": "Travel",
+      "subcategory": "Flights",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 95,
+      "confidenceHint": "high",
+      "tags": [
+        "airline",
+        "travel"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "ryanair"
+      ]
+    },
+    {
+      "id": "eu-wizz-air",
+      "canonicalName": "Wizz Air",
+      "aliases": [
+        "wizz air",
+        "Wizz Air",
+        "wizzair"
+      ],
+      "normalizedAliases": [
+        "wizz air",
+        "wizzair"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "EU"
+      ],
+      "category": "Travel",
+      "subcategory": "Flights",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 95,
+      "confidenceHint": "high",
+      "tags": [
+        "airline",
+        "travel"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "wizz air",
+        "wizzair"
+      ]
+    },
+    {
+      "id": "ro-emag",
+      "canonicalName": "eMAG",
+      "aliases": [
+        "emag",
+        "eMAG",
+        "emag.ro"
+      ],
+      "normalizedAliases": [
+        "emag",
+        "emag ro"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Marketplace",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 94,
+      "confidenceHint": "high",
+      "tags": [
+        "electronics",
+        "marketplace",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "emag",
+        "emag ro"
+      ]
+    },
+    {
+      "id": "ro-glovo",
+      "canonicalName": "Glovo",
+      "aliases": [
+        "glovo",
+        "Glovo"
+      ],
+      "normalizedAliases": [
+        "glovo"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Delivery",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 94,
+      "confidenceHint": "high",
+      "tags": [
+        "delivery",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "glovo"
+      ]
+    },
+    {
+      "id": "ro-la-doi-pasi",
+      "canonicalName": "La Doi Pași",
+      "aliases": [
+        "la doi pasi",
+        "la doi pași",
+        "La Doi Pași"
+      ],
+      "normalizedAliases": [
+        "la doi pasi"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Convenience",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 94,
+      "confidenceHint": "high",
+      "tags": [
+        "convenience",
+        "grocery"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "la doi pasi"
+      ]
+    },
+    {
+      "id": "ro-tazz",
+      "canonicalName": "Tazz",
+      "aliases": [
+        "tazz",
+        "Tazz",
+        "tazz by emag"
+      ],
+      "normalizedAliases": [
+        "tazz",
+        "tazz by emag"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Delivery",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 94,
+      "confidenceHint": "high",
+      "tags": [
+        "delivery",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "tazz",
+        "tazz by emag"
+      ]
+    },
+    {
+      "id": "eu-wolt",
+      "canonicalName": "Wolt",
+      "aliases": [
+        "wolt",
+        "Wolt"
+      ],
+      "normalizedAliases": [
+        "wolt"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "EU"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Delivery",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 94,
+      "confidenceHint": "high",
+      "tags": [
+        "delivery",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "wolt"
+      ]
+    },
+    {
+      "id": "ro-auchan",
+      "canonicalName": "Auchan",
+      "aliases": [
+        "auchan",
+        "Auchan"
+      ],
+      "normalizedAliases": [
+        "auchan"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Hypermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 92,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "hypermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "auchan"
+      ]
+    },
+    {
+      "id": "ro-catena",
+      "canonicalName": "Catena",
+      "aliases": [
+        "catena",
+        "Catena"
+      ],
+      "normalizedAliases": [
+        "catena"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Pharmacy",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 92,
+      "confidenceHint": "high",
+      "tags": [
+        "health",
+        "pharmacy"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "catena"
+      ]
+    },
+    {
+      "id": "ro-dr-max",
+      "canonicalName": "Dr Max",
+      "aliases": [
+        "dr max",
+        "Dr Max"
+      ],
+      "normalizedAliases": [
+        "dr max"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Pharmacy",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 92,
+      "confidenceHint": "high",
+      "tags": [
+        "health",
+        "pharmacy"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "dr max"
+      ]
+    },
+    {
+      "id": "ro-omv",
+      "canonicalName": "OMV",
+      "aliases": [
+        "omv",
+        "OMV"
+      ],
+      "normalizedAliases": [
+        "omv"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 92,
+      "confidenceHint": "high",
+      "tags": [
+        "fuel",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "omv"
+      ]
+    },
+    {
+      "id": "ro-selgros",
+      "canonicalName": "Selgros",
+      "aliases": [
+        "selgros",
+        "Selgros",
+        "selgros cash carry"
+      ],
+      "normalizedAliases": [
+        "selgros",
+        "selgros cash carry"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Hypermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 92,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "hypermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "selgros",
+        "selgros cash carry"
+      ]
+    },
+    {
+      "id": "ro-altex",
+      "canonicalName": "Altex",
+      "aliases": [
+        "altex",
+        "Altex"
+      ],
+      "normalizedAliases": [
+        "altex"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Electronics",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "electronics",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "altex"
+      ]
+    },
+    {
+      "id": "ro-cora",
+      "canonicalName": "Cora",
+      "aliases": [
+        "cora",
+        "Cora",
+        "cora romania"
+      ],
+      "normalizedAliases": [
+        "cora",
+        "cora romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Hypermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "hypermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "cora",
+        "cora romania"
+      ]
+    },
+    {
+      "id": "ro-dedeman",
+      "canonicalName": "Dedeman",
+      "aliases": [
+        "dedeman",
+        "Dedeman"
+      ],
+      "normalizedAliases": [
+        "dedeman"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Home",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "home",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "dedeman"
+      ]
+    },
+    {
+      "id": "ro-farmacia-tei",
+      "canonicalName": "Farmacia Tei",
+      "aliases": [
+        "farmacia tei",
+        "Farmacia Tei"
+      ],
+      "normalizedAliases": [
+        "farmacia tei"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Pharmacy",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "health",
+        "pharmacy"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "farmacia tei"
+      ]
+    },
+    {
+      "id": "ro-help-net",
+      "canonicalName": "Help Net",
+      "aliases": [
+        "help net",
+        "Help Net"
+      ],
+      "normalizedAliases": [
+        "help net"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Pharmacy",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "health",
+        "pharmacy"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "help net"
+      ]
+    },
+    {
+      "id": "ro-kfc",
+      "canonicalName": "KFC",
+      "aliases": [
+        "kfc",
+        "KFC"
+      ],
+      "normalizedAliases": [
+        "kfc"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "Global",
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Fast Food",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "kfc"
+      ]
+    },
+    {
+      "id": "ro-mcdonalds",
+      "canonicalName": "McDonald's",
+      "aliases": [
+        "mc donalds",
+        "mcdonald's",
+        "McDonald's",
+        "mcdonalds"
+      ],
+      "normalizedAliases": [
+        "mc donalds",
+        "mcdonald s",
+        "mcdonalds"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "Global",
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Fast Food",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "mc donalds",
+        "mcdonald s",
+        "mcdonalds"
+      ]
+    },
+    {
+      "id": "ro-sensiblu",
+      "canonicalName": "Sensiblu",
+      "aliases": [
+        "sensiblu",
+        "Sensiblu"
+      ],
+      "normalizedAliases": [
+        "sensiblu"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Pharmacy",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "health",
+        "pharmacy"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "sensiblu"
+      ]
+    },
+    {
+      "id": "global-kfc",
+      "canonicalName": "KFC",
+      "aliases": [
+        "kfc",
+        "KFC"
+      ],
+      "normalizedAliases": [
+        "kfc"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Fast Food",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "fast-food",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "kfc"
+      ]
+    },
+    {
+      "id": "global-mcdonalds",
+      "canonicalName": "McDonald's",
+      "aliases": [
+        "mcdonald's",
+        "McDonald's",
+        "mcdonalds"
+      ],
+      "normalizedAliases": [
+        "mcdonald s",
+        "mcdonalds"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Fast Food",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "fast-food",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "mcdonald s",
+        "mcdonalds"
+      ]
+    },
+    {
+      "id": "global-starbucks",
+      "canonicalName": "Starbucks",
+      "aliases": [
+        "starbucks",
+        "Starbucks"
+      ],
+      "normalizedAliases": [
+        "starbucks"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Coffee",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 90,
+      "confidenceHint": "high",
+      "tags": [
+        "coffee",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "starbucks"
+      ]
+    },
+    {
+      "id": "ro-5-to-go",
+      "canonicalName": "5 to go",
+      "aliases": [
+        "5 to go",
+        "5togo"
+      ],
+      "normalizedAliases": [
+        "5 to go",
+        "5togo"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Coffee",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "coffee",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "5 to go",
+        "5togo"
+      ]
+    },
+    {
+      "id": "ro-brico-depot",
+      "canonicalName": "Brico Depot",
+      "aliases": [
+        "brico depot",
+        "Brico Depot"
+      ],
+      "normalizedAliases": [
+        "brico depot"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Home",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "home",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "brico depot"
+      ]
+    },
+    {
+      "id": "ro-digi",
+      "canonicalName": "Digi Romania",
+      "aliases": [
+        "digi",
+        "Digi",
+        "digi mobil",
+        "digi romania",
+        "Digi Romania",
+        "rcs rds"
+      ],
+      "normalizedAliases": [
+        "digi",
+        "digi mobil",
+        "digi romania",
+        "rcs rds"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Internet & TV",
+      "sourceType": "wikidata",
+      "sourceEvidence": [
+        "nsi",
+        "wikidata"
+      ],
+      "priority": 88,
+      "confidenceHint": "medium",
+      "tags": [
+        "internet",
+        "telecom",
+        "tv"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "digi",
+        "digi mobil",
+        "digi romania",
+        "rcs rds"
+      ]
+    },
+    {
+      "id": "ro-fan-courier",
+      "canonicalName": "Fan Courier",
+      "aliases": [
+        "fan",
+        "fan courier",
+        "Fan Courier"
+      ],
+      "normalizedAliases": [
+        "fan",
+        "fan courier"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Courier",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "courier",
+        "shipping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "fan",
+        "fan courier"
+      ]
+    },
+    {
+      "id": "ro-flanco",
+      "canonicalName": "Flanco",
+      "aliases": [
+        "flanco",
+        "Flanco"
+      ],
+      "normalizedAliases": [
+        "flanco"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Electronics",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "electronics",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "flanco"
+      ]
+    },
+    {
+      "id": "ro-hidroelectrica",
+      "canonicalName": "Hidroelectrica",
+      "aliases": [
+        "hidroelectrica",
+        "Hidroelectrica"
+      ],
+      "normalizedAliases": [
+        "hidroelectrica"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Utilities",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "electricity",
+        "utilities"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "hidroelectrica"
+      ]
+    },
+    {
+      "id": "ro-ikea",
+      "canonicalName": "IKEA",
+      "aliases": [
+        "ikea",
+        "IKEA",
+        "ikea romania"
+      ],
+      "normalizedAliases": [
+        "ikea",
+        "ikea romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Home",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "home",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "ikea",
+        "ikea romania"
+      ]
+    },
+    {
+      "id": "ro-leroy-merlin",
+      "canonicalName": "Leroy Merlin",
+      "aliases": [
+        "leroy merlin",
+        "Leroy Merlin"
+      ],
+      "normalizedAliases": [
+        "leroy merlin"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Home",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "home",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "leroy merlin"
+      ]
+    },
+    {
+      "id": "ro-lukoil",
+      "canonicalName": "Lukoil",
+      "aliases": [
+        "lukoil",
+        "Lukoil",
+        "lukoil romania"
+      ],
+      "normalizedAliases": [
+        "lukoil",
+        "lukoil romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "fuel",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "lukoil",
+        "lukoil romania"
+      ]
+    },
+    {
+      "id": "ro-medlife",
+      "canonicalName": "MedLife",
+      "aliases": [
+        "medlife",
+        "MedLife"
+      ],
+      "normalizedAliases": [
+        "medlife"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Clinics",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "clinic",
+        "health"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "medlife"
+      ]
+    },
+    {
+      "id": "ro-mega-image",
+      "canonicalName": "Mega Image",
+      "aliases": [
+        "mega image",
+        "Mega Image",
+        "mega image romania"
+      ],
+      "normalizedAliases": [
+        "mega image",
+        "mega image romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Supermarket",
+      "sourceType": "wikidata",
+      "sourceEvidence": [
+        "nsi",
+        "wikidata"
+      ],
+      "priority": 88,
+      "confidenceHint": "medium",
+      "tags": [
+        "grocery",
+        "supermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "mega image",
+        "mega image romania"
+      ]
+    },
+    {
+      "id": "ro-mol",
+      "canonicalName": "MOL",
+      "aliases": [
+        "mol",
+        "MOL"
+      ],
+      "normalizedAliases": [
+        "mol"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "medium",
+      "tags": [
+        "fuel",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "mol"
+      ]
+    },
+    {
+      "id": "ro-pc-garage",
+      "canonicalName": "PC Garage",
+      "aliases": [
+        "pc garage",
+        "PC Garage",
+        "pcgarage"
+      ],
+      "normalizedAliases": [
+        "pc garage",
+        "pcgarage"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Electronics",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "electronics",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "pc garage",
+        "pcgarage"
+      ]
+    },
+    {
+      "id": "ro-profi",
+      "canonicalName": "Profi",
+      "aliases": [
+        "profi",
+        "Profi",
+        "profi rom food",
+        "profi romania"
+      ],
+      "normalizedAliases": [
+        "profi",
+        "profi rom food",
+        "profi romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Supermarket",
+      "sourceType": "wikidata",
+      "sourceEvidence": [
+        "nsi",
+        "wikidata"
+      ],
+      "priority": 88,
+      "confidenceHint": "medium",
+      "tags": [
+        "grocery",
+        "supermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "profi",
+        "profi rom food",
+        "profi romania"
+      ]
+    },
+    {
+      "id": "ro-regina-maria",
+      "canonicalName": "Regina Maria",
+      "aliases": [
+        "regina maria",
+        "Regina Maria"
+      ],
+      "normalizedAliases": [
+        "regina maria"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Clinics",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "clinic",
+        "health"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "regina maria"
+      ]
+    },
+    {
+      "id": "ro-sameday",
+      "canonicalName": "Sameday",
+      "aliases": [
+        "easybox",
+        "sameday",
+        "Sameday"
+      ],
+      "normalizedAliases": [
+        "easybox",
+        "sameday"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Courier",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "courier",
+        "shipping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "easybox",
+        "sameday"
+      ]
+    },
+    {
+      "id": "ro-starbucks",
+      "canonicalName": "Starbucks",
+      "aliases": [
+        "starbucks",
+        "Starbucks",
+        "starbucks coffee"
+      ],
+      "normalizedAliases": [
+        "starbucks",
+        "starbucks coffee"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "Global",
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Coffee",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "coffee",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "starbucks",
+        "starbucks coffee"
+      ]
+    },
+    {
+      "id": "ro-supeco",
+      "canonicalName": "Supeco",
+      "aliases": [
+        "supeco",
+        "Supeco"
+      ],
+      "normalizedAliases": [
+        "supeco"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Hypermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 88,
+      "confidenceHint": "high",
+      "tags": [
+        "grocery",
+        "hypermarket"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "supeco"
+      ]
+    },
+    {
+      "id": "ro-burger-king",
+      "canonicalName": "Burger King",
+      "aliases": [
+        "burger king",
+        "Burger King"
+      ],
+      "normalizedAliases": [
+        "burger king"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "Global",
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Fast Food",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 86,
+      "confidenceHint": "high",
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "burger king"
+      ]
+    },
+    {
+      "id": "ro-enel",
+      "canonicalName": "Enel",
+      "aliases": [
+        "enel",
+        "Enel"
+      ],
+      "normalizedAliases": [
+        "enel"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Utilities",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 86,
+      "confidenceHint": "high",
+      "tags": [
+        "electricity",
+        "utilities"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "enel"
+      ]
+    },
+    {
+      "id": "ro-engie",
+      "canonicalName": "Engie",
+      "aliases": [
+        "engie",
+        "Engie"
+      ],
+      "normalizedAliases": [
+        "engie"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Utilities",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 86,
+      "confidenceHint": "high",
+      "tags": [
+        "gas",
+        "utilities"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "engie"
+      ]
+    },
+    {
+      "id": "ro-eon",
+      "canonicalName": "E.ON",
+      "aliases": [
+        "e.on",
+        "E.ON",
+        "eon"
+      ],
+      "normalizedAliases": [
+        "e on",
+        "eon"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Utilities",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 86,
+      "confidenceHint": "high",
+      "tags": [
+        "electricity",
+        "gas",
+        "utilities"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "e on",
+        "eon"
+      ]
+    },
+    {
+      "id": "ro-foodpanda",
+      "canonicalName": "Foodpanda",
+      "aliases": [
+        "food panda",
+        "foodpanda",
+        "Foodpanda"
+      ],
+      "normalizedAliases": [
+        "food panda",
+        "foodpanda"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Delivery",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 86,
+      "confidenceHint": "high",
+      "tags": [
+        "delivery",
+        "food"
+      ],
+      "family": null,
+      "familyAliases": [
+        "foodpanda ro"
+      ],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "food panda",
+        "foodpanda",
+        "foodpanda ro"
+      ]
+    },
+    {
+      "id": "ro-hornbach",
+      "canonicalName": "Hornbach",
+      "aliases": [
+        "hornbach",
+        "Hornbach"
+      ],
+      "normalizedAliases": [
+        "hornbach"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Home",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 86,
+      "confidenceHint": "high",
+      "tags": [
+        "home",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "hornbach"
+      ]
+    },
+    {
+      "id": "ro-mol-romania",
+      "canonicalName": "MOL Romania",
+      "aliases": [
+        "mol romania",
+        "MOL Romania",
+        "mol station"
+      ],
+      "normalizedAliases": [
+        "mol romania",
+        "mol station"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 86,
+      "confidenceHint": "high",
+      "tags": [
+        "fuel",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [
+        "mol romania"
+      ],
+      "searchKeys": [
+        "mol romania",
+        "mol station"
+      ]
+    },
+    {
+      "id": "ro-orange",
+      "canonicalName": "Orange Romania",
+      "aliases": [
+        "orange",
+        "Orange",
+        "orange ro",
+        "orange romania",
+        "Orange Romania"
+      ],
+      "normalizedAliases": [
+        "orange",
+        "orange ro",
+        "orange romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Mobile",
+      "sourceType": "wikidata",
+      "sourceEvidence": [
+        "nsi",
+        "wikidata"
+      ],
+      "priority": 86,
+      "confidenceHint": "medium",
+      "tags": [
+        "mobile",
+        "telecom"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "orange",
+        "orange ro",
+        "orange romania"
+      ]
+    },
+    {
+      "id": "ro-rompetrol",
+      "canonicalName": "Rompetrol",
+      "aliases": [
+        "rompetrol",
+        "Rompetrol",
+        "rompetrol downstream"
+      ],
+      "normalizedAliases": [
+        "rompetrol",
+        "rompetrol downstream"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "sourceType": "wikidata",
+      "sourceEvidence": [
+        "nsi",
+        "wikidata"
+      ],
+      "priority": 86,
+      "confidenceHint": "medium",
+      "tags": [
+        "fuel",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "rompetrol",
+        "rompetrol downstream"
+      ]
+    },
+    {
+      "id": "ro-vodafone",
+      "canonicalName": "Vodafone Romania",
+      "aliases": [
+        "vodafone",
+        "Vodafone",
+        "vodafone ro",
+        "vodafone romania",
+        "Vodafone Romania"
+      ],
+      "normalizedAliases": [
+        "vodafone",
+        "vodafone ro",
+        "vodafone romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Mobile",
+      "sourceType": "wikidata",
+      "sourceEvidence": [
+        "nsi",
+        "wikidata"
+      ],
+      "priority": 86,
+      "confidenceHint": "medium",
+      "tags": [
+        "mobile",
+        "telecom"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "vodafone",
+        "vodafone ro",
+        "vodafone romania"
+      ]
+    },
+    {
+      "id": "ro-apa-nova",
+      "canonicalName": "Apa Nova",
+      "aliases": [
+        "apa nova",
+        "Apa Nova"
+      ],
+      "normalizedAliases": [
+        "apa nova"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Utilities",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 84,
+      "confidenceHint": "high",
+      "tags": [
+        "utilities",
+        "water"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "apa nova"
+      ]
+    },
+    {
+      "id": "ro-cargus",
+      "canonicalName": "Cargus",
+      "aliases": [
+        "cargus",
+        "Cargus",
+        "urgent cargus"
+      ],
+      "normalizedAliases": [
+        "cargus",
+        "urgent cargus"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Courier",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 84,
+      "confidenceHint": "medium",
+      "tags": [
+        "courier",
+        "shipping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "cargus",
+        "urgent cargus"
+      ]
+    },
+    {
+      "id": "ro-dm",
+      "canonicalName": "dm drogerie markt",
+      "aliases": [
+        "dm",
+        "dm drogerie markt"
+      ],
+      "normalizedAliases": [
+        "dm",
+        "dm drogerie markt"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Personal Care",
+      "subcategory": "Beauty",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 84,
+      "confidenceHint": "high",
+      "tags": [
+        "beauty",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "dm",
+        "dm drogerie markt"
+      ]
+    },
+    {
+      "id": "ro-jysk",
+      "canonicalName": "JYSK",
+      "aliases": [
+        "jysk",
+        "JYSK"
+      ],
+      "normalizedAliases": [
+        "jysk"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Home",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 84,
+      "confidenceHint": "high",
+      "tags": [
+        "home",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "jysk"
+      ]
+    },
+    {
+      "id": "ro-metro",
+      "canonicalName": "Metro",
+      "aliases": [
+        "metro",
+        "Metro"
+      ],
+      "normalizedAliases": [
+        "metro"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Groceries",
+      "subcategory": "Hypermarket",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 84,
+      "confidenceHint": "medium",
+      "tags": [
+        "grocery",
+        "wholesale"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "metro"
+      ]
+    },
+    {
+      "id": "ro-ppc-energie",
+      "canonicalName": "PPC Energie",
+      "aliases": [
+        "ppc energie",
+        "PPC Energie",
+        "ppc energie romania"
+      ],
+      "normalizedAliases": [
+        "ppc energie",
+        "ppc energie romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Utilities",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 84,
+      "confidenceHint": "high",
+      "tags": [
+        "electricity",
+        "utilities"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "ppc energie",
+        "ppc energie romania"
+      ]
+    },
+    {
+      "id": "ro-sephora",
+      "canonicalName": "Sephora",
+      "aliases": [
+        "sephora",
+        "Sephora",
+        "sephora romania"
+      ],
+      "normalizedAliases": [
+        "sephora",
+        "sephora romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Personal Care",
+      "subcategory": "Beauty",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 84,
+      "confidenceHint": "high",
+      "tags": [
+        "beauty",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "sephora",
+        "sephora romania"
+      ]
+    },
+    {
+      "id": "ro-socar",
+      "canonicalName": "SOCAR",
+      "aliases": [
+        "socar",
+        "SOCAR"
+      ],
+      "normalizedAliases": [
+        "socar"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "sourceType": "manual",
+      "sourceEvidence": [
+        "manual"
+      ],
+      "priority": 84,
+      "confidenceHint": "high",
+      "tags": [
+        "fuel",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "socar"
+      ]
+    },
+    {
+      "id": "ro-cel",
+      "canonicalName": "CEL.ro",
+      "aliases": [
+        "cel",
+        "cel ro",
+        "cel.ro",
+        "CEL.ro"
+      ],
+      "normalizedAliases": [
+        "cel",
+        "cel ro"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Electronics",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "medium",
+      "tags": [
+        "electronics",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "cel",
+        "cel ro"
+      ]
+    },
+    {
+      "id": "ro-douglas",
+      "canonicalName": "Douglas",
+      "aliases": [
+        "douglas",
+        "Douglas"
+      ],
+      "normalizedAliases": [
+        "douglas"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Personal Care",
+      "subcategory": "Beauty",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "high",
+      "tags": [
+        "beauty",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "douglas"
+      ]
+    },
+    {
+      "id": "ro-dpd",
+      "canonicalName": "DPD",
+      "aliases": [
+        "dpd",
+        "DPD",
+        "dpd romania"
+      ],
+      "normalizedAliases": [
+        "dpd",
+        "dpd romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Courier",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "high",
+      "tags": [
+        "courier",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "dpd",
+        "dpd romania"
+      ]
+    },
+    {
+      "id": "ro-fashion-days",
+      "canonicalName": "Fashion Days",
+      "aliases": [
+        "fashion days",
+        "Fashion Days",
+        "fashiondays"
+      ],
+      "normalizedAliases": [
+        "fashion days",
+        "fashiondays"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Marketplace",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "high",
+      "tags": [
+        "marketplace",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "fashion days",
+        "fashiondays"
+      ]
+    },
+    {
+      "id": "ro-sanador",
+      "canonicalName": "Sanador",
+      "aliases": [
+        "sanador",
+        "Sanador"
+      ],
+      "normalizedAliases": [
+        "sanador"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Clinics",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "high",
+      "tags": [
+        "clinic",
+        "health"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "sanador"
+      ]
+    },
+    {
+      "id": "ro-telekom-mobile",
+      "canonicalName": "Telekom Romania Mobile",
+      "aliases": [
+        "telekom",
+        "telekom mobile",
+        "Telekom Mobile",
+        "telekom romania mobile",
+        "Telekom Romania Mobile",
+        "tkrm"
+      ],
+      "normalizedAliases": [
+        "telekom",
+        "telekom mobile",
+        "telekom romania mobile",
+        "tkrm"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Mobile",
+      "sourceType": "wikidata",
+      "sourceEvidence": [
+        "nsi",
+        "wikidata"
+      ],
+      "priority": 82,
+      "confidenceHint": "medium",
+      "tags": [
+        "mobile",
+        "telecom"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "telekom",
+        "telekom mobile",
+        "telekom romania mobile",
+        "tkrm"
+      ]
+    },
+    {
+      "id": "global-amazon",
+      "canonicalName": "Amazon",
+      "aliases": [
+        "amazon",
+        "Amazon",
+        "amazon eu",
+        "amazon marketplace"
+      ],
+      "normalizedAliases": [
+        "amazon",
+        "amazon eu",
+        "amazon marketplace"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Shopping",
+      "subcategory": "Marketplace",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "medium",
+      "tags": [
+        "marketplace",
+        "shopping"
+      ],
+      "family": "amazon",
+      "familyAliases": [
+        "amazon eu",
+        "amazon marketplace"
+      ],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "amazon",
+        "amazon eu",
+        "amazon marketplace"
+      ]
+    },
+    {
+      "id": "global-decathlon",
+      "canonicalName": "Decathlon",
+      "aliases": [
+        "decathlon",
+        "Decathlon"
+      ],
+      "normalizedAliases": [
+        "decathlon"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Sports & Fitness",
+      "subcategory": "Equipment",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "high",
+      "tags": [
+        "shopping",
+        "sports"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "decathlon"
+      ]
+    },
+    {
+      "id": "global-dhl",
+      "canonicalName": "DHL",
+      "aliases": [
+        "dhl",
+        "DHL"
+      ],
+      "normalizedAliases": [
+        "dhl"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Shopping",
+      "subcategory": "Courier",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "medium",
+      "tags": [
+        "courier",
+        "shipping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "dhl"
+      ]
+    },
+    {
+      "id": "global-ikea",
+      "canonicalName": "IKEA",
+      "aliases": [
+        "ikea",
+        "IKEA"
+      ],
+      "normalizedAliases": [
+        "ikea"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Shopping",
+      "subcategory": "Home",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 82,
+      "confidenceHint": "high",
+      "tags": [
+        "home",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "ikea"
+      ]
+    },
+    {
+      "id": "ro-synevo",
+      "canonicalName": "Synevo",
+      "aliases": [
+        "synevo",
+        "Synevo"
+      ],
+      "normalizedAliases": [
+        "synevo"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Health",
+      "subcategory": "Clinics",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 80,
+      "confidenceHint": "high",
+      "tags": [
+        "clinic",
+        "health"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "synevo"
+      ]
+    },
+    {
+      "id": "ro-telekom-fixed",
+      "canonicalName": "Telekom",
+      "aliases": [
+        "telekom",
+        "Telekom",
+        "telekom romania"
+      ],
+      "normalizedAliases": [
+        "telekom",
+        "telekom romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Utilities",
+      "subcategory": "Internet & TV",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 80,
+      "confidenceHint": "medium",
+      "tags": [
+        "internet",
+        "telecom",
+        "tv"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [
+        "telekom romania"
+      ],
+      "searchKeys": [
+        "telekom",
+        "telekom romania"
+      ]
+    },
+    {
+      "id": "eu-notino",
+      "canonicalName": "Notino",
+      "aliases": [
+        "notino",
+        "Notino"
+      ],
+      "normalizedAliases": [
+        "notino"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "EU"
+      ],
+      "category": "Shopping",
+      "subcategory": "Beauty",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 80,
+      "confidenceHint": "high",
+      "tags": [
+        "beauty",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "notino"
+      ]
+    },
+    {
+      "id": "ro-olx",
+      "canonicalName": "OLX",
+      "aliases": [
+        "olx",
+        "OLX",
+        "olx romania"
+      ],
+      "normalizedAliases": [
+        "olx",
+        "olx romania"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Shopping",
+      "subcategory": "Marketplace",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 78,
+      "confidenceHint": "medium",
+      "tags": [
+        "marketplace",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "olx",
+        "olx romania"
+      ]
+    },
+    {
+      "id": "ro-salad-box",
+      "canonicalName": "Salad Box",
+      "aliases": [
+        "salad box",
+        "Salad Box",
+        "saladbox"
+      ],
+      "normalizedAliases": [
+        "salad box",
+        "saladbox"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Fast Food",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 78,
+      "confidenceHint": "high",
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "salad box",
+        "saladbox"
+      ]
+    },
+    {
+      "id": "ro-youtube-premium",
+      "canonicalName": "YouTube Premium",
+      "aliases": [
+        "youtube",
+        "youtube premium",
+        "YouTube Premium"
+      ],
+      "normalizedAliases": [
+        "youtube",
+        "youtube premium"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "Global",
+        "RO"
+      ],
+      "category": "Subscriptions",
+      "subcategory": "Entertainment",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 78,
+      "confidenceHint": "medium",
+      "tags": [
+        "streaming",
+        "subscription"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "youtube",
+        "youtube premium"
+      ]
+    },
+    {
+      "id": "global-gls",
+      "canonicalName": "GLS",
+      "aliases": [
+        "gls",
+        "GLS"
+      ],
+      "normalizedAliases": [
+        "gls"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "Global"
+      ],
+      "category": "Shopping",
+      "subcategory": "Courier",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 78,
+      "confidenceHint": "medium",
+      "tags": [
+        "courier",
+        "shipping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "gls"
+      ]
+    },
+    {
+      "id": "ro-oscar",
+      "canonicalName": "OSCAR",
+      "aliases": [
+        "dieselpoint",
+        "oscar",
+        "OSCAR",
+        "oscar downstream"
+      ],
+      "normalizedAliases": [
+        "dieselpoint",
+        "oscar",
+        "oscar downstream"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "sourceType": "wikidata",
+      "sourceEvidence": [
+        "wikidata"
+      ],
+      "priority": 76,
+      "confidenceHint": "medium",
+      "tags": [
+        "fuel",
+        "transport"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "dieselpoint",
+        "oscar",
+        "oscar downstream"
+      ]
+    },
+    {
+      "id": "ro-spartan",
+      "canonicalName": "Spartan",
+      "aliases": [
+        "spartan",
+        "Spartan"
+      ],
+      "normalizedAliases": [
+        "spartan"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Fast Food",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 76,
+      "confidenceHint": "high",
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "spartan"
+      ]
+    },
+    {
+      "id": "ro-apple-services",
+      "canonicalName": "Apple Services",
+      "aliases": [
+        "apple bill",
+        "apple services",
+        "Apple Services",
+        "apple.com bill"
+      ],
+      "normalizedAliases": [
+        "apple bill",
+        "apple com bill",
+        "apple services"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "Global",
+        "RO"
+      ],
+      "category": "Subscriptions",
+      "subcategory": "Entertainment",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 74,
+      "confidenceHint": "medium",
+      "tags": [
+        "streaming",
+        "subscription"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "apple bill",
+        "apple com bill",
+        "apple services"
+      ]
+    },
+    {
+      "id": "ro-cfr-calatori",
+      "canonicalName": "CFR Calatori",
+      "aliases": [
+        "bilete cfr",
+        "cfr calatori",
+        "CFR Calatori",
+        "cfr calatori sa"
+      ],
+      "normalizedAliases": [
+        "bilete cfr",
+        "cfr calatori"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Travel",
+      "subcategory": "Travel",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 74,
+      "confidenceHint": "medium",
+      "tags": [
+        "transport",
+        "travel"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "bilete cfr",
+        "cfr calatori"
+      ]
+    },
+    {
+      "id": "ro-mesopotamia",
+      "canonicalName": "Mesopotamia",
+      "aliases": [
+        "mesopotamia",
+        "Mesopotamia"
+      ],
+      "normalizedAliases": [
+        "mesopotamia"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "RO"
+      ],
+      "category": "Food & Dining",
+      "subcategory": "Fast Food",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 74,
+      "confidenceHint": "high",
+      "tags": [
+        "food",
+        "restaurant"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "mesopotamia"
+      ]
+    },
+    {
+      "id": "ro-google-play",
+      "canonicalName": "Google Play",
+      "aliases": [
+        "google play",
+        "Google Play",
+        "google services"
+      ],
+      "normalizedAliases": [
+        "google play",
+        "google services"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "Global",
+        "RO"
+      ],
+      "category": "Subscriptions",
+      "subcategory": "Entertainment",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 72,
+      "confidenceHint": "medium",
+      "tags": [
+        "streaming",
+        "subscription"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "google play",
+        "google services"
+      ]
+    },
+    {
+      "id": "eu-dm",
+      "canonicalName": "DM",
+      "aliases": [
+        "dm",
+        "DM",
+        "dm drogerie"
+      ],
+      "normalizedAliases": [
+        "dm",
+        "dm drogerie"
+      ],
+      "countryCodes": [],
+      "regions": [
+        "EU"
+      ],
+      "category": "Shopping",
+      "subcategory": "Beauty",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 70,
+      "confidenceHint": "medium",
+      "tags": [
+        "beauty",
+        "shopping"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "dm",
+        "dm drogerie"
+      ]
+    },
+    {
+      "id": "ro-blue-air",
+      "canonicalName": "Blue Air",
+      "aliases": [
+        "blue air",
+        "Blue Air"
+      ],
+      "normalizedAliases": [
+        "blue air"
+      ],
+      "countryCodes": [
+        "RO"
+      ],
+      "regions": [
+        "EU",
+        "RO"
+      ],
+      "category": "Travel",
+      "subcategory": "Flights",
+      "sourceType": "nsi",
+      "sourceEvidence": [
+        "nsi"
+      ],
+      "priority": 68,
+      "confidenceHint": "medium",
+      "tags": [
+        "airline",
+        "travel"
+      ],
+      "family": null,
+      "familyAliases": [],
+      "fallbackKeywords": [],
+      "searchKeys": [
+        "blue air"
+      ]
+    }
+  ]
+}

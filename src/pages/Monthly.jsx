@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
+import { CalendarDays } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { getDailySpend, getMonthlySummary, getUniqueMonths } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
+import { EmptyState } from '../components/ui';
 
 export default function Monthly() {
   const { data, currencySummary } = useAppContext();
@@ -46,20 +48,20 @@ export default function Monthly() {
           includeIncome ? {
             label: 'Income',
             data: monthlySummary.map(d => d.inc),
-            backgroundColor: 'rgba(52, 199, 89, 0.82)',
-            borderColor: '#FFFFFF',
-            borderWidth: 2,
-            borderRadius: 6,
+            backgroundColor: 'rgba(31, 157, 90, 0.82)',
+            borderColor: 'rgba(31, 157, 90, 0.95)',
+            borderWidth: 1,
+            borderRadius: 10,
             barPercentage: 0.7,
             categoryPercentage: 0.7,
           } : null,
           includeExpenses ? {
             label: 'Expenses',
             data: monthlySummary.map(d => d.exp),
-            backgroundColor: 'rgba(255, 59, 48, 0.82)',
-            borderColor: '#FFFFFF',
-            borderWidth: 2,
-            borderRadius: 6,
+            backgroundColor: 'rgba(209, 79, 69, 0.82)',
+            borderColor: 'rgba(209, 79, 69, 0.95)',
+            borderWidth: 1,
+            borderRadius: 10,
             barPercentage: 0.7,
             categoryPercentage: 0.7,
           } : null,
@@ -73,19 +75,19 @@ export default function Monthly() {
         includeIncome ? {
           label: 'Income',
           data: (dailyData || []).map(d => d.inc),
-          backgroundColor: 'rgba(52, 199, 89, 0.85)',
-          borderColor: '#FFFFFF',
-          borderWidth: 2,
-          borderRadius: 6,
+          backgroundColor: 'rgba(31, 157, 90, 0.85)',
+          borderColor: 'rgba(31, 157, 90, 0.95)',
+          borderWidth: 1,
+          borderRadius: 10,
           barPercentage: 0.65,
         } : null,
         includeExpenses ? {
           label: 'Expenses',
           data: (dailyData || []).map(d => d.exp),
-          backgroundColor: 'rgba(255, 59, 48, 0.85)',
-          borderColor: '#FFFFFF',
-          borderWidth: 2,
-          borderRadius: 6,
+          backgroundColor: 'rgba(209, 79, 69, 0.85)',
+          borderColor: 'rgba(209, 79, 69, 0.95)',
+          borderWidth: 1,
+          borderRadius: 10,
           barPercentage: 0.65,
         } : null,
       ].filter(Boolean),
@@ -94,14 +96,13 @@ export default function Monthly() {
 
   if (txns.length === 0) {
     return (
-      <div>
-        <h2 style={{ marginBottom: '20px' }}>Monthly Breakdown</h2>
-        <div className="empty-state">
-          <div className="empty-state-icon">&#128197;</div>
-          <div className="empty-state-title">No data yet</div>
-          <div className="empty-state-desc">Upload a CSV to view monthly breakdowns.</div>
+      <div className="page-stack">
+        <div>
+          <h2 className="page-title" style={{ marginBottom: '10px' }}>Monthly Breakdown</h2>
+          <div className="page-subtitle">Use this page to compare months and then zoom into a single month’s daily movement.</div>
         </div>
-        <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '10px' }}>Last data update: {lastUpdated}</div>
+        <EmptyState icon={CalendarDays} title="No monthly activity yet" description="Import transactions to compare months and inspect daily movement." />
+        <div className="section-note">Last data update: {lastUpdated}</div>
       </div>
     );
   }
@@ -111,10 +112,13 @@ export default function Monthly() {
     : monthlySummary.find(m => m.month === effectiveSelectedMonth) || { inc: 0, exp: 0, net: 0 };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2 style={{ margin: 0 }}>Monthly Breakdown</h2>
-        <div style={{ fontSize: '12px', color: 'var(--muted)' }}>Last updated: {lastUpdated}</div>
+    <div className="page-stack">
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Monthly Breakdown</h2>
+          <div className="page-subtitle">Switch between the full monthly trend and a single month’s daily spending pattern.</div>
+        </div>
+        <div className="topbar-meta">Last updated: {lastUpdated}</div>
       </div>
       {currencySummary.hasMixedCurrencies && (
         <div style={{ marginBottom: '20px' }}>
@@ -122,39 +126,24 @@ export default function Monthly() {
         </div>
       )}
 
-      <div className="card" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--muted)' }}>View:</label>
+      <div className="card" style={{ marginBottom: '0' }}>
+        <div className="filter-row">
+        <label style={{ fontSize: '13px', fontWeight: 700, color: 'var(--muted)' }}>View</label>
         <select 
+          className="input select-inline"
           value={effectiveSelectedMonth} 
           onChange={(e) => setSelectedMonth(e.target.value)}
-          style={{ 
-            padding: '8px 12px', 
-            borderRadius: '6px', 
-            border: '1px solid var(--border)', 
-            background: 'var(--bg)', 
-            color: 'var(--text)',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
         >
           {uniqueMonths.map(m => (
             <option key={m} value={m}>{m}</option>
           ))}
           <option value="All">All Months (Trend)</option>
         </select>
-        <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--muted)' }}>Series:</label>
+        <label style={{ fontSize: '13px', fontWeight: 700, color: 'var(--muted)' }}>Series</label>
         <select
+          className="input select-inline"
           value={seriesFilter}
           onChange={(e) => setSeriesFilter(e.target.value)}
-          style={{
-            padding: '8px 12px',
-            borderRadius: '6px',
-            border: '1px solid var(--border)',
-            background: 'var(--bg)',
-            color: 'var(--text)',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
         >
           <option value="both">Income + Expenses</option>
           <option value="income">Income only</option>
@@ -162,16 +151,22 @@ export default function Monthly() {
         </select>
         
         {currentMonthStats && (
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '24px', fontSize: '14px' }}>
-            <span>Income: <strong style={{ color: 'var(--green)' }}>{formatCurrency(currentMonthStats.inc, displayCurrency)}</strong></span>
-            <span>Expenses: <strong style={{ color: 'var(--red)' }}>{formatCurrency(currentMonthStats.exp, displayCurrency)}</strong></span>
-            <span>Net: <strong style={{ color: currentMonthStats.net >= 0 ? 'var(--accent)' : 'var(--red)' }}>{formatCurrency(currentMonthStats.net, displayCurrency)}</strong></span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '18px', fontSize: '13px', flexWrap: 'wrap' }}>
+            <span className="tag-pill">Income <strong style={{ color: 'var(--success)' }}>{formatCurrency(currentMonthStats.inc, displayCurrency)}</strong></span>
+            <span className="tag-pill">Expenses <strong style={{ color: 'var(--danger)' }}>{formatCurrency(currentMonthStats.exp, displayCurrency)}</strong></span>
+            <span className="tag-pill">Net <strong style={{ color: currentMonthStats.net >= 0 ? 'var(--accent)' : 'var(--danger)' }}>{formatCurrency(currentMonthStats.net, displayCurrency)}</strong></span>
           </div>
         )}
+        </div>
       </div>
 
-      <div className="card" style={{ marginBottom: '20px' }}>
+      <div className="card" style={{ marginBottom: '0' }}>
         <div className="card-title">{effectiveSelectedMonth === 'All' ? 'Monthly Trend' : `Daily Breakdown: ${effectiveSelectedMonth}`}</div>
+        <div className="section-note" style={{ marginBottom: '16px' }}>
+          {effectiveSelectedMonth === 'All'
+            ? 'Compare income and expenses across months to see structural changes in your finances.'
+            : 'Use the daily view to identify spikes, clustered bills, or quiet spending periods inside one month.'}
+        </div>
         <ChartWrapper
           type="bar"
           data={chartData}
@@ -180,7 +175,7 @@ export default function Monthly() {
         />
       </div>
 
-      <div className="card">
+      <div className="card" style={{ marginBottom: '0' }}>
         <div className="card-title">Monthly Summary Table</div>
         <div className="tbl-wrap">
           <table>

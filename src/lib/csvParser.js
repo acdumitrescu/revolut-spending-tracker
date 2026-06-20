@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { ParsedCSVSchema } from './validation';
-import builtInVendorRules from './vendorRules.json';
+import { defaultVendorMatcher, normalizeText, normalizeVendorKey } from './vendorKnowledge';
 
 const PROFILE_REGISTRY = [
   {
@@ -91,20 +91,6 @@ const HEADER_ALIASES = {
   subcategory: ['subcategory'],
   account: ['account'],
 };
-
-function normalizeText(value) {
-  return String(value || '')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^\w\s/-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
-}
-
-function normalizeVendorKey(value) {
-  return normalizeText(value);
-}
 
 function normalizeHeader(value) {
   return normalizeText(value);
@@ -238,57 +224,13 @@ function getFirstMappedValue(row, headerLookup, canonicalKeys) {
   return '';
 }
 
-function sortVendorMappings(vendors) {
-  return Object.entries(vendors).sort((a, b) => normalizeVendorKey(b[0]).length - normalizeVendorKey(a[0]).length);
+export function categorizeTransactionDetailed(description, amount, customVendors = {}) {
+  return defaultVendorMatcher.classifyVendor(description, amount, customVendors);
 }
-
-function vendorMatches(normalizedDescription, vendor) {
-  const normalizedVendor = normalizeVendorKey(vendor);
-  if (!normalizedVendor) return false;
-  if (normalizedDescription === normalizedVendor) return true;
-  return normalizedDescription.includes(`${normalizedVendor} `) ||
-    normalizedDescription.includes(` ${normalizedVendor}`) ||
-    normalizedDescription.includes(` ${normalizedVendor} `);
-}
-
-function getBuiltInVendorMatchers() {
-  return builtInVendorRules
-    .flatMap((rule) => rule.aliases.map((alias) => ({
-      alias,
-      category: rule.category,
-      subcategory: rule.subcategory,
-      precedence: rule.precedence || 0,
-    })))
-    .sort((a, b) => {
-      const aliasLengthDiff = normalizeVendorKey(b.alias).length - normalizeVendorKey(a.alias).length;
-      if (aliasLengthDiff !== 0) return aliasLengthDiff;
-      if (b.precedence !== a.precedence) return b.precedence - a.precedence;
-      return a.alias.localeCompare(b.alias);
-    });
-}
-
-const BUILT_IN_VENDOR_MATCHERS = getBuiltInVendorMatchers();
 
 export function categorizeTransaction(description, amount, customVendors = {}) {
-  if (amount > 0) {
-    return ['Income', 'Income'];
-  }
-
-  const descLower = normalizeText(description);
-
-  for (const [vendor, [cat, sub]] of sortVendorMappings(customVendors)) {
-    if (vendorMatches(descLower, vendor)) {
-      return [cat, sub];
-    }
-  }
-
-  for (const matcher of BUILT_IN_VENDOR_MATCHERS) {
-    if (vendorMatches(descLower, matcher.alias)) {
-      return [matcher.category, matcher.subcategory];
-    }
-  }
-
-  return ['Other', 'Other'];
+  const result = categorizeTransactionDetailed(description, amount, customVendors);
+  return [result.category, result.subcategory];
 }
 
 function categorizeNormalizedTransaction(description, amount, type, customVendors) {
@@ -296,27 +238,56 @@ function categorizeNormalizedTransaction(description, amount, type, customVendor
   const lowerType = normalizeText(normalizedType);
 
   if (amount > 0 && (lowerType.includes('refund') || lowerType.includes('chargeback'))) {
-    return ['Refunds', 'Refunds'];
+    return {
+      category: 'Refunds',
+      subcategory: 'Refunds',
+      matchedVendor: 'Refund',
+      matchedAlias: normalizedType,
+      matchSource: 'system',
+      confidence: 'high',
+    };
   }
 
   if (lowerType.includes('transfer')) {
-    return ['Transfers', 'Transfers'];
+    return {
+      category: 'Transfers',
+      subcategory: 'Transfers',
+      matchedVendor: 'Transfer',
+      matchedAlias: normalizedType,
+      matchSource: 'system',
+      confidence: 'high',
+    };
   }
 
   if (lowerType.includes('top up')) {
-    return ['Savings', 'Top Up'];
+    return {
+      category: 'Savings',
+      subcategory: 'Top Up',
+      matchedVendor: 'Top Up',
+      matchedAlias: normalizedType,
+      matchSource: 'system',
+      confidence: 'high',
+    };
   }
 
   if (lowerType.includes('cash')) {
-    return ['Cash', 'Cash Withdrawal'];
+    return {
+      category: 'Cash',
+      subcategory: 'Cash Withdrawal',
+      matchedVendor: 'Cash Withdrawal',
+      matchedAlias: normalizedType,
+      matchSource: 'system',
+      confidence: 'high',
+    };
   }
 
-  return categorizeTransaction(description, amount, customVendors);
+  return categorizeTransactionDetailed(description, amount, customVendors);
 }
 
 function buildWarnings(profile, headerLookup) {
   const warnings = [];
   const warningSet = new Set();
+  const validationCategories = {};
 
   function pushWarning(message) {
     if (!warningSet.has(message)) {
@@ -325,12 +296,18 @@ function buildWarnings(profile, headerLookup) {
     }
   }
 
+  function tagValidation(category) {
+    validationCategories[category] = (validationCategories[category] || 0) + 1;
+  }
+
   if (headerLookup.unrecognizedHeaders.length > 0) {
     pushWarning(`Unrecognized columns ignored: ${headerLookup.unrecognizedHeaders.slice(0, 5).join(', ')}${headerLookup.unrecognizedHeaders.length > 5 ? ', ...' : ''}`);
+    tagValidation('unrecognized-columns');
   }
 
   if (headerLookup.unrecognizedHeaders.length > 0 && headerLookup.recognizedHeaders.size > 0) {
     pushWarning('Partially recognized header set detected. Parsed using the closest supported profile.');
+    tagValidation('partial-header-match');
   }
 
   if (
@@ -338,6 +315,7 @@ function buildWarnings(profile, headerLookup) {
     hasAnyHeaderGroup(headerLookup, ['date_started_local'])
   ) {
     pushWarning('Both UTC and local started-date columns detected. Local/completed dates are preferred when available.');
+    tagValidation('multiple-date-sources');
   }
 
   if (
@@ -345,6 +323,7 @@ function buildWarnings(profile, headerLookup) {
     hasAnyHeaderGroup(headerLookup, ['date_completed_local'])
   ) {
     pushWarning('Both UTC and local completed-date columns detected. Local completed dates are preferred when available.');
+    tagValidation('multiple-date-sources');
   }
 
   if (
@@ -352,6 +331,7 @@ function buildWarnings(profile, headerLookup) {
     hasAnyHeaderGroup(headerLookup, ['amount_original'])
   ) {
     pushWarning('Both payment and original amount columns detected. Payment amount is used for analytics.');
+    tagValidation('multiple-amount-sources');
   }
 
   if (
@@ -359,13 +339,65 @@ function buildWarnings(profile, headerLookup) {
     hasAnyHeaderGroup(headerLookup, ['currency_original'])
   ) {
     pushWarning('Both payment and original currency columns detected. Payment currency is preferred when available.');
+    tagValidation('multiple-currency-sources');
   }
 
   if (profile.id === 'normalized-csv' && !hasAnyHeaderGroup(headerLookup, ['flow'])) {
     pushWarning('Normalized CSV is missing an explicit Flow column. Flow will fall back to amount sign.');
+    tagValidation('flow-derived-from-sign');
   }
 
-  return warnings;
+  return {
+    warnings,
+    validationCategories,
+  };
+}
+
+function buildVendorObservation(transaction, classification) {
+  if (classification.matchSource !== 'none') return null;
+
+  return {
+    normalizedDescription: normalizeVendorKey(transaction.desc),
+    rawDescription: transaction.desc,
+    amountAbs: Math.abs(transaction.amt),
+    count: 1,
+    firstSeenAt: transaction.date,
+    lastSeenAt: transaction.date,
+    suggestedCandidates: classification.candidateSuggestions || [],
+  };
+}
+
+function mergeVendorObservations(observations) {
+  const merged = new Map();
+
+  for (const observation of observations.filter(Boolean)) {
+    const existing = merged.get(observation.normalizedDescription);
+    if (!existing) {
+      merged.set(observation.normalizedDescription, {
+        ...observation,
+      });
+      continue;
+    }
+
+    const sampleSet = new Set([existing.rawDescription, observation.rawDescription].filter(Boolean));
+    const preferredSuggestionMap = new Map(
+      [...existing.suggestedCandidates, ...observation.suggestedCandidates]
+        .sort((a, b) => a.score - b.score)
+        .map((candidate) => [`${candidate.canonicalName}:${candidate.alias}`, candidate])
+    );
+
+    merged.set(observation.normalizedDescription, {
+      normalizedDescription: observation.normalizedDescription,
+      rawDescription: [...sampleSet][0],
+      amountAbs: existing.amountAbs + observation.amountAbs,
+      count: existing.count + observation.count,
+      firstSeenAt: existing.firstSeenAt < observation.firstSeenAt ? existing.firstSeenAt : observation.firstSeenAt,
+      lastSeenAt: existing.lastSeenAt > observation.lastSeenAt ? existing.lastSeenAt : observation.lastSeenAt,
+      suggestedCandidates: [...preferredSuggestionMap.values()].slice(0, 3),
+    });
+  }
+
+  return [...merged.values()].sort((a, b) => b.amountAbs - a.amountAbs);
 }
 
 function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
@@ -395,9 +427,21 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
   let sub = String(getFirstMappedValue(row, headerLookup, ['subcategory']) || '').trim();
   const flowRaw = String(getFirstMappedValue(row, headerLookup, ['flow']) || '').trim();
   const flow = flowRaw || (amount > 0 ? 'Credit' : 'Debit');
+  let classification = {
+    matchedVendor: undefined,
+    matchedAlias: undefined,
+    matchedVendorId: undefined,
+    matchedRegion: undefined,
+    matchSource: 'none',
+    matchStrategy: 'none',
+    confidence: 'none',
+  };
 
   if (!cat || !sub || cat === 'nan' || sub === 'nan') {
-    [cat, sub] = categorizeNormalizedTransaction(desc, amount, type, customVendors);
+    const derived = categorizeNormalizedTransaction(desc, amount, type, customVendors);
+    cat = derived.category;
+    sub = derived.subcategory;
+    classification = derived;
   }
 
   return {
@@ -413,7 +457,19 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
       currency: currency || undefined,
       ref: ref || undefined,
       source: profile.source,
+      matchedVendor: classification.matchedVendor,
+      matchedAlias: classification.matchedAlias,
+      matchedVendorId: classification.matchedVendorId,
+      matchedRegion: classification.matchedRegion,
+      matchSource: classification.matchSource,
+      matchStrategy: classification.matchStrategy,
+      confidence: classification.confidence,
     },
+    vendorObservation: buildVendorObservation({
+      date,
+      desc,
+      amt: amount,
+    }, classification),
   };
 }
 
@@ -445,12 +501,13 @@ export function parseCSV(file, customVendors = {}) {
         const { profile, headerLookup } = detectProfile(columns);
 
         if (!profile) {
-          reject(new Error('Unknown CSV format. Columns: ' + columns.join(', ')));
+          reject(new Error(`Unknown CSV format. Validation category: unsupported-file-shape. Columns: ${columns.join(', ')}`));
           return;
         }
 
-        const warnings = buildWarnings(profile, headerLookup);
+        const { warnings, validationCategories } = buildWarnings(profile, headerLookup);
         const processed = [];
+        const vendorObservations = [];
         const skippedDetails = [];
         const skippedReasonCounts = {};
 
@@ -460,9 +517,21 @@ export function parseCSV(file, customVendors = {}) {
             skippedDetails.push(result.error);
             const reason = result.error.split(': ').at(-1);
             skippedReasonCounts[reason] = (skippedReasonCounts[reason] || 0) + 1;
+            if (reason.includes('invalid amount')) {
+              validationCategories['suspicious-amount'] = (validationCategories['suspicious-amount'] || 0) + 1;
+            } else if (reason.includes('invalid date')) {
+              validationCategories['suspicious-date'] = (validationCategories['suspicious-date'] || 0) + 1;
+            } else if (reason.includes('missing description')) {
+              validationCategories['missing-description'] = (validationCategories['missing-description'] || 0) + 1;
+            } else if (reason.includes('zero-value')) {
+              validationCategories['zero-value-row'] = (validationCategories['zero-value-row'] || 0) + 1;
+            }
             continue;
           }
           processed.push(result.transaction);
+          if (result.vendorObservation) {
+            vendorObservations.push(result.vendorObservation);
+          }
         }
 
         const payload = {
@@ -476,7 +545,10 @@ export function parseCSV(file, customVendors = {}) {
             warnings,
             skippedReasonCounts,
             skippedDetails,
+            validationCategories,
+            unknownVendorCount: vendorObservations.length,
           },
+          vendorObservations: mergeVendorObservations(vendorObservations),
         };
 
         const validated = ParsedCSVSchema.safeParse(payload);

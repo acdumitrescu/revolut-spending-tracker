@@ -39,7 +39,7 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
             <div className="card-title" style={{ marginBottom: '6px' }}>Import Summary</div>
             <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.5 }}>
               {fileName ? `File: ${fileName}` : 'Imported file'} was parsed locally in your browser.
-              Nothing from this CSV is uploaded to a backend service.
+              If private sync is enabled for this deployment, only the resulting app state may later sync to your own server.
             </div>
           </div>
           <button className="btn" type="button" onClick={onClose} style={{ whiteSpace: 'nowrap' }}>
@@ -95,6 +95,23 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
             ) : (
               <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
                 No rows were skipped.
+              </div>
+            )}
+          </section>
+
+          <section className="card" style={{ margin: 0 }}>
+            <div className="card-title">Validation Categories</div>
+            {Object.keys(summary.validationCategories || {}).length ? (
+              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--text)', lineHeight: 1.6 }}>
+                {Object.entries(summary.validationCategories).map(([category, count]) => (
+                  <li key={category}>
+                    {category} ({count})
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
+                No validation categories were triggered for this import.
               </div>
             )}
           </section>

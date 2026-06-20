@@ -13,9 +13,12 @@ Use this checklist before sharing, pushing, or publishing anything from SimpleSa
 
 By default, this data lives only in your browser `localStorage`.
 
+If you enable the private-sync deployment profile, a versioned copy of the app state may also be written to your own private server.
+
 ## What leaves the browser
 
-- nothing from your transaction or account data is uploaded by default
+- nothing from your transaction or account data is uploaded by default in `client-only` mode
+- in `private-sync` mode, the versioned app state may sync to your own private deployment
 - the only intended network request is optional FX refresh for `RON -> EUR/USD` rates
 - if FX refresh fails, the app continues using saved local rates
 
@@ -25,6 +28,7 @@ By default, this data lives only in your browser `localStorage`.
 - `Export Excel` writes a workbook version of your local app data to your machine
 - `Restore Backup JSON` reads a local file back into the browser
 - `Import Revolut CSV` parses the CSV locally in the browser
+- private-sync stores one private state blob for your deployment rather than creating public user accounts
 
 Treat exported JSON and Excel files as private personal data.
 

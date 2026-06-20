@@ -1,0 +1,102 @@
+{
+  "sourceType": "wikidata",
+  "sourceName": "wikidata-ro-snapshot",
+  "records": [
+    {
+      "id": "ro-orange",
+      "canonicalName": "Orange Romania",
+      "aliases": ["orange romania", "orange ro"],
+      "countryCodes": ["RO"],
+      "regions": ["RO"],
+      "category": "Telecom",
+      "subcategory": "Mobile",
+      "priority": 86,
+      "confidenceHint": "medium",
+      "tags": ["telecom", "mobile"]
+    },
+    {
+      "id": "ro-vodafone",
+      "canonicalName": "Vodafone Romania",
+      "aliases": ["vodafone romania", "vodafone ro"],
+      "countryCodes": ["RO"],
+      "regions": ["RO"],
+      "category": "Telecom",
+      "subcategory": "Mobile",
+      "priority": 86,
+      "confidenceHint": "medium",
+      "tags": ["telecom", "mobile"]
+    },
+    {
+      "id": "ro-digi",
+      "canonicalName": "Digi Romania",
+      "aliases": ["digi romania", "digi mobil"],
+      "countryCodes": ["RO"],
+      "regions": ["RO"],
+      "category": "Telecom",
+      "subcategory": "Internet & TV",
+      "priority": 88,
+      "confidenceHint": "medium",
+      "tags": ["telecom", "internet", "tv"]
+    },
+    {
+      "id": "ro-telekom-mobile",
+      "canonicalName": "Telekom Romania Mobile",
+      "aliases": ["telekom romania mobile", "tkrm"],
+      "countryCodes": ["RO"],
+      "regions": ["RO"],
+      "category": "Telecom",
+      "subcategory": "Mobile",
+      "priority": 82,
+      "confidenceHint": "medium",
+      "tags": ["telecom", "mobile"]
+    },
+    {
+      "id": "ro-mega-image",
+      "canonicalName": "Mega Image",
+      "aliases": ["mega image romania"],
+      "countryCodes": ["RO"],
+      "regions": ["RO"],
+      "category": "Groceries",
+      "subcategory": "Supermarket",
+      "priority": 88,
+      "confidenceHint": "medium",
+      "tags": ["grocery", "supermarket"]
+    },
+    {
+      "id": "ro-profi",
+      "canonicalName": "Profi",
+      "aliases": ["profi rom food", "profi romania"],
+      "countryCodes": ["RO"],
+      "regions": ["RO"],
+      "category": "Groceries",
+      "subcategory": "Supermarket",
+      "priority": 88,
+      "confidenceHint": "medium",
+      "tags": ["grocery", "supermarket"]
+    },
+    {
+      "id": "ro-rompetrol",
+      "canonicalName": "Rompetrol",
+      "aliases": ["rompetrol downstream"],
+      "countryCodes": ["RO"],
+      "regions": ["RO"],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "priority": 86,
+      "confidenceHint": "medium",
+      "tags": ["transport", "fuel"]
+    },
+    {
+      "id": "ro-oscar",
+      "canonicalName": "OSCAR",
+      "aliases": ["oscar", "oscar downstream", "dieselpoint"],
+      "countryCodes": ["RO"],
+      "regions": ["RO"],
+      "category": "Transport",
+      "subcategory": "Fuel",
+      "priority": 76,
+      "confidenceHint": "medium",
+      "tags": ["transport", "fuel"]
+    }
+  ]
+}

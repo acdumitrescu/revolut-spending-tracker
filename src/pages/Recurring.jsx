@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
+import { Repeat2 } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { convertAmountToDisplay } from '../lib/fx';
 import { detectRecurringTransactions } from '../lib/recurring';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
+import { EmptyState } from '../components/ui';
 
 export default function Recurring() {
   const { data, currencySummary } = useAppContext();
@@ -19,11 +21,7 @@ export default function Recurring() {
       <h2 style={{ marginBottom: '20px' }}>Recurring Transactions</h2>
 
       {data.transactions.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-state-icon">&#128260;</div>
-          <div className="empty-state-title">No data yet</div>
-          <div className="empty-state-desc">Upload a few months of transactions to detect subscriptions and repeating bills.</div>
-        </div>
+        <EmptyState icon={Repeat2} title="No recurring activity yet" description="Import a few months of transactions to detect subscriptions and repeating bills." />
       ) : recurring.length === 0 ? (
         <div className="card">
           <div className="card-title">Upcoming Bills</div>

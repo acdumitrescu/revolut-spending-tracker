@@ -108,6 +108,36 @@ describe('AppContext trust behavior', () => {
     });
   });
 
+  it('does not attempt backend sync unless explicitly enabled', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        rates: {
+          EUR: 5,
+          USD: 4.6,
+        },
+      }),
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(
+      <AppProvider>
+        <BackupHarness />
+      </AppProvider>
+    );
+
+    act(() => {
+      fireEvent.click(screen.getByText('Import backup'));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('goal-name')).toHaveTextContent('Fund');
+    });
+
+    expect(fetchMock).not.toHaveBeenCalledWith('/api/data', expect.anything());
+  });
+
   it('persists and applies the selected theme mode', async () => {
     render(
       <AppProvider>

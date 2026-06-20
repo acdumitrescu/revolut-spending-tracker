@@ -3,6 +3,7 @@ import {
   getAccountTotalsByMonth,
   getAccountCurrency,
   getBudgetEntries,
+  getRolling12MonthSummary,
   getCurrencySummary,
   getDailySpend,
   filterTransactionsByPeriod,
@@ -36,6 +37,23 @@ describe('selectors', () => {
     expect(getMonthlySummary(transactions)).toEqual([
       { month: '2024-01', inc: 5000, exp: 30, net: 4970 },
       { month: '2024-02', inc: 5500, exp: 100, net: 5400 },
+    ]);
+  });
+
+  it('builds a rolling 12-month summary ending with the provided current month', () => {
+    expect(getRolling12MonthSummary(transactions, new Date('2024-06-15'))).toEqual([
+      { month: '2023-07', inc: 0, exp: 0, net: 0 },
+      { month: '2023-08', inc: 0, exp: 0, net: 0 },
+      { month: '2023-09', inc: 0, exp: 0, net: 0 },
+      { month: '2023-10', inc: 0, exp: 0, net: 0 },
+      { month: '2023-11', inc: 0, exp: 0, net: 0 },
+      { month: '2023-12', inc: 0, exp: 0, net: 0 },
+      { month: '2024-01', inc: 5000, exp: 30, net: 4970 },
+      { month: '2024-02', inc: 5500, exp: 100, net: 5400 },
+      { month: '2024-03', inc: 0, exp: 0, net: 0 },
+      { month: '2024-04', inc: 0, exp: 0, net: 0 },
+      { month: '2024-05', inc: 0, exp: 0, net: 0 },
+      { month: '2024-06', inc: 0, exp: 0, net: 0 },
     ]);
   });
 

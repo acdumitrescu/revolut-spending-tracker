@@ -30,7 +30,7 @@ This app is a strong fit if you:
 
 ## What makes it different
 
-- Local-first by default: no backend, no forced sync, no account-linking flow
+- Local-first by default: no public backend requirement, no forced sync, no account-linking flow
 - Revolut-focused import workflow: optimized around CSV exports instead of open banking integrations
 - Privacy-oriented data model: your runtime data stays in browser storage unless you choose to export it
 - Multi-currency aware: supports FX-based display conversion and per-account currencies without changing the app’s local-first model
@@ -59,15 +59,16 @@ This app is a strong fit if you:
 
 ## Privacy and local-first promise
 
-- No backend
+- Browser-local by default
 - No analytics
 - No forced account connection
 - No third-party sync requirement
-- Data is stored in browser `localStorage`
+- Data is stored in browser `localStorage` in `client-only` mode
+- Optional private-sync deployment is available for self-hosted use without turning the product into a public SaaS
 - Backup and restore are controlled by the user
 
-For public vs private workflow guidance, see [docs/local-workflow.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/local-workflow.md).
-For a publishing and backup safety checklist, see [docs/security-checklist.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/security-checklist.md).
+For public vs private workflow guidance, see [docs/local-workflow.md](docs/local-workflow.md).
+For a publishing and backup safety checklist, see [docs/security-checklist.md](docs/security-checklist.md).
 
 ## Supported imports
 
@@ -91,7 +92,7 @@ Current import behavior:
 - source transaction currency is preserved where available
 - import summaries include detected profile, skip reasons, and warnings
 
-The normalized CSV fallback format is documented in [docs/normalized-csv.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/normalized-csv.md).
+The normalized CSV fallback format is documented in [docs/normalized-csv.md](docs/normalized-csv.md).
 
 ## Currency support
 
@@ -117,8 +118,8 @@ The normalized CSV fallback format is documented in [docs/normalized-csv.md](/Us
 
 ## Demo data and screenshots
 
-- Public demo CSV: [public/demo-revolut.csv](/Users/user/Desktop/IT/SimpleSafeBanking/public/demo-revolut.csv)
-- Current preview image: [src/assets/hero.png](/Users/user/Desktop/IT/SimpleSafeBanking/src/assets/hero.png)
+- Public demo CSV: [public/demo-revolut.csv](public/demo-revolut.csv)
+- Current preview image: [src/assets/hero.png](src/assets/hero.png)
 
 Recommended future screenshot set for GitHub:
 
@@ -143,6 +144,15 @@ Recommended personal workflow:
 2. Review vendor mappings, budgets, accounts, and goals.
 3. Export JSON after important updates.
 4. Keep your exported backups in a private local location.
+
+## Deployment profiles
+
+SimpleSafeBanking supports two deployment profiles:
+
+- `client-only`: static frontend only, strongest local-first posture
+- `private-sync`: static frontend plus a single-tenant private sync API for self-hosted deployments
+
+See [docs/deployment.md](docs/deployment.md) and [docs/backup-runbook.md](docs/backup-runbook.md).
 
 ## Development
 
@@ -172,6 +182,7 @@ npm run build
 - Recurring detection is heuristic, not guaranteed
 - Browser storage can be cleared, so backups still matter
 - The app is intentionally local-first and does not yet provide encrypted sync
+- Private-sync is designed for private self-hosted deployments, not public multi-user hosting
 - FX refresh uses a latest-rate request and is optional; the app keeps working with saved local rates if that request fails
 
 ## Next up
@@ -193,4 +204,9 @@ npm run build
 
 ## Product direction
 
-Longer-term roadmap and monetization notes are documented in [docs/product-direction.md](/Users/user/Desktop/IT/SimpleSafeBanking/docs/product-direction.md).
+Longer-term roadmap and monetization notes are documented in [docs/product-direction.md](docs/product-direction.md).
+
+## License
+
+This project is licensed under [CC BY-NC-SA 4.0](LICENSE).
+Copyright (c) 2026 SimpleSafeBanking contributors. Non-commercial use only.

@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import Monthly from '../pages/Monthly';
 import { AppProvider, useAppContext } from '../lib/AppContext';
 
@@ -22,8 +23,10 @@ describe('Monthly page', () => {
   it('defaults to the latest month after data is added later', () => {
     render(
       <AppProvider>
-        <Loader />
-        <Monthly />
+        <MemoryRouter>
+          <Loader />
+          <Monthly />
+        </MemoryRouter>
       </AppProvider>
     );
 
