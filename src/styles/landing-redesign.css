@@ -13,6 +13,7 @@
 .landing-primary-action { background: #247a55; }
 .landing-trust-row { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 22px; color: #69766f; font-size: 11px; }
 .landing-trust-row span { display: inline-flex; align-items: center; gap: 5px; }
+.landing-demo-note { max-width: 640px; margin-top: 14px; color: #69766f; font-size: 12px; line-height: 1.6; }
 .product-preview { position: relative; overflow: hidden; border: 1px solid #d2d0c8; border-radius: 20px; background: #fff; box-shadow: 0 34px 80px rgba(39, 55, 46, .15); transform: rotate(1deg); }
 .preview-topline { display: flex; gap: 5px; padding: 12px 14px; border-bottom: 1px solid #e7e5de; background: #f8f7f3; }
 .preview-topline span { width: 7px; height: 7px; border-radius: 50%; background: #d7d4cb; }
@@ -55,6 +56,7 @@
 .landing-privacy h2 { max-width: 650px; margin-top: 10px; font-family: var(--font-display); font-size: clamp(34px, 4vw, 50px); font-weight: 500; line-height: 1; letter-spacing: -.04em; }
 .landing-privacy p { margin-top: 18px; color: #b6c1ba; line-height: 1.7; }
 .landing-privacy a { display: inline-flex; align-items: center; gap: 7px; margin-top: 22px; color: #85d0a8; font-size: 12px; font-weight: 750; }
+.landing-how-demo-works { padding: 32px; margin-top: 24px; border: 1px solid #dfddd5; border-radius: 24px; background: #fff; }
 .landing-final-cta { display: flex; flex-direction: column; align-items: center; padding: 110px 20px; text-align: center; }
 .landing-final-cta h2 { margin-top: 18px; font-family: var(--font-display); font-size: clamp(38px, 5vw, 60px); font-weight: 500; letter-spacing: -.04em; }
 .landing-final-cta p { margin: 12px 0 24px; color: #69766f; }

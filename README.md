@@ -121,6 +121,27 @@ The normalized CSV fallback format is documented in [docs/normalized-csv.md](doc
 - Public demo CSV: [public/demo-revolut.csv](public/demo-revolut.csv)
 - Current preview image: [src/assets/hero.png](src/assets/hero.png)
 
+## Public demo publishing
+
+The safest public demo shape for this project is `client-only`:
+
+- deploy the frontend as a static site
+- keep `VITE_DEPLOYMENT_PROFILE=client-only`
+- keep `VITE_PRIVATE_SYNC_ENABLED=false`
+- do not deploy the `private-sync` backend for a public demo
+
+Public demo visitors can:
+
+- explore the bundled synthetic sample data
+- upload their own CSV locally in the browser
+
+In this demo mode:
+
+- uploaded CSV data is not stored on a public server
+- app state remains in browser storage on that device
+- users should export a JSON backup before leaving if they imported personal data
+- browser-local data may be lost if storage is cleared or the user returns on another device
+
 Recommended future screenshot set for GitHub:
 
 - import flow

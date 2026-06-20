@@ -15,12 +15,32 @@ Use this when you want the strongest local-first posture and do not need server 
    - `VITE_PRIVATE_SYNC_ENABLED=false`
 3. Build the frontend image and deploy the static site.
 4. Do not run the `api` service.
+5. For a public demo, prefer a static host such as Vercel and keep the deployment frontend-only.
 
 Behavior:
 
 - all finance data stays in browser storage
 - backups are exported and restored through JSON/Excel flows
 - FX refresh remains optional
+- users may upload their own CSV locally, so the demo should recommend exporting a JSON backup before they leave
+
+### Vercel demo setup
+
+Recommended public demo settings:
+
+1. Import the GitHub repo into Vercel.
+2. Deploy from `main`.
+3. Set:
+   - `VITE_DEPLOYMENT_PROFILE=client-only`
+   - `VITE_PRIVATE_SYNC_ENABLED=false`
+4. Leave the backend undeployed.
+5. Use the included `vercel.json` rewrite so client-side routes keep working on refresh.
+
+Recommended public demo messaging:
+
+- offer `Try synthetic demo data` as the safest first path
+- allow CSV upload locally in-browser
+- remind users to export a JSON backup before leaving if they imported personal data
 
 ## 2. Private-sync deployment
 

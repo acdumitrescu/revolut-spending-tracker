@@ -31,6 +31,9 @@ export default function ImportWorkspace() {
   const jsonInputRef = useRef(null);
   const [summary, setSummary] = useState(data.importMeta?.latestSummary || null);
   const [busy, setBusy] = useState(false);
+  const isDemoImport = summary?.fileName === 'demo-revolut.csv';
+  const hasImportedTransactions = Boolean(summary?.processedRows);
+  const shouldShowPersonalBackupReminder = hasImportedTransactions && !isDemoImport;
 
   const processCsv = async (file) => {
     if (!file) return;
@@ -42,7 +45,11 @@ export default function ImportWorkspace() {
       recordImportSummary(file.name, result.summary);
       await recordVendorObservations(result.vendorObservations);
       setSummary({ fileName: file.name, ...result.summary });
-      toast.success(`${result.summary.processedRows} transactions processed locally.`);
+      toast.success(
+        file.name === 'demo-revolut.csv'
+          ? `${result.summary.processedRows} demo transactions processed locally.`
+          : `${result.summary.processedRows} transactions processed locally. Export a backup before leaving if you want to keep this browser-local data.`
+      );
     } catch (error) {
       console.error(error);
       toast.error(`Unable to import CSV: ${error.message}`);
@@ -100,7 +107,7 @@ export default function ImportWorkspace() {
       <PageHeader
         eyebrow="Private workspace"
         title="Bring your financial history into focus"
-        description="Import is processed locally. Start with your Revolut CSV, explore synthetic demo data, or restore a private backup."
+        description="Import is processed locally in this browser. Start with your Revolut CSV, explore synthetic demo data, or restore a private backup."
         actions={<StatusPill tone="success"><ShieldCheck size={14} /> Local processing</StatusPill>}
       />
 
@@ -111,16 +118,21 @@ export default function ImportWorkspace() {
         <div className="import-primary-copy">
           <span className="step-marker">Recommended</span>
           <h2>Import a Revolut CSV</h2>
-          <p>Personal, Business transaction statement, Business expense, and normalized CSV profiles are supported.</p>
+          <p>Personal, Business transaction statement, Business expense, and normalized CSV profiles are supported. In this public demo, uploaded CSVs stay in this browser on this device and are not saved to an account or public server.</p>
           <button className="btn btn-primary" type="button" disabled={busy} onClick={() => csvInputRef.current?.click()}>
             <FileUp size={17} /> {busy ? 'Processing…' : 'Choose CSV file'}
           </button>
         </div>
         <div className="privacy-proof">
           <ShieldCheck size={24} />
-          <strong>No bank connection required</strong>
-          <span>The file is parsed in this app. Keep original exports in an ignored private folder.</span>
+          <strong>No bank connection or public upload required</strong>
+          <span>The file is parsed in this app and stored in this browser. If you import personal data, export a JSON backup before leaving.</span>
         </div>
+      </section>
+
+      <section className="demo-privacy-note" aria-label="How this public demo handles data">
+        <strong>How this public demo handles data</strong>
+        <p>Try the synthetic sample safely, or upload your own CSV for a local-only session. Nothing from a CSV import is stored on our server in this demo, and browser data can disappear later if you clear storage, use private browsing, or switch devices.</p>
       </section>
 
       <div className="workspace-action-grid">
@@ -150,6 +162,12 @@ export default function ImportWorkspace() {
               {summary.warnings.map((warning) => <span key={warning}>{warning}</span>)}
             </div>
           )}
+          {shouldShowPersonalBackupReminder && (
+            <div className="import-local-reminder">
+              <strong>Imported your own CSV?</strong>
+              <span>This demo keeps your data only in this browser. Export a JSON backup before leaving so you do not lose access later.</span>
+            </div>
+          )}
           <button className="btn btn-primary" type="button" onClick={() => navigate('/app')}>
             Continue to overview <ArrowRight size={16} />
           </button>
@@ -160,7 +178,7 @@ export default function ImportWorkspace() {
         <div>
           <div className="eyebrow">Portable backups</div>
           <h2>Your data should remain easy to leave with.</h2>
-          <p>Export after important changes and store generated files outside tracked project folders.</p>
+          <p>{shouldShowPersonalBackupReminder ? 'You imported personal data into a browser-local demo. Export a JSON backup before leaving and store it in a private local folder.' : 'Export after important changes and store generated files outside tracked project folders.'}</p>
         </div>
         <div className="backup-actions">
           <button className="btn" type="button" disabled={!data.transactions.length} onClick={() => exportJsonBackup(persistedState)}>

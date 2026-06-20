@@ -49,6 +49,7 @@ export default function LandingPage() {
               <span><Check size={14} /> Local-first storage</span>
               <span><Check size={14} /> Your backups</span>
             </div>
+            <p className="landing-demo-note">Public demo mode lets you try synthetic sample data or upload your own CSV locally in-browser. If you import personal data, export a backup before leaving.</p>
           </div>
 
           <div className="product-preview" aria-label="SimpleSafeBanking product preview">
@@ -112,6 +113,14 @@ export default function LandingPage() {
             <h2>Your finance tool should not need to become your bank.</h2>
             <p>SimpleSafeBanking works from files you export. Browser-local mode needs no public backend, and optional private sync is designed for self-hosted deployments you control.</p>
             <Link to="/app/import">Open the private workspace <ArrowRight size={15} /></Link>
+          </div>
+        </section>
+
+        <section className="landing-how-demo-works" aria-labelledby="demo-privacy-title">
+          <div className="landing-section-heading">
+            <span>How demo privacy works</span>
+            <h2 id="demo-privacy-title">Safe to explore, local by default.</h2>
+            <p>The public demo stores app state in your browser on this device. There is no public cloud sync, no account system, and data may disappear if browser storage is cleared.</p>
           </div>
         </section>
 

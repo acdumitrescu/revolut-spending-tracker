@@ -31,6 +31,9 @@
 .privacy-proof { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 9px; padding: 24px; border-radius: 14px; background: var(--surface-subtle); color: var(--accent); }
 .privacy-proof strong { color: var(--text); }
 .privacy-proof span { color: var(--muted); font-size: 12px; line-height: 1.55; }
+.demo-privacy-note { display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; border: 1px solid color-mix(in srgb, var(--info) 22%, var(--border)); border-radius: 14px; background: var(--info-soft); }
+.demo-privacy-note strong { font-size: 13px; }
+.demo-privacy-note p { color: var(--muted); font-size: 12px; line-height: 1.6; }
 .workspace-action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 .action-card { width: 100%; display: flex; align-items: center; gap: 13px; padding: 17px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); color: var(--text); text-align: left; cursor: pointer; transition: transform var(--ease), border-color var(--ease); }
 .action-card:hover { transform: translateY(-1px); border-color: var(--border-strong); }
@@ -50,6 +53,9 @@
 .import-summary-stats strong { margin-top: 3px; font-family: var(--font-numeric); font-size: 18px; }
 .import-warning-list { width: 100%; display: flex; flex-direction: column; gap: 5px; padding-top: 14px; border-top: 1px solid color-mix(in srgb, var(--success) 24%, transparent); font-size: 11px; }
 .import-warning-list span { color: var(--muted); }
+.import-local-reminder { width: 100%; display: flex; flex-direction: column; gap: 5px; padding: 14px 0 0; border-top: 1px solid color-mix(in srgb, var(--success) 24%, transparent); }
+.import-local-reminder strong { font-size: 12px; }
+.import-local-reminder span { color: var(--muted); font-size: 11px; line-height: 1.55; }
 .backup-section { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 22px 0; border-top: 1px solid var(--border); }
 .backup-section h2, .settings-section h2 { margin-top: 5px; font-size: 17px; }
 .backup-section p, .settings-section-heading p { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.55; }
