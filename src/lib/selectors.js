@@ -21,6 +21,36 @@ export function getCurrencySummary(transactions) {
   };
 }
 
+export function getUniqueYears(transactions) {
+  return [...new Set(
+    transactions
+      .map((txn) => String(txn.date || '').substring(0, 4))
+      .filter((year) => /^\d{4}$/.test(year))
+  )].sort((a, b) => b.localeCompare(a));
+}
+
+export function filterTransactionsByPeriod(transactions, timeFilter = 'ALL TIME', yearFilter = 'ALL') {
+  const now = new Date();
+  const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  return transactions.filter((txn) => {
+    if (yearFilter !== 'ALL' && !txn.date.startsWith(yearFilter)) return false;
+
+    if (timeFilter !== 'ALL TIME') {
+      const txDate = new Date(txn.date);
+      const diffTime = now.getTime() - txDate.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (timeFilter === 'Today' && txn.date !== todayLocal) return false;
+      if (timeFilter === 'Last Week' && diffDays > 7) return false;
+      if (timeFilter === 'Last Month' && diffDays > 30) return false;
+      if (timeFilter === 'Last Year' && diffDays > 365) return false;
+    }
+
+    return true;
+  });
+}
+
 function convertTxnAmount(txn, displayCurrency = BASE_CURRENCY, fxRates) {
   return convertAmountToDisplay(txn.amt, getEffectiveCurrency(txn), displayCurrency, fxRates);
 }
@@ -74,6 +104,28 @@ export function getMonthlyExpense(transactions, month, options = {}) {
 
 export function getMonthlySummary(transactions, options = {}) {
   return getUniqueMonths(transactions).map((month) => {
+    const inc = getMonthlyIncome(transactions, month, options);
+    const exp = getMonthlyExpense(transactions, month, options);
+    return { month, inc, exp, net: inc - exp };
+  });
+}
+
+export function getCalendarYearMonthlySummary(transactions, year = new Date().getFullYear(), options = {}) {
+  return Array.from({ length: 12 }, (_, index) => {
+    const month = `${year}-${String(index + 1).padStart(2, '0')}`;
+    const inc = getMonthlyIncome(transactions, month, options);
+    const exp = getMonthlyExpense(transactions, month, options);
+    return { month, inc, exp, net: inc - exp };
+  });
+}
+
+export function getRolling12MonthSummary(transactions, endDate = new Date(), options = {}) {
+  const endYear = endDate.getFullYear();
+  const endMonth = endDate.getMonth();
+
+  return Array.from({ length: 12 }, (_, index) => {
+    const cursor = new Date(endYear, endMonth - (11 - index), 1);
+    const month = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
     const inc = getMonthlyIncome(transactions, month, options);
     const exp = getMonthlyExpense(transactions, month, options);
     return { month, inc, exp, net: inc - exp };

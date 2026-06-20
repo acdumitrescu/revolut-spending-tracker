@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { categorizeTransaction, parseCSV, txKey, mergeTransactions } from '../lib/csvParser';
+import { categorizeTransaction, categorizeTransactionDetailed, parseCSV, txKey, mergeTransactions } from '../lib/csvParser';
 
 describe('categorizeTransaction', () => {
   it('categorizes positive amounts as Income', () => {
@@ -30,6 +30,12 @@ describe('categorizeTransaction', () => {
     expect(sub).toBe('CustomSub');
   });
 
+  it('lets custom vendor overrides win over strong built-in aliases', () => {
+    const [cat, sub] = categorizeTransaction('Uber Eats', -22, { 'uber eats': ['CustomFood', 'Manual'] });
+    expect(cat).toBe('CustomFood');
+    expect(sub).toBe('Manual');
+  });
+
   it('prefers longer custom vendor rules first', () => {
     const [cat] = categorizeTransaction('Netflix family plan', -50, {
       netflix: ['Subscriptions', 'Streaming'],
@@ -43,15 +49,85 @@ describe('categorizeTransaction', () => {
     expect(cat).toBe('Subscriptions');
   });
 
+  it('matches expanded built-in US/EU vendors', () => {
+    const [cat, sub] = categorizeTransaction('eMAG.RO', -70);
+    expect(cat).toBe('Shopping');
+    expect(sub).toBe('Marketplace');
+  });
+
+  it('ignores legal suffix and terminal noise for vendor identity', () => {
+    const [cat, sub] = categorizeTransaction('Netflix SRL POS 884422', -49);
+    expect(cat).toBe('Subscriptions');
+    expect(sub).toBe('Entertainment');
+  });
+
+  it('prefers stronger food-delivery aliases over broader rideshare vendors', () => {
+    const [cat, sub] = categorizeTransaction('Uber Eats', -55);
+    expect(cat).toBe('Food & Dining');
+    expect(sub).toBe('Delivery');
+  });
+
+  it('maps Bolt Food separately from Bolt rides', () => {
+    const [cat, sub] = categorizeTransaction('Bolt Food', -32);
+    expect(cat).toBe('Food & Dining');
+    expect(sub).toBe('Delivery');
+  });
+
   it('falls back to Other for unknown vendors', () => {
     const [cat, sub] = categorizeTransaction('unknown vendor xyz', -50);
     expect(cat).toBe('Other');
-    expect(sub).toBe('Other');
+    expect(sub).toBe('');
   });
 
   it('handles zero amount as debit/Other', () => {
     const [cat] = categorizeTransaction('unknown', 0);
     expect(cat).toBe('Other');
+  });
+});
+
+describe('categorizeTransactionDetailed', () => {
+  it('returns custom override metadata when a custom vendor wins', () => {
+    const result = categorizeTransactionDetailed('Uber Eats', -20, { 'uber eats': ['Food', 'Manual'] });
+    expect(result.category).toBe('Food');
+    expect(result.matchSource).toBe('custom');
+    expect(result.confidence).toBe('high');
+    expect(result.matchedVendor).toBe('uber eats');
+  });
+
+  it('marks exact built-in alias matches as high confidence', () => {
+    const result = categorizeTransactionDetailed('Netflix', -30);
+    expect(result.category).toBe('Subscriptions');
+    expect(result.matchSource).toBe('built-in-exact');
+    expect(result.confidence).toBe('high');
+    expect(result.matchedVendor).toBe('Netflix');
+  });
+
+  it('marks contained built-in alias matches as medium confidence', () => {
+    const result = categorizeTransactionDetailed('Netflix family plan', -30);
+    expect(result.category).toBe('Subscriptions');
+    expect(result.matchSource).toBe('built-in-contains');
+    expect(result.confidence).toBe('medium');
+  });
+
+  it('falls back to keyword heuristics with low confidence', () => {
+    const result = categorizeTransactionDetailed('vodafone romania recharge', -19);
+    expect(result.category).toBe('Utilities');
+    expect(result.matchSource).toBe('built-in-contains');
+    expect(result.confidence).toBe('medium');
+  });
+
+  it('accepts low-risk fuzzy vendor matches with explicit fuzzy metadata', () => {
+    const result = categorizeTransactionDetailed('kauflan', -42);
+    expect(result.category).toBe('Groceries');
+    expect(result.subcategory).toBe('Hypermarket');
+    expect(result.matchSource).toBe('fuzzy');
+    expect(result.matchStrategy).toBe('fuzzy');
+  });
+
+  it('returns traceability metadata for matched vendor knowledge', () => {
+    const result = categorizeTransactionDetailed('Mega Image Berceni', -31);
+    expect(result.matchedVendorId).toBe('ro-mega-image');
+    expect(result.matchedRegion).toBe('RO');
   });
 });
 
@@ -82,7 +158,10 @@ describe('parseCSV', () => {
     const result = await parseCSV(file);
 
     expect(result.summary.processedRows).toBe(5);
+    expect(result.summary.detectedProfileId).toBe('revolut-personal-raw');
     expect(result.transactions[0].cat).toBe('Transfers');
+    expect(result.transactions[1].matchedVendor).toBe('Uber');
+    expect(result.transactions[1].matchSource).toBe('built-in-exact');
     expect(result.transactions[2].cat).toBe('Refunds');
     expect(result.transactions[3].cat).toBe('Savings');
     expect(result.transactions[4].cat).toBe('Cash');
@@ -101,9 +180,12 @@ describe('parseCSV', () => {
 
     expect(result.summary.processedRows).toBe(1);
     expect(result.summary.skippedRows).toBe(3);
+    expect(result.summary.detectedProfileLabel).toBe('Revolut Personal CSV');
     expect(result.summary.skippedReasonCounts['invalid amount']).toBe(1);
     expect(result.summary.skippedReasonCounts['missing or invalid date']).toBe(1);
     expect(result.summary.skippedReasonCounts['zero-value transaction skipped']).toBe(1);
+    expect(result.summary.unknownVendorCount).toBe(1);
+    expect(result.vendorObservations).toHaveLength(1);
   });
 
   it('parses normalized master exports', async () => {
@@ -116,8 +198,71 @@ describe('parseCSV', () => {
     const result = await parseCSV(file);
 
     expect(result.summary.processedRows).toBe(2);
+    expect(result.summary.detectedProfileId).toBe('normalized-csv');
     expect(result.transactions[0].source).toBe('master');
     expect(result.transactions[1].cat).toBe('Income');
+  });
+
+  it('parses a Revolut business transaction statement like CSV', async () => {
+    const csv = [
+      'Transaction started (UTC),Transaction completed (UTC),Transaction Description,Transaction Type,Payment Currency,Amount (Payment Currency),Transaction ID,Account',
+      '2024-03-01T08:00:00Z,2024-03-01T08:05:00Z,Amazon Marketplace,card payment,USD,-19.99,tx-1,Main',
+      '2024-03-02T08:00:00Z,2024-03-02T08:05:00Z,Salary,bank transfer,RON,5000,tx-2,Main',
+    ].join('\n');
+    const file = new File([csv], 'business-transactions.csv', { type: 'text/csv' });
+    const result = await parseCSV(file);
+
+    expect(result.summary.detectedProfileId).toBe('revolut-business-transaction');
+    expect(result.summary.processedRows).toBe(2);
+    expect(result.transactions[0].currency).toBe('USD');
+    expect(result.transactions[0].cat).toBe('Shopping');
+    expect(result.transactions[1].cat).toBe('Transfers');
+  });
+
+  it('parses a localized Revolut business expense CSV and prefers payment amount/currency', async () => {
+    const csv = [
+      'Tranzacție inițiată (UTC),Tranzacție finalizată (UTC),ID tranzacție,Tipul tranzacției,Descriere tranzacție,Monedă origine,Sumă inițială (monedă inițială),Moneda de plată,Sumă (monedă plată)',
+      '2024-04-01T10:00:00Z,2024-04-01T10:10:00Z,ro-1,card payment,Starbucks,USD,-5.00,RON,-24.50',
+    ].join('\n');
+    const file = new File([csv], 'business-expense-ro.csv', { type: 'text/csv' });
+    const result = await parseCSV(file);
+
+    expect(result.summary.detectedProfileId).toBe('revolut-business-expense');
+    expect(result.summary.warnings.some((warning) => warning.includes('payment and original amount'))).toBe(true);
+    expect(result.transactions[0].currency).toBe('RON');
+    expect(result.transactions[0].amt).toBe(-24.5);
+    expect(result.transactions[0].cat).toBe('Food & Dining');
+  });
+
+  it('classifies Romanian merchants across groceries, fuel, pharmacy, and courier categories', async () => {
+    const csv = [
+      'Started Date,Completed Date,Description,Amount,Type,Currency,Reference',
+      '2024-06-01,2024-06-01,Mega Image,-30,card payment,RON,ro-1',
+      '2024-06-02,2024-06-02,Petrom,-250,card payment,RON,ro-2',
+      '2024-06-03,2024-06-03,Catena,-45,card payment,RON,ro-3',
+      '2024-06-04,2024-06-04,Fan Courier,-18,card payment,RON,ro-4',
+    ].join('\n');
+    const file = new File([csv], 'romanian-merchants.csv', { type: 'text/csv' });
+    const result = await parseCSV(file);
+
+    expect(result.transactions.map((txn) => txn.sub)).toEqual([
+      'Supermarket',
+      'Fuel',
+      'Pharmacy',
+      'Courier',
+    ]);
+  });
+
+  it('warns on partially recognized headers while still parsing supported columns', async () => {
+    const csv = [
+      'Started Date,Description,Amount,Type,Currency,Unexpected Internal Note',
+      '2024-05-01,Uber,-12,card payment,RON,test',
+    ].join('\n');
+    const file = new File([csv], 'partial.csv', { type: 'text/csv' });
+    const result = await parseCSV(file);
+
+    expect(result.summary.processedRows).toBe(1);
+    expect(result.summary.warnings.some((warning) => warning.includes('Partially recognized header set'))).toBe(true);
   });
 });
 

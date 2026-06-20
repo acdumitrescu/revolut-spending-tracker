@@ -3,6 +3,8 @@ import { getColorForCategory } from '../lib/utils';
 import { getCategoryTotals } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
+import { Tags } from 'lucide-react';
+import { EmptyState } from '../components/ui';
 
 export default function Categories() {
   const { data, currencySummary } = useAppContext();
@@ -14,11 +16,7 @@ export default function Categories() {
     return (
       <div>
         <h2 style={{ marginBottom: '20px' }}>Categories</h2>
-        <div className="empty-state">
-          <div className="empty-state-icon">&#127919;</div>
-          <div className="empty-state-title">No data yet</div>
-          <div className="empty-state-desc">Upload a CSV to see spending by category.</div>
-        </div>
+        <EmptyState icon={Tags} title="No category insights yet" description="Import transactions to see how your spending is distributed." />
       </div>
     );
   }
@@ -31,11 +29,7 @@ export default function Categories() {
     return (
       <div>
         <h2 style={{ marginBottom: '20px' }}>Categories</h2>
-        <div className="empty-state">
-          <div className="empty-state-icon">&#128179;</div>
-          <div className="empty-state-title">No expense categories found</div>
-          <div className="empty-state-desc">Your uploaded data doesn't contain recognizable expense categories yet.</div>
-        </div>
+        <EmptyState icon={Tags} title="No expense categories found" description="The current data does not contain recognizable expense categories." actionLabel="Review vendor mappings" actionTo="/app/insights/vendors" />
       </div>
     );
   }

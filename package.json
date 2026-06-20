@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:vendor-knowledge": "node scripts/buildVendorKnowledge.mjs",
+    "discover:vendor-knowledge:ro": "node scripts/discoverRomanianVendors.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
@@ -16,6 +18,7 @@
   "dependencies": {
     "chart.js": "^4.5.1",
     "exceljs": "^4.4.0",
+    "fuse.js": "^7.4.2",
     "lucide-react": "^1.17.0",
     "papaparse": "^5.5.3",
     "react": "^19.2.6",

@@ -2,5 +2,31 @@ services:
   app:
     build: .
     ports:
-      - "3000:80"
+      - "127.0.0.1:3176:80"
     restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      APP_STATE_FILE: /data/app-state.json
+      APP_STATE_MAX_BYTES: 5242880
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+    volumes:
+      - app-state:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3177/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  app-state:

@@ -7,19 +7,40 @@ const CHART_COMPONENTS = {
   doughnut: Doughnut,
 };
 
+function getThemeValue(token, fallback) {
+  if (typeof window === 'undefined') return fallback;
+  const value = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+  return value || fallback;
+}
+
 const DEFAULT_OPTIONS = {
   responsive: true,
   maintainAspectRatio: false,
   resizeDelay: 0,
+  layout: {
+    padding: {
+      top: 4,
+      left: 4,
+      right: 6,
+      bottom: 0,
+    },
+  },
   plugins: {
     legend: {
-      labels: { color: '#333333', font: { size: 12, weight: '500' } },
+      labels: {
+        color: '#333333',
+        font: { size: 11, weight: '600' },
+        padding: 14,
+        boxWidth: 10,
+        boxHeight: 10,
+        usePointStyle: true,
+      },
     },
     tooltip: {
       backgroundColor: '#000000',
       titleColor: '#FFFFFF',
       bodyColor: '#FFFFFF',
-      cornerRadius: 8,
+      cornerRadius: 12,
       padding: 12,
     },
   },
@@ -31,10 +52,10 @@ const DOUGHNUT_OPTIONS = {
   plugins: {
     legend: {
       position: 'right',
-      labels: { color: '#333333', font: { size: 12, weight: '500' }, padding: 12 },
+      labels: { color: '#333333', font: { size: 11, weight: '600' }, padding: 12, usePointStyle: true, boxWidth: 8, boxHeight: 8 },
     },
   },
-  cutout: '60%',
+  cutout: '68%',
 };
 
 export default function ChartWrapper({
@@ -54,6 +75,10 @@ export default function ChartWrapper({
 
   const labels = Array.isArray(data?.labels) ? data.labels : [];
   const datasets = Array.isArray(data?.datasets) ? data.datasets : [];
+  const textColor = getThemeValue('--text', '#111827');
+  const mutedColor = getThemeValue('--muted', '#6f7d93');
+  const borderColor = getThemeValue('--border', 'rgba(72, 50, 24, 0.09)');
+  const surfaceColor = getThemeValue('--surface-elevated', '#ffffff');
   const hasRenderableData = labels.length > 0 && datasets.some((dataset) => Array.isArray(dataset?.data) && dataset.data.length > 0);
   if (!hasRenderableData) {
     return (
@@ -72,6 +97,11 @@ export default function ChartWrapper({
         ...DOUGHNUT_OPTIONS.plugins,
         ...(options.plugins || {}),
         tooltip: {
+          backgroundColor: surfaceColor,
+          titleColor: textColor,
+          bodyColor: textColor,
+          borderColor,
+          borderWidth: 1,
           callbacks: {
             label: (context) => `${context.label}: ${formatCurrency(context.parsed, currency)}`,
           },
@@ -79,6 +109,10 @@ export default function ChartWrapper({
         },
         legend: {
           ...DOUGHNUT_OPTIONS.plugins.legend,
+          labels: {
+            ...DOUGHNUT_OPTIONS.plugins.legend.labels,
+            color: textColor,
+          },
           ...(options.plugins?.legend || {}),
           display: showLegend,
         },
@@ -90,8 +124,10 @@ export default function ChartWrapper({
         type: 'category',
         offset: true,
         ticks: {
-          color: '#333333',
-          font: { size: 11 },
+          color: mutedColor,
+          font: { size: 10 },
+          maxRotation: 0,
+          autoSkipPadding: 10,
         },
         grid: {
           display: false,
@@ -101,13 +137,14 @@ export default function ChartWrapper({
         type: 'linear',
         beginAtZero: true,
         ticks: {
-          color: '#333333',
-          font: { size: 11 },
+          color: mutedColor,
+          font: { size: 10 },
           callback: (value) => formatCurrencyK(Number(value), currency),
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.08)',
+          color: borderColor,
           drawBorder: false,
+          tickLength: 0,
         },
       },
     };
@@ -117,21 +154,22 @@ export default function ChartWrapper({
         type: 'linear',
         beginAtZero: true,
         ticks: {
-          color: '#333333',
-          font: { size: 11 },
+          color: mutedColor,
+          font: { size: 10 },
           callback: (value) => formatCurrencyK(Number(value), currency),
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.08)',
+          color: borderColor,
           drawBorder: false,
+          tickLength: 0,
         },
       },
       y: {
         type: 'category',
         offset: true,
         ticks: {
-          color: '#333333',
-          font: { size: 11 },
+          color: mutedColor,
+          font: { size: 10 },
         },
         grid: {
           display: false,
@@ -148,6 +186,11 @@ export default function ChartWrapper({
         ...(options.plugins || {}),
         tooltip: {
           ...DEFAULT_OPTIONS.plugins.tooltip,
+          backgroundColor: surfaceColor,
+          titleColor: textColor,
+          bodyColor: textColor,
+          borderColor,
+          borderWidth: 1,
           callbacks: {
             label: (context) => `${context.dataset.label || 'Value'}: ${formatCurrency(context.parsed.x ?? context.parsed.y ?? context.raw, currency)}`,
           },
@@ -155,6 +198,10 @@ export default function ChartWrapper({
         },
         legend: {
           ...DEFAULT_OPTIONS.plugins.legend,
+          labels: {
+            ...DEFAULT_OPTIONS.plugins.legend.labels,
+            color: textColor,
+          },
           ...(options.plugins?.legend || {}),
           display: showLegend,
         },

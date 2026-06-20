@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TransactionSchema, AppDataSchema, sanitizeAppData } from '../lib/validation';
+import { TransactionSchema, AppDataSchema, PersistedAppStateSchema, sanitizeAppData, sanitizePersistedAppState } from '../lib/validation';
 
 describe('TransactionSchema', () => {
   const base = { date: '2024-01-15', desc: 'Uber', cat: 'Transport', sub: 'Taxi', amt: -15, flow: 'Debit', type: 'TOP_UP', ym: '2024-01', currency: 'RON', ref: 'abc' };
@@ -38,9 +38,12 @@ describe('AppDataSchema', () => {
       goals: [{ id: 'goal-1', name: 'Emergency Fund', targetAmount: 10000, targetMonth: '2024-12' }],
       baseCurrency: 'RON',
       displayCurrency: 'EUR',
+      themeMode: 'dark',
       fxRates: { EUR: 5, USD: 4.6 },
       fxUpdatedAt: 1705312801000,
       fxSource: 'Frankfurter',
+      importMeta: { latestSummary: null },
+      syncInfo: { lastSuccessfulSyncAt: null, lastRemoteVersion: 0, lastRemoteUpdatedAt: null },
       lastUpdated: 1705312800000,
     };
     expect(AppDataSchema.safeParse(data).success).toBe(true);
@@ -48,6 +51,23 @@ describe('AppDataSchema', () => {
 
   it('rejects missing fields', () => {
     expect(AppDataSchema.safeParse({}).success).toBe(false);
+  });
+});
+
+describe('PersistedAppStateSchema', () => {
+  it('validates the versioned persisted contract', () => {
+    expect(PersistedAppStateSchema.safeParse({
+      schemaVersion: 1,
+      exportedAt: null,
+      data: sanitizeAppData({
+        transactions: [],
+        customVendors: {},
+        accounts: [],
+        budgets: {},
+        goals: [],
+        lastUpdated: null,
+      }),
+    }).success).toBe(true);
   });
 });
 
@@ -61,9 +81,12 @@ describe('sanitizeAppData', () => {
       goals: [],
       baseCurrency: 'RON',
       displayCurrency: 'RON',
+      themeMode: 'light',
       fxRates: { EUR: 5, USD: 4.6 },
       fxUpdatedAt: null,
       fxSource: 'manual-default',
+      importMeta: { latestSummary: null },
+      syncInfo: { lastSuccessfulSyncAt: null, lastRemoteVersion: 0, lastRemoteUpdatedAt: null },
       lastUpdated: null,
     };
     expect(sanitizeAppData(data)).toEqual(data);
@@ -86,6 +109,24 @@ describe('sanitizeAppData', () => {
     expect(result.transactions).toHaveLength(1);
   });
 
+  it('normalizes duplicate subcategories that repeat the category label', () => {
+    const result = sanitizeAppData({
+      transactions: [
+        { date: '2024-02-15', desc: 'A', cat: 'Other', sub: 'Other', amt: -12, flow: 'Debit', type: 'CARD', ym: '2024-02' },
+        { date: '2024-02-16', desc: 'B', cat: 'Shopping', sub: 'Electronics', amt: -50, flow: 'Debit', type: 'CARD', ym: '2024-02' },
+      ],
+      customVendors: {},
+      accounts: [],
+      goals: [],
+      baseCurrency: 'RON',
+      displayCurrency: 'RON',
+      lastUpdated: null,
+    });
+
+    expect(result.transactions[0].sub).toBe('');
+    expect(result.transactions[1].sub).toBe('Electronics');
+  });
+
   it('falls back gracefully on garbage input', () => {
     const result = sanitizeAppData('garbage');
     expect(result.transactions).toEqual([]);
@@ -101,6 +142,7 @@ describe('sanitizeAppData', () => {
       goals: [],
       baseCurrency: 'RON',
       displayCurrency: 'USD',
+      themeMode: 'dark',
       fxRates: { EUR: 4.95, USD: 4.55 },
       fxUpdatedAt: 123456,
       fxSource: 'manual',
@@ -109,6 +151,7 @@ describe('sanitizeAppData', () => {
     const result = sanitizeAppData(data);
     expect(result.lastUpdated).toBe(12345);
     expect(result.displayCurrency).toBe('USD');
+    expect(result.themeMode).toBe('dark');
     expect(result.fxRates).toEqual({ EUR: 4.95, USD: 4.55 });
   });
 
@@ -154,7 +197,14 @@ describe('sanitizeAppData', () => {
     });
     expect(result.baseCurrency).toBe('RON');
     expect(result.displayCurrency).toBe('RON');
+    expect(result.themeMode).toBe('light');
     expect(result.fxRates).toEqual({ EUR: 5, USD: 4.6 });
+    expect(result.importMeta).toEqual({ latestSummary: null });
+    expect(result.syncInfo).toEqual({
+      lastSuccessfulSyncAt: null,
+      lastRemoteVersion: 0,
+      lastRemoteUpdatedAt: null,
+    });
   });
 
   it('defaults legacy accounts to RON currency during sanitization', () => {
@@ -167,5 +217,19 @@ describe('sanitizeAppData', () => {
       lastUpdated: null,
     });
     expect(result.accounts[0].currency).toBe('RON');
+  });
+
+  it('wraps legacy data into the versioned persisted contract', () => {
+    const result = sanitizePersistedAppState({
+      transactions: [],
+      customVendors: {},
+      accounts: [],
+      budgets: {},
+      goals: [],
+      lastUpdated: null,
+    });
+
+    expect(result.schemaVersion).toBe(1);
+    expect(result.data.displayCurrency).toBe('RON');
   });
 }); 
