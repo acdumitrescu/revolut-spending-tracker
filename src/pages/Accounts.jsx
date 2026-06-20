@@ -60,8 +60,8 @@ export default function Accounts() {
   };
 
   return (
-    <div>
-      <h2 style={{ marginBottom: '20px' }}>Accounts & Savings Tracking</h2>
+    <div className="page-stack accounts-page">
+      <h2>Accounts & Savings Tracking</h2>
 
       <div className="kpi-grid">
         <div className="kpi blue">
@@ -104,9 +104,9 @@ export default function Accounts() {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card accounts-manage-card">
         <div className="card-title">Manage Accounts</div>
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+        <div className="account-form-row">
           <input
             type="text"
             className="input"

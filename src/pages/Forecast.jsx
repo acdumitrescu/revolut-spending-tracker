@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
+import { TrendingUp } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { BASE_CURRENCY, convertAmountToDisplay } from '../lib/fx';
 import { getLatestAccountTotal, getMonthlySummary, getTotalAccountContributions } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
+import { EmptyState } from '../components/ui';
 
 export default function Forecast() {
   const { data, currencySummary } = useAppContext();
@@ -70,9 +72,11 @@ export default function Forecast() {
 
   if (!analysis) {
     return (
-      <div style={{ color: 'var(--muted)', padding: '24px' }}>
-        Upload a CSV and add at least one account with a balance to view forecasting insights.
-      </div>
+      <EmptyState
+        icon={TrendingUp}
+        title="Forecast needs activity and a balance"
+        description="Import transactions, then add at least one account balance to explore planning scenarios."
+      />
     );
   }
 
@@ -147,7 +151,7 @@ export default function Forecast() {
       <div className="grid2" style={{ marginTop: '24px' }}>
         {/* Tool 1: Running Balance Projection Chart */}
         <div className="card" style={{ gridColumn: '1 / -1' }}>
-          <div className="card-title">📈 24-Month Running Balance Forecast</div>
+          <div className="card-title">24-Month Running Balance Forecast</div>
           <div style={{ marginTop: '16px' }}>
             <ChartWrapper type="line" data={chartData} height={300} currency={displayCurrency} />
           </div>
@@ -158,7 +162,7 @@ export default function Forecast() {
 
         {/* Tool 2: Savings Override */}
         <div className="card">
-          <div className="card-title">💰 Monthly Savings Configuration</div>
+          <div className="card-title">Monthly Savings Configuration</div>
           <div style={{ marginBottom: '16px' }}>
             <label style={labelStyle}>
               Total from Accounts: <strong>{formatCurrency(convertAmountToDisplay(analysis.totalAccountContributions, BASE_CURRENCY, displayCurrency, data.fxRates), displayCurrency)}</strong>
@@ -185,7 +189,7 @@ export default function Forecast() {
 
         {/* Tool 3: Expense Reduction Impact */}
         <div className="card">
-          <div className="card-title">✂️ Expense Reduction Impact</div>
+          <div className="card-title">Expense Reduction Impact</div>
           <div style={{ marginBottom: '16px' }}>
             <label style={labelStyle}>If I reduce monthly expenses by (stored in RON)</label>
             <input 
@@ -213,7 +217,7 @@ export default function Forecast() {
 
         {/* Tool 4: Emergency Fund Calculator */}
         <div className="card">
-          <div className="card-title">🛡️ Emergency Fund Timeline</div>
+          <div className="card-title">Emergency Fund Timeline</div>
           <div style={{ marginBottom: '16px' }}>
             <label style={labelStyle}>Months of expenses to cover</label>
             <select 

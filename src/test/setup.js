@@ -10,11 +10,13 @@ beforeEach(() => {
   };
 
   vi.stubGlobal('localStorage', storage);
-  Object.defineProperty(window, 'localStorage', {
-    value: storage,
-    writable: true,
-    configurable: true,
-  });
+  if (typeof window !== 'undefined') {
+    Object.defineProperty(window, 'localStorage', {
+      value: storage,
+      writable: true,
+      configurable: true,
+    });
+  }
 
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
     ok: true,

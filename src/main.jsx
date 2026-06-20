@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client';
 import Chart from 'chart.js/auto';
 import App from './App';
 import './index.css';
+import './styles/tokens.css';
+import './styles/shell.css';
+import './styles/workspace.css';
+import './styles/landing-redesign.css';
 
 // High-Visibility Chart.js Defaults for Grey Theme
 Chart.defaults.color = '#333333'; // Dark text for labels

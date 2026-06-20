@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Target, Trash2 } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { BASE_CURRENCY, convertAmountToDisplay } from '../lib/fx';
@@ -30,8 +30,8 @@ export default function Goals() {
   };
 
   return (
-    <div>
-      <h2 style={{ marginBottom: '20px' }}>Savings Goals</h2>
+    <div className="page-stack goals-page">
+      <h2>Savings Goals</h2>
 
       <div className="kpi-grid">
         <div className="kpi blue">
@@ -40,15 +40,15 @@ export default function Goals() {
         </div>
       </div>
 
-      <div className="card" style={{ marginBottom: '20px' }}>
+      <div className="card goal-create-card">
         <div className="card-title">Create Goal</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '8px' }}>
+        <div className="goal-form-row">
           <input className="input" placeholder="Emergency fund, travel, taxes..." value={name} onChange={(e) => setName(e.target.value)} />
           <input className="input" type="number" placeholder="Target amount in RON" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} />
           <input className="input" type="month" value={targetMonth} onChange={(e) => setTargetMonth(e.target.value)} />
           <button className="btn btn-primary" onClick={handleAddGoal}><Plus size={16} /> Add</button>
         </div>
-        <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '10px' }}>
+        <div className="goal-form-note">
           Goal targets are stored in RON. Progress is based on your explicitly entered account balances, then converted for display.
         </div>
       </div>
@@ -57,7 +57,7 @@ export default function Goals() {
         {data.goals.length === 0 ? (
           <div className="card">
             <div className="empty-state">
-              <div className="empty-state-icon">&#127919;</div>
+              <div className="empty-state-icon"><Target size={22} /></div>
               <div className="empty-state-title">No goals yet</div>
               <div className="empty-state-desc">Add a target above to track progress against your saved balances.</div>
             </div>

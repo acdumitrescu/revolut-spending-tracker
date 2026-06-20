@@ -3,12 +3,15 @@ import {
   getAccountTotalsByMonth,
   getAccountCurrency,
   getBudgetEntries,
+  getRolling12MonthSummary,
   getCurrencySummary,
   getDailySpend,
+  filterTransactionsByPeriod,
   getLatestMonth,
   getMonthlyExpense,
   getMonthlyIncome,
   getMonthlySummary,
+  getUniqueYears,
   getTotalAccountContributions,
 } from '../lib/selectors';
 
@@ -34,6 +37,23 @@ describe('selectors', () => {
     expect(getMonthlySummary(transactions)).toEqual([
       { month: '2024-01', inc: 5000, exp: 30, net: 4970 },
       { month: '2024-02', inc: 5500, exp: 100, net: 5400 },
+    ]);
+  });
+
+  it('builds a rolling 12-month summary ending with the provided current month', () => {
+    expect(getRolling12MonthSummary(transactions, new Date('2024-06-15'))).toEqual([
+      { month: '2023-07', inc: 0, exp: 0, net: 0 },
+      { month: '2023-08', inc: 0, exp: 0, net: 0 },
+      { month: '2023-09', inc: 0, exp: 0, net: 0 },
+      { month: '2023-10', inc: 0, exp: 0, net: 0 },
+      { month: '2023-11', inc: 0, exp: 0, net: 0 },
+      { month: '2023-12', inc: 0, exp: 0, net: 0 },
+      { month: '2024-01', inc: 5000, exp: 30, net: 4970 },
+      { month: '2024-02', inc: 5500, exp: 100, net: 5400 },
+      { month: '2024-03', inc: 0, exp: 0, net: 0 },
+      { month: '2024-04', inc: 0, exp: 0, net: 0 },
+      { month: '2024-05', inc: 0, exp: 0, net: 0 },
+      { month: '2024-06', inc: 0, exp: 0, net: 0 },
     ]);
   });
 
@@ -98,6 +118,20 @@ describe('selectors', () => {
     expect(summary.currencies).toEqual(['EUR', 'RON']);
   });
 
+  it('builds unique year filters in descending order', () => {
+    expect(getUniqueYears(transactions)).toEqual(['2024']);
+  });
+
+  it('filters transactions by selected year', () => {
+    const filtered = filterTransactionsByPeriod([
+      ...transactions,
+      { date: '2023-12-01', ym: '2023-12', desc: 'Legacy', cat: 'Groceries', sub: 'Food', amt: -20, flow: 'Debit', type: 'Card Payment' },
+    ], 'ALL TIME', '2024');
+
+    expect(filtered).toHaveLength(transactions.length);
+    expect(filtered.every((txn) => txn.date.startsWith('2024'))).toBe(true);
+  });
+
   it('converts transaction summaries into the selected display currency', () => {
     const mixedTransactions = [
       { date: '2024-01-01', ym: '2024-01', desc: 'Salary', cat: 'Income', sub: 'Income', amt: 5000, flow: 'Credit', type: 'Bank Transfer', currency: 'RON' },
@@ -122,5 +156,26 @@ describe('selectors', () => {
       spent: 20,
       remaining: 80,
     });
+  });
+
+  it('does not count transfers, savings top-ups, or cash movement as monthly expenses', () => {
+    const trustTransactions = [
+      { date: '2024-03-01', ym: '2024-03', desc: 'Transfer out', cat: 'Transfers', sub: 'Transfers', amt: -500, flow: 'Debit', type: 'Bank Transfer' },
+      { date: '2024-03-02', ym: '2024-03', desc: 'Top up', cat: 'Savings', sub: 'Top Up', amt: -300, flow: 'Debit', type: 'Top Up' },
+      { date: '2024-03-03', ym: '2024-03', desc: 'ATM', cat: 'Cash', sub: 'Cash Withdrawal', amt: -100, flow: 'Debit', type: 'Cash Withdrawal' },
+      { date: '2024-03-04', ym: '2024-03', desc: 'Groceries', cat: 'Groceries', sub: 'Food', amt: -80, flow: 'Debit', type: 'Card Payment' },
+    ];
+    expect(getMonthlyExpense(trustTransactions, '2024-03')).toBe(180);
+  });
+
+  it('defaults missing transaction currency to RON during summary conversion', () => {
+    const summary = getMonthlySummary([
+      { date: '2024-04-01', ym: '2024-04', desc: 'Legacy salary', cat: 'Income', sub: 'Income', amt: 1000, flow: 'Credit', type: 'Bank Transfer' },
+      { date: '2024-04-02', ym: '2024-04', desc: 'Legacy food', cat: 'Groceries', sub: 'Food', amt: -100, flow: 'Debit', type: 'Card Payment' },
+    ], { displayCurrency: 'EUR', fxRates: { EUR: 5, USD: 4.6 } });
+
+    expect(summary).toEqual([
+      { month: '2024-04', inc: 200, exp: 20, net: 180 },
+    ]);
   });
 });

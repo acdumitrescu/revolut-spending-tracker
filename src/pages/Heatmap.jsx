@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarRange, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { convertAmountToDisplay } from '../lib/fx';
 import { getDailySpend, getUniqueMonths } from '../lib/selectors';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
+import { EmptyState } from '../components/ui';
 
 function getColor(intensity) {
   if (intensity === 0) return 'var(--surface2)';
@@ -66,11 +67,7 @@ export default function Heatmap() {
     return (
       <div>
         <h2 style={{ marginBottom: '20px' }}>Spending Heatmap</h2>
-        <div className="empty-state">
-          <div className="empty-state-icon">&#128197;</div>
-          <div className="empty-state-title">No data yet</div>
-          <div className="empty-state-desc">Upload a CSV to see multi-month spending intensity and drill into daily spikes.</div>
-        </div>
+        <EmptyState icon={CalendarRange} title="No spending rhythm yet" description="Import transactions to explore daily intensity and unusual spending days." />
       </div>
     );
   }

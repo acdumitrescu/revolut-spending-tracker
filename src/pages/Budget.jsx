@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency, EXPENSE_CATS } from '../lib/utils';
 import { getBudgetEntries, getUniqueMonths } from '../lib/selectors';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, WalletCards } from 'lucide-react';
 import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
+import { EmptyState } from '../components/ui';
 
 export default function Budget() {
   const { data, setBudget, removeBudget, currencySummary } = useAppContext();
@@ -55,11 +56,7 @@ export default function Budget() {
     return (
       <div>
         <h2 style={{ marginBottom: '20px' }}>Monthly Budget</h2>
-        <div className="empty-state">
-          <div className="empty-state-icon">&#128176;</div>
-          <div className="empty-state-title">No data yet</div>
-          <div className="empty-state-desc">Upload a CSV to set up budgets.</div>
-        </div>
+        <EmptyState icon={WalletCards} title="Start with real spending context" description="Import transactions before setting category limits for a month." />
       </div>
     );
   }
@@ -215,7 +212,7 @@ export default function Budget() {
       ) : (
         <div className="card">
           <div className="empty-state">
-            <div className="empty-state-icon">&#128203;</div>
+            <div className="empty-state-icon"><WalletCards size={22} /></div>
             <div className="empty-state-title">No budgets set</div>
             <div className="empty-state-desc">Add categories above to start tracking your monthly budget.</div>
           </div>
