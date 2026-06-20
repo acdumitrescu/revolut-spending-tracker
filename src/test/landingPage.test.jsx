@@ -16,5 +16,7 @@ describe('LandingPage', () => {
     expect(screen.getByText(/no account required/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /useful dashboard in three quiet steps/i })).toBeInTheDocument();
     expect(screen.getByText(/optional private sync is designed for self-hosted deployments/i)).toBeInTheDocument();
+    expect(screen.getByText(/upload your own csv locally in-browser/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /safe to explore, local by default/i })).toBeInTheDocument();
   });
 });
