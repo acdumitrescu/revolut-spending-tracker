@@ -1,12 +1,26 @@
 FROM node:20-alpine AS build
 WORKDIR /app
+ARG VITE_DEPLOYMENT_PROFILE=private-sync
+ARG VITE_PRIVATE_SYNC_ENABLED=true
+ARG VITE_API_BASE_PATH=/api
+ARG VITE_FX_REFRESH_ENABLED=true
+ARG VITE_FX_REFRESH_RETRIES=2
+ARG VITE_FX_REFRESH_RETRY_DELAY_MS=450
+ENV VITE_DEPLOYMENT_PROFILE=$VITE_DEPLOYMENT_PROFILE
+ENV VITE_PRIVATE_SYNC_ENABLED=$VITE_PRIVATE_SYNC_ENABLED
+ENV VITE_API_BASE_PATH=$VITE_API_BASE_PATH
+ENV VITE_FX_REFRESH_ENABLED=$VITE_FX_REFRESH_ENABLED
+ENV VITE_FX_REFRESH_RETRIES=$VITE_FX_REFRESH_RETRIES
+ENV VITE_FX_REFRESH_RETRY_DELAY_MS=$VITE_FX_REFRESH_RETRY_DELAY_MS
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
 FROM nginx:alpine
+ARG NGINX_CONF=nginx.conf
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY ${NGINX_CONF} /etc/nginx/conf.d/default.conf
 EXPOSE 80
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1
 CMD ["nginx", "-g", "daemon off;"]

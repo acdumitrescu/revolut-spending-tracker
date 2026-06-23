@@ -15,7 +15,7 @@ Use this when you want the strongest local-first posture and do not need server 
    - `VITE_PRIVATE_SYNC_ENABLED=false`
 3. Build the frontend image and deploy the static site.
 4. Do not run the `api` service.
-5. For a public demo, prefer a static host such as Vercel and keep the deployment frontend-only.
+5. For a public demo, prefer a static host such as Netlify and keep the deployment frontend-only.
 
 Behavior:
 
@@ -24,17 +24,19 @@ Behavior:
 - FX refresh remains optional
 - users may upload their own CSV locally, so the demo should recommend exporting a JSON backup before they leave
 
-### Vercel demo setup
+### Netlify demo setup
 
 Recommended public demo settings:
 
-1. Import the GitHub repo into Vercel.
+1. Import the GitHub repo into Netlify.
 2. Deploy from `main`.
 3. Set:
    - `VITE_DEPLOYMENT_PROFILE=client-only`
    - `VITE_PRIVATE_SYNC_ENABLED=false`
 4. Leave the backend undeployed.
-5. Use the included `vercel.json` rewrite so client-side routes keep working on refresh.
+5. Use the included `public/_redirects` rewrite so client-side routes keep working on refresh.
+6. Set the build command to `npm run build`.
+7. Set the publish directory to `dist`.
 
 Recommended public demo messaging:
 
@@ -62,6 +64,59 @@ Behavior:
 - browser-local state remains primary
 - the app still works if private sync is unavailable
 - the API stores one versioned private state blob for the deployment
+
+### Local Docker workflow
+
+Use this when you want the private-sync app available on localhost without keeping a Vite or Node dev server open.
+
+Start:
+
+```bash
+docker compose up -d --build
+```
+
+Open:
+
+```text
+http://127.0.0.1:3176
+```
+
+Stop without deleting private sync data:
+
+```bash
+docker compose down
+```
+
+Delete containers and the private sync volume only when you intentionally want to erase server-side local state:
+
+```bash
+docker compose down -v
+```
+
+The helper script wraps the same commands:
+
+```bash
+scripts/personal-app.sh start
+scripts/personal-app.sh status
+scripts/personal-app.sh logs
+scripts/personal-app.sh stop
+```
+
+Local Docker behavior:
+
+- only `127.0.0.1:3176` is published on the host
+- the API stays internal to Compose and is reached through `/api`
+- nginx serves the built frontend from a read-only container filesystem
+- app state and vendor observations persist in the `ssb-personal_app-state` volume when using `scripts/personal-app.sh`
+- memory and process limits keep the background footprint small
+
+For GitHub-safe public testing, use the client-only profile:
+
+```bash
+scripts/public-test.sh start
+```
+
+It opens on `http://127.0.0.1:3178`, does not start the API service, and does not mount a private sync volume.
 
 ## Reverse proxy notes
 
