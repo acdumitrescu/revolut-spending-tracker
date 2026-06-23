@@ -68,6 +68,7 @@ This app is a strong fit if you:
 - Backup and restore are controlled by the user
 
 For public vs private workflow guidance, see [docs/local-workflow.md](docs/local-workflow.md).
+For the two-folder public/personal setup, see [docs/public-private-split.md](docs/public-private-split.md).
 For a publishing and backup safety checklist, see [docs/security-checklist.md](docs/security-checklist.md).
 
 ## Supported imports
@@ -129,6 +130,7 @@ The safest public demo shape for this project is `client-only`:
 - keep `VITE_DEPLOYMENT_PROFILE=client-only`
 - keep `VITE_PRIVATE_SYNC_ENABLED=false`
 - do not deploy the `private-sync` backend for a public demo
+- for Netlify, use the included `public/_redirects` SPA rewrite
 
 Public demo visitors can:
 
@@ -174,6 +176,32 @@ SimpleSafeBanking supports two deployment profiles:
 - `private-sync`: static frontend plus a single-tenant private sync API for self-hosted deployments
 
 See [docs/deployment.md](docs/deployment.md) and [docs/backup-runbook.md](docs/backup-runbook.md).
+
+## Docker localhost
+
+For private local use without running Vite or Node manually:
+
+```bash
+scripts/personal-app.sh start
+```
+
+Then open `http://127.0.0.1:3176`.
+
+The personal Docker profile serves the production frontend through nginx, keeps the API internal to Compose, and stores private sync data in the `ssb-personal_app-state` Docker volume. Stop it with:
+
+```bash
+scripts/personal-app.sh stop
+```
+
+For GitHub-safe public testing with no API and no private sync volume:
+
+```bash
+scripts/public-test.sh start
+```
+
+Then open `http://127.0.0.1:3178`.
+
+Only run a Docker volume delete command when you intentionally want to erase private sync state.
 
 ## Development
 

@@ -1,9 +1,24 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        VITE_DEPLOYMENT_PROFILE: private-sync
+        VITE_PRIVATE_SYNC_ENABLED: "true"
+        VITE_API_BASE_PATH: /api
+        VITE_FX_REFRESH_ENABLED: ${VITE_FX_REFRESH_ENABLED:-true}
+        VITE_FX_REFRESH_RETRIES: ${VITE_FX_REFRESH_RETRIES:-2}
+        VITE_FX_REFRESH_RETRY_DELAY_MS: ${VITE_FX_REFRESH_RETRY_DELAY_MS:-450}
     ports:
       - "127.0.0.1:3176:80"
     restart: unless-stopped
+    mem_limit: 64m
+    pids_limit: 128
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:rw,noexec,nosuid,size=16m
+      - /var/run:rw,noexec,nosuid,size=1m
+      - /tmp:rw,noexec,nosuid,size=8m
     depends_on:
       api:
         condition: service_healthy
@@ -14,12 +29,16 @@ services:
       retries: 3
 
   api:
-    build: ./backend
+    build:
+      context: ./backend
     restart: unless-stopped
+    mem_limit: 128m
+    pids_limit: 128
     environment:
       APP_STATE_FILE: /data/app-state.json
+      VENDOR_OBSERVATIONS_FILE: /data/vendor-observations.json
       APP_STATE_MAX_BYTES: 5242880
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3176,http://127.0.0.1:3176}
     volumes:
       - app-state:/data
     healthcheck:
