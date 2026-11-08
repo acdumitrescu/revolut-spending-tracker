@@ -14,6 +14,8 @@ Use this checklist before sharing, pushing, or publishing anything from SimpleSa
 By default, this data lives only in your browser `localStorage`.
 
 If you enable the private-sync deployment profile, a versioned copy of the app state may also be written to your own private server.
+If you explicitly refresh Portfolio prices, the private server sends only the configured quote symbols to
+Yahoo. Holdings, quantities, costs, account names, and portfolio totals are not included in that request.
 
 ## What leaves the browser
 

@@ -1,0 +1,3030 @@
+{
+  "source": "Bucharest Stock Exchange shares market pages",
+  "generatedAt": "2026-07-26T14:33:03.598Z",
+  "instruments": [
+    {
+      "ticker": "2P",
+      "quoteSymbol": "2P.RO",
+      "name": "2PERFORMANT NETWORK SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "4RT",
+      "quoteSymbol": "4RT.RO",
+      "name": "FORT SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AAB",
+      "quoteSymbol": "AAB.RO",
+      "name": "AGROLAND AGRIBUSINESS",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AAG",
+      "quoteSymbol": "AAG.RO",
+      "name": "S.C AAGES S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ABN",
+      "quoteSymbol": "ABN.RO",
+      "name": "ABN Systems International",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ADISS",
+      "quoteSymbol": "ADISS.RO",
+      "name": "ADISS",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ADMY",
+      "quoteSymbol": "ADMY.RO",
+      "name": "ADMET SA GALATI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AG",
+      "quoteSymbol": "AG.RO",
+      "name": "AGROLAND BUSINESS SYSTEM S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AGCM",
+      "quoteSymbol": "AGCM.RO",
+      "name": "AGROMEC SA CIOROGARLA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ALB",
+      "quoteSymbol": "ALB.RO",
+      "name": "ALBAPAM S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ALCQ",
+      "quoteSymbol": "ALCQ.RO",
+      "name": "ALCOM SA TIMISOARA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ALDANI",
+      "quoteSymbol": "ALDANI.RO",
+      "name": "ALDANI MASTER CAPITAL S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ALR",
+      "quoteSymbol": "ALR.RO",
+      "name": "ALRO S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ALRV",
+      "quoteSymbol": "ALRV.RO",
+      "name": "ALIMENTARA SA Slatina",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ALT",
+      "quoteSymbol": "ALT.RO",
+      "name": "ALTUR S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ALU",
+      "quoteSymbol": "ALU.RO",
+      "name": "ALUMIL ROM INDUSTRY S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ALW",
+      "quoteSymbol": "ALW.RO",
+      "name": "VISUAL FAN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AMAL",
+      "quoteSymbol": "AMAL.RO",
+      "name": "INTERNATIONAL CAVIAR CORPORATION SA CALAN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ANIM",
+      "quoteSymbol": "ANIM.RO",
+      "name": "STUDIOUL CINEMATOGRAFIC ANIMAFILM SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ANTA",
+      "quoteSymbol": "ANTA.RO",
+      "name": "ROMANTA ESTIVAL 2002 SA NEPTUN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "APP",
+      "quoteSymbol": "APP.RO",
+      "name": "APPRAISAL & VALUATION",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AQ",
+      "quoteSymbol": "AQ.RO",
+      "name": "AQUILA PART PROD COM",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARAX",
+      "quoteSymbol": "ARAX.RO",
+      "name": "ARMAX GAZ SA Medias",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARCU",
+      "quoteSymbol": "ARCU.RO",
+      "name": "SIFI CLUJ RETAIL SA Bucuresti",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARCV",
+      "quoteSymbol": "ARCV.RO",
+      "name": "IMOTRUST SA ARAD",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARJI",
+      "quoteSymbol": "ARJI.RO",
+      "name": "ARTECA SA JILAVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARM",
+      "quoteSymbol": "ARM.RO",
+      "name": "ARMATURA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARMT",
+      "quoteSymbol": "ARMT.RO",
+      "name": "CAROMET SA CARANSEBES",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARO",
+      "quoteSymbol": "ARO.RO",
+      "name": "ARO-PALACE SA BRASOV",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AROBS",
+      "quoteSymbol": "AROBS.RO",
+      "name": "AROBS TRANSILVANIA SOFTWARE",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARS",
+      "quoteSymbol": "ARS.RO",
+      "name": "AEROSTAR S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ARTE",
+      "quoteSymbol": "ARTE.RO",
+      "name": "ARTEGO SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ASC",
+      "quoteSymbol": "ASC.RO",
+      "name": "ASCENDIA SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ASP",
+      "quoteSymbol": "ASP.RO",
+      "name": "RAFINARIA ASTRA ROMANA S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AST",
+      "quoteSymbol": "AST.RO",
+      "name": "ARCTIC STREAM",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ATB",
+      "quoteSymbol": "ATB.RO",
+      "name": "ANTIBIOTICE S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ATRD",
+      "quoteSymbol": "ATRD.RO",
+      "name": "ATELIERELE CFR GRIVITA SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AUXI",
+      "quoteSymbol": "AUXI.RO",
+      "name": "ATM - CONSTRUCT SA PLOIESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AVIO",
+      "quoteSymbol": "AVIO.RO",
+      "name": "AVIOANE SA CRAIOVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "AVSL",
+      "quoteSymbol": "AVSL.RO",
+      "name": "AVICOLA SA SLOBOZIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BADE",
+      "quoteSymbol": "BADE.RO",
+      "name": "BAD SA SUCEAVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BALN",
+      "quoteSymbol": "BALN.RO",
+      "name": "TRATAMENT BALNEAR BUZIAS SA BUZIAS",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BBGA",
+      "quoteSymbol": "BBGA.RO",
+      "name": "ALUM SA Tulcea",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BCM",
+      "quoteSymbol": "BCM.RO",
+      "name": "CASA DE BUCOVINA-CLUB DE MUNTE",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BENTO",
+      "quoteSymbol": "BENTO.RO",
+      "name": "2B INTELLIGENT SOFT S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BIBU",
+      "quoteSymbol": "BIBU.RO",
+      "name": "BTT SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BIO",
+      "quoteSymbol": "BIO.RO",
+      "name": "BIOFARM S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BIOW",
+      "quoteSymbol": "BIOW.RO",
+      "name": "VIFRANA S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BLEA",
+      "quoteSymbol": "BLEA.RO",
+      "name": "BALEA ESTIVAL 2002 SA NEPTUN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BNAT",
+      "quoteSymbol": "BNAT.RO",
+      "name": "BANAT ESTIVAL 2002 SA OLIMP",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BNET",
+      "quoteSymbol": "BNET.RO",
+      "name": "BITTNET SYSTEMS SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BONA",
+      "quoteSymbol": "BONA.RO",
+      "name": "BONAS IMPORT EXPORT",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BRCR",
+      "quoteSymbol": "BRCR.RO",
+      "name": "BRAICONF SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BRD",
+      "quoteSymbol": "BRD.RO",
+      "name": "BRD - GROUPE SOCIETE GENERALE S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BRK",
+      "quoteSymbol": "BRK.RO",
+      "name": "SSIF BRK FINANCIAL GROUP SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BRM",
+      "quoteSymbol": "BRM.RO",
+      "name": "BERMAS S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BRNA",
+      "quoteSymbol": "BRNA.RO",
+      "name": "ROMNAV SA BRAILA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BUCS",
+      "quoteSymbol": "BUCS.RO",
+      "name": "BUCOVINA SA SCHEIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BUCU",
+      "quoteSymbol": "BUCU.RO",
+      "name": "BUCUR OBOR SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BUCV",
+      "quoteSymbol": "BUCV.RO",
+      "name": "BUCUR SA Bucuresti",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "BVB",
+      "quoteSymbol": "BVB.RO",
+      "name": "BURSA DE VALORI BUCURESTI SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CAB",
+      "quoteSymbol": "CAB.RO",
+      "name": "GOCAB SOFTWARE S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CACU",
+      "quoteSymbol": "CACU.RO",
+      "name": "SIFI CJ LOGISTIC SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CAIN",
+      "quoteSymbol": "CAIN.RO",
+      "name": "CASA ALBA - INDEPENDENTA SA SIBIU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CAOR",
+      "quoteSymbol": "CAOR.RO",
+      "name": "SIF HOTELURI SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CBC",
+      "quoteSymbol": "CBC.RO",
+      "name": "CARBOCHIM S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CBOT",
+      "quoteSymbol": "CBOT.RO",
+      "name": "COMCEREAL SA BOTOSANI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CC",
+      "quoteSymbol": "CC.RO",
+      "name": "Connections Consult",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CCOM",
+      "quoteSymbol": "CCOM.RO",
+      "name": "CEREALCOM SA ALEXANDRIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CEPO",
+      "quoteSymbol": "CEPO.RO",
+      "name": "CEPROCIM SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CFED",
+      "quoteSymbol": "CFED.RO",
+      "name": "CONSTRUCTII FEROVIARE CRAIOVA SA CRAIOVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CFH",
+      "quoteSymbol": "CFH.RO",
+      "name": "CRIS-TIM FAMILY HOLDING S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CHIA",
+      "quoteSymbol": "CHIA.RO",
+      "name": "CONSTRUCTII HIDROTEHNICE SA IASI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CHRD",
+      "quoteSymbol": "CHRD.RO",
+      "name": "CHROMOSOME DYNAMICS",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CICE",
+      "quoteSymbol": "CICE.RO",
+      "name": "CICERO SA DR. T. SEVERIN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CICO",
+      "quoteSymbol": "CICO.RO",
+      "name": "CI-CO SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CLAIM",
+      "quoteSymbol": "CLAIM.RO",
+      "name": "AIR CLAIM",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CLUB",
+      "quoteSymbol": "CLUB.RO",
+      "name": "HOTEL CLUB ESTIVAL 2002 SA NEPTUN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CMBU",
+      "quoteSymbol": "CMBU.RO",
+      "name": "COMMIXT SA BUFTEA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CMCM",
+      "quoteSymbol": "CMCM.RO",
+      "name": "COMCM SA CONSTANTA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CMF",
+      "quoteSymbol": "CMF.RO",
+      "name": "COMELF S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CMIL",
+      "quoteSymbol": "CMIL.RO",
+      "name": "COMCEREAL SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CMP",
+      "quoteSymbol": "CMP.RO",
+      "name": "COMPA S. A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CMVX",
+      "quoteSymbol": "CMVX.RO",
+      "name": "COMVEX SA CONSTANTA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CNTE",
+      "quoteSymbol": "CNTE.RO",
+      "name": "CONTED SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COBL",
+      "quoteSymbol": "COBL.RO",
+      "name": "BRICOMAT SA SIBIU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COBU",
+      "quoteSymbol": "COBU.RO",
+      "name": "RENEWABLE HOLDING MANAGEMENT S.A. BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COCB",
+      "quoteSymbol": "COCB.RO",
+      "name": "COMCEREAL SA SLOBOZIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COCR",
+      "quoteSymbol": "COCR.RO",
+      "name": "COCOR SA Bucuresti",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CODE",
+      "quoteSymbol": "CODE.RO",
+      "name": "Softbinator Technologies",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COEC",
+      "quoteSymbol": "COEC.RO",
+      "name": "CONECT BUSINESS PARK SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COET",
+      "quoteSymbol": "COET.RO",
+      "name": "COMPLEX COMET SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COKG",
+      "quoteSymbol": "COKG.RO",
+      "name": "COMALEX SA Alexandria",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COKJ",
+      "quoteSymbol": "COKJ.RO",
+      "name": "CONCIVIA SA BRAILA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COLK",
+      "quoteSymbol": "COLK.RO",
+      "name": "CONEX PRAHOVA SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COMI",
+      "quoteSymbol": "COMI.RO",
+      "name": "CONDMAG S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COMY",
+      "quoteSymbol": "COMY.RO",
+      "name": "COMAT SA GIURGIU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CONK",
+      "quoteSymbol": "CONK.RO",
+      "name": "CONCAS SA BUZAU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CORO",
+      "quoteSymbol": "CORO.RO",
+      "name": "CONSTRUCTII FEROVIARE CFB S.A. BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COTE",
+      "quoteSymbol": "COTE.RO",
+      "name": "CONPET SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COTM",
+      "quoteSymbol": "COTM.RO",
+      "name": "COMAT SA GALATI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COTN",
+      "quoteSymbol": "COTN.RO",
+      "name": "COMREP SA Ploiesti",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COUT",
+      "quoteSymbol": "COUT.RO",
+      "name": "COMTURIST SA Bucuresti",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "COVB",
+      "quoteSymbol": "COVB.RO",
+      "name": "CONFECTII VASLUI SA VASLUI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CPHA",
+      "quoteSymbol": "CPHA.RO",
+      "name": "CEPROHART SA BRAILA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CPLB",
+      "quoteSymbol": "CPLB.RO",
+      "name": "CONSTRUCTII COMPLEXE SA BUZAU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CRC",
+      "quoteSymbol": "CRC.RO",
+      "name": "CHIMCOMPLEX BORZESTI SA ONESTI",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CRMC",
+      "quoteSymbol": "CRMC.RO",
+      "name": "CARMECO SA CONSTANTA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "CRPC",
+      "quoteSymbol": "CRPC.RO",
+      "name": "CARPATHIA CAPITAL ALTERNATYWNA SPOLKA INWESTYCYJNA SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "DENT",
+      "quoteSymbol": "DENT.RO",
+      "name": "Dr. Fischer Dental",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "DIAS",
+      "quoteSymbol": "DIAS.RO",
+      "name": "DIASFIN SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "DIGI",
+      "quoteSymbol": "DIGI.RO",
+      "name": "Digi Communications N.V.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "DN",
+      "quoteSymbol": "DN.RO",
+      "name": "DN Agrar Group",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "DOIS",
+      "quoteSymbol": "DOIS.RO",
+      "name": "DORNA TURISM SA VATRA DORNEI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "DUPX",
+      "quoteSymbol": "DUPX.RO",
+      "name": "DUPLEX SA FAGARAS",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EAI",
+      "quoteSymbol": "EAI.RO",
+      "name": "Electro-Alfa International S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EBS",
+      "quoteSymbol": "EBS.RO",
+      "name": "Erste Group Bank AG",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ECT",
+      "quoteSymbol": "ECT.RO",
+      "name": "GRUPUL INDUSTRIAL ELECTROCONTACT S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EEAI",
+      "quoteSymbol": "EEAI.RO",
+      "name": "ELECTROCONSTRUCTIA ELCO ALBA IULIA SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EFO",
+      "quoteSymbol": "EFO.RO",
+      "name": "TURISM, HOTELURI, RESTAURANTE MAREA NEAGRA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EL",
+      "quoteSymbol": "EL.RO",
+      "name": "SOCIETATEA ENERGETICA ELECTRICA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELCT",
+      "quoteSymbol": "ELCT.RO",
+      "name": "EL-CO SA TARGU SECUIESC",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELEL",
+      "quoteSymbol": "ELEL.RO",
+      "name": "ELECTROCONSTRUCTIA ELCO SA SUCEAVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELER",
+      "quoteSymbol": "ELER.RO",
+      "name": "ELEROM SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELGS",
+      "quoteSymbol": "ELGS.RO",
+      "name": "AETA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELJ",
+      "quoteSymbol": "ELJ.RO",
+      "name": "ELECTROAPARATAJ S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELJA",
+      "quoteSymbol": "ELJA.RO",
+      "name": "ELECTROMONTAJ CARPATI SA Sibiu",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELMA",
+      "quoteSymbol": "ELMA.RO",
+      "name": "ELECTROMAGNETICA SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELRD",
+      "quoteSymbol": "ELRD.RO",
+      "name": "ELECTRECORD SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELV",
+      "quoteSymbol": "ELV.RO",
+      "name": "ELVILA S.A. BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ELZY",
+      "quoteSymbol": "ELZY.RO",
+      "name": "ELECTROPRECIZIA SA Sacele",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EM",
+      "quoteSymbol": "EM.RO",
+      "name": "Grup EM S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EMAI",
+      "quoteSymbol": "EMAI.RO",
+      "name": "EMAILUL SA MEDIAS",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EMTL",
+      "quoteSymbol": "EMTL.RO",
+      "name": "ELECTROMETAL SA TIMISOARA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ENP",
+      "quoteSymbol": "ENP.RO",
+      "name": "COMPANIA ENERGOPETROL S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EPN",
+      "quoteSymbol": "EPN.RO",
+      "name": "EMA PIATRA NEAMT S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "EVER",
+      "quoteSymbol": "EVER.RO",
+      "name": "EVERGENT INVESTMENTS S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FACY",
+      "quoteSymbol": "FACY.RO",
+      "name": "FABRICA DE SCULE RASNOV SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FAMZ",
+      "quoteSymbol": "FAMZ.RO",
+      "name": "FAM SA GALATI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FEP",
+      "quoteSymbol": "FEP.RO",
+      "name": "FEPER",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FERO",
+      "quoteSymbol": "FERO.RO",
+      "name": "IAMBA ARAD S.A. ARAD",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FIMA",
+      "quoteSymbol": "FIMA.RO",
+      "name": "FIMARO SA Cluj",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FMAR",
+      "quoteSymbol": "FMAR.RO",
+      "name": "FAIMAR SA BAIA MARE",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FOJE",
+      "quoteSymbol": "FOJE.RO",
+      "name": "FORAJ SONDE SA VIDELE",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FOMA",
+      "quoteSymbol": "FOMA.RO",
+      "name": "FORMA SA BOTOSANI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FOSB",
+      "quoteSymbol": "FOSB.RO",
+      "name": "FORAJ SONDE SA CRAIOVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FP",
+      "quoteSymbol": "FP.RO",
+      "name": "FONDUL PROPRIETATEA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "FRB",
+      "quoteSymbol": "FRB.RO",
+      "name": "FIREBYTE GAMES S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GALF",
+      "quoteSymbol": "GALF.RO",
+      "name": "GALFINBAND SA GALATI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GDP",
+      "quoteSymbol": "GDP.RO",
+      "name": "GRUPUL EDITORILOR SI DIFUZORILOR DE PRESA S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GGC",
+      "quoteSymbol": "GGC.RO",
+      "name": "GLISSANDO GARDEN CENTER S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GHIM",
+      "quoteSymbol": "GHIM.RO",
+      "name": "A.T.C. - AGRO TOTAL CONSTRUCT SA GHIMBAV",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GREEN",
+      "quoteSymbol": "GREEN.RO",
+      "name": "GREEN TECH INTERNATIONAL S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GRF",
+      "quoteSymbol": "GRF.RO",
+      "name": "GRAFFITI PLUS S.A",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GRIU",
+      "quoteSymbol": "GRIU.RO",
+      "name": "GRIUL SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GROB",
+      "quoteSymbol": "GROB.RO",
+      "name": "GEROM SA BUZAU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "GSH",
+      "quoteSymbol": "GSH.RO",
+      "name": "Grup Serban Holding",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "H2O",
+      "quoteSymbol": "H2O.RO",
+      "name": "SOCIETATEA DE PRODUCERE A ENERGIEI ELECTRICE IN HIDROCENTRALE HIDROELECTRICA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "HAI",
+      "quoteSymbol": "HAI.RO",
+      "name": "HOLDE AGRI INVEST S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "HEAL",
+      "quoteSymbol": "HEAL.RO",
+      "name": "HELIOS SA ASTILEU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "HLEB",
+      "quoteSymbol": "HLEB.RO",
+      "name": "HERCULES SA BRAILA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "HUNT",
+      "quoteSymbol": "HUNT.RO",
+      "name": "IHUNT TECHNOLOGY IMPORT-EXPORT S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IAMU",
+      "quoteSymbol": "IAMU.RO",
+      "name": "IAMU SA BLAJ",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IANY",
+      "quoteSymbol": "IANY.RO",
+      "name": "24 IANUARIE SA PLOIESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IARV",
+      "quoteSymbol": "IARV.RO",
+      "name": "IAR SA Brasov",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IASX",
+      "quoteSymbol": "IASX.RO",
+      "name": "IASITEX SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ICEV",
+      "quoteSymbol": "ICEV.RO",
+      "name": "INSTITUTUL DE CERCETARI PENTRU ACOPERIRI AVANSATE ICAA SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ICMA",
+      "quoteSymbol": "ICMA.RO",
+      "name": "ICMA SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ICSH",
+      "quoteSymbol": "ICSH.RO",
+      "name": "ICSH SA HUNEDOARA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IMMO",
+      "quoteSymbol": "IMMO.RO",
+      "name": "IMMO GURU S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IMP",
+      "quoteSymbol": "IMP.RO",
+      "name": "IMPACT DEVELOPER & CONTRACTOR S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "INCT",
+      "quoteSymbol": "INCT.RO",
+      "name": "INCERTRANS SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "INFINITY",
+      "quoteSymbol": "INFINITY.RO",
+      "name": "INFINITY CAPITAL INVESTMENTS S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "INMA",
+      "quoteSymbol": "INMA.RO",
+      "name": "INDUSTRIE MICA SA PLOIESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "INOX",
+      "quoteSymbol": "INOX.RO",
+      "name": "INOX SA MAGURELE",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "INTA",
+      "quoteSymbol": "INTA.RO",
+      "name": "INDEPENDENTA SA SIBIU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IORB",
+      "quoteSymbol": "IORB.RO",
+      "name": "IOR SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IPHI",
+      "quoteSymbol": "IPHI.RO",
+      "name": "IPROCHIM SA Bucuresti",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IPRO",
+      "quoteSymbol": "IPRO.RO",
+      "name": "IPROLAM SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IPRU",
+      "quoteSymbol": "IPRU.RO",
+      "name": "IPROEB SA Bistrita",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ITG",
+      "quoteSymbol": "ITG.RO",
+      "name": "IT GENETICS S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "IUBR",
+      "quoteSymbol": "IUBR.RO",
+      "name": "IUS SA BRASOV",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "JTG",
+      "quoteSymbol": "JTG.RO",
+      "name": "J.T. GRUP OIL S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "LCSI",
+      "quoteSymbol": "LCSI.RO",
+      "name": "LCS IMOBILIAR SA CLUJ NAPOCA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "LIH",
+      "quoteSymbol": "LIH.RO",
+      "name": "LIFE IS HARD S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "LION",
+      "quoteSymbol": "LION.RO",
+      "name": "LION CAPITAL S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "LITO",
+      "quoteSymbol": "LITO.RO",
+      "name": "LITORAL SA MAMAIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "LONG",
+      "quoteSymbol": "LONG.RO",
+      "name": "LONGSHIELD INVESTMENT GROUP S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "M",
+      "quoteSymbol": "M.RO",
+      "name": "Med Life S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MACO",
+      "quoteSymbol": "MACO.RO",
+      "name": "MACOFIL SA TG. JIU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MALI",
+      "quoteSymbol": "MALI.RO",
+      "name": "COMALIM SA ARAD",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MAM",
+      "quoteSymbol": "MAM.RO",
+      "name": "MAMBRICOLAJ S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MAMA",
+      "quoteSymbol": "MAMA.RO",
+      "name": "MAGAZIN UNIVERSAL MARAMURES SA BAIA MARE",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MCAB",
+      "quoteSymbol": "MCAB.RO",
+      "name": "ROMCAB SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MEBY",
+      "quoteSymbol": "MEBY.RO",
+      "name": "LUCEAFARUL SA BACAU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MECA",
+      "quoteSymbol": "MECA.RO",
+      "name": "METALURGICA SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MECF",
+      "quoteSymbol": "MECF.RO",
+      "name": "MECANICA CEAHLAU",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MECP",
+      "quoteSymbol": "MECP.RO",
+      "name": "MECON SA BRASOV",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MELE",
+      "quoteSymbol": "MELE.RO",
+      "name": "METAL LEMN SA CRAIOVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MEOR",
+      "quoteSymbol": "MEOR.RO",
+      "name": "METALICA SA ORADEA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MEOY",
+      "quoteSymbol": "MEOY.RO",
+      "name": "MECANICA CODLEA SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MESA",
+      "quoteSymbol": "MESA.RO",
+      "name": "METALUL MESA SA SALONTA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MET",
+      "quoteSymbol": "MET.RO",
+      "name": "NOVERE CAPITAL",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "METT",
+      "quoteSymbol": "METT.RO",
+      "name": "METTEXIN SA MANGALIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "METY",
+      "quoteSymbol": "METY.RO",
+      "name": "MECANICA ROTES SA Targoviste",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MFC",
+      "quoteSymbol": "MFC.RO",
+      "name": "MF CAPITAL SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MIB",
+      "quoteSymbol": "MIB.RO",
+      "name": "MILLENIUM INSURANCE BROKER (MIB) BROKER DE ASIGURARE - REASIGURARE S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MILK",
+      "quoteSymbol": "MILK.RO",
+      "name": "AGROSERV MARIUTA S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MINO",
+      "quoteSymbol": "MINO.RO",
+      "name": "MINDO SA DOROHOI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MINX",
+      "quoteSymbol": "MINX.RO",
+      "name": "MINEXFOR SA DEVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MOBE",
+      "quoteSymbol": "MOBE.RO",
+      "name": "MOBEST SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MOBG",
+      "quoteSymbol": "MOBG.RO",
+      "name": "MOBEX SA TG.MURES",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MOBT",
+      "quoteSymbol": "MOBT.RO",
+      "name": "MOBILA SA RADAUTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MODY",
+      "quoteSymbol": "MODY.RO",
+      "name": "MOLDOVA SA VASLUI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MOIB",
+      "quoteSymbol": "MOIB.RO",
+      "name": "MOARA CIBIN SA SIBIU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "MORA",
+      "quoteSymbol": "MORA.RO",
+      "name": "MORARIT PANIFICATIE SA ROMAN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NAPO",
+      "quoteSymbol": "NAPO.RO",
+      "name": "SOCIETATEA DE CONSTRUCTII NAPOCA SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NAXY",
+      "quoteSymbol": "NAXY.RO",
+      "name": "NAVEXIM SA GALATI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NC",
+      "quoteSymbol": "NC.RO",
+      "name": "NOVERE CAPITAL",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NCHI",
+      "quoteSymbol": "NCHI.RO",
+      "name": "SCALA DEVELOPMENT S.A. CLUJ-NAPOCA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NEOL",
+      "quoteSymbol": "NEOL.RO",
+      "name": "NEPTUN OLIMP SA NEPTUN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NORD",
+      "quoteSymbol": "NORD.RO",
+      "name": "NORD SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NRF",
+      "quoteSymbol": "NRF.RO",
+      "name": "NOROFERT",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NTEX",
+      "quoteSymbol": "NTEX.RO",
+      "name": "SIFI CJ STORAGE SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "NUIA",
+      "quoteSymbol": "NUIA.RO",
+      "name": "ABO MIX SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "OIL",
+      "quoteSymbol": "OIL.RO",
+      "name": "OIL TERMINAL S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "OMAL",
+      "quoteSymbol": "OMAL.RO",
+      "name": "COMALIMENT SA RESITA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "OMSE",
+      "quoteSymbol": "OMSE.RO",
+      "name": "COMAT CARAS SEVERIN SA RESITA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ONE",
+      "quoteSymbol": "ONE.RO",
+      "name": "ONE UNITED PROPERTIES",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PACY",
+      "quoteSymbol": "PACY.RO",
+      "name": "PALACE SA SINAIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PBK",
+      "quoteSymbol": "PBK.RO",
+      "name": "PATRIA BANK S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PCTM",
+      "quoteSymbol": "PCTM.RO",
+      "name": "PRIMACONSTRUCT SA TIMISOARA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PE",
+      "quoteSymbol": "PE.RO",
+      "name": "Premier Energy PLC",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PELA",
+      "quoteSymbol": "PELA.RO",
+      "name": "PERLA COVASNEI SA VOLUNTARI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PETY",
+      "quoteSymbol": "PETY.RO",
+      "name": "PETAL SA HUSI (fost ROBINETE INDUSTRIALE - UTILAJ PETROLIER)",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "POTI",
+      "quoteSymbol": "POTI.RO",
+      "name": "POTIS CAPITAL SA CLUJ-NAPOCA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PPL",
+      "quoteSymbol": "PPL.RO",
+      "name": "PROMATERIS S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PPLI",
+      "quoteSymbol": "PPLI.RO",
+      "name": "PROFESSIONAL IMO PARTNERS S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PRAE",
+      "quoteSymbol": "PRAE.RO",
+      "name": "PRODLACTA SA Brasov",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PRBU",
+      "quoteSymbol": "PRBU.RO",
+      "name": "PRACTIC SA Bucuresti",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PRDI",
+      "quoteSymbol": "PRDI.RO",
+      "name": "PRODHART SA IASI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PREB",
+      "quoteSymbol": "PREB.RO",
+      "name": "PREBET SA AIUD",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PREH",
+      "quoteSymbol": "PREH.RO",
+      "name": "PREFAB SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PRIB",
+      "quoteSymbol": "PRIB.RO",
+      "name": "PRIMCOM SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PRIN",
+      "quoteSymbol": "PRIN.RO",
+      "name": "PROIECT COVASNA SA SFANTU GHEORGHE",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PRSN",
+      "quoteSymbol": "PRSN.RO",
+      "name": "PROSPECTIUNI SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PTR",
+      "quoteSymbol": "PTR.RO",
+      "name": "ROMPETROL WELL SERVICES S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "PVBS",
+      "quoteSymbol": "PVBS.RO",
+      "name": "PERSEUS FINTECH S.A. BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "RANT",
+      "quoteSymbol": "RANT.RO",
+      "name": "GRANITUL SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "RCHI",
+      "quoteSymbol": "RCHI.RO",
+      "name": "GRAND HOTEL BUCHAREST S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "REFE",
+      "quoteSymbol": "REFE.RO",
+      "name": "REMARUL 16 FEBRUARIE SA CLUJ NAPOCA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "REIT",
+      "quoteSymbol": "REIT.RO",
+      "name": "STAR INVEST IMOBILIARE S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "RELE",
+      "quoteSymbol": "RELE.RO",
+      "name": "RELEE SA MEDIAS",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "REMM",
+      "quoteSymbol": "REMM.RO",
+      "name": "REMAT MARAMURES SA BAIA MARE",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "REVA",
+      "quoteSymbol": "REVA.RO",
+      "name": "REVA SA SIMERIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "RMAH",
+      "quoteSymbol": "RMAH.RO",
+      "name": "FARMACEUTICA REMEDIA SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ROC1",
+      "quoteSymbol": "ROC1.RO",
+      "name": "ROCA INDUSTRY HOLDINGROCK1 S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ROCE",
+      "quoteSymbol": "ROCE.RO",
+      "name": "ROMCARBON SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "ROOF",
+      "quoteSymbol": "ROOF.RO",
+      "name": "ROMANOFIR SA TALMACIU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "RORX",
+      "quoteSymbol": "RORX.RO",
+      "name": "ROMAERO SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "RPH",
+      "quoteSymbol": "RPH.RO",
+      "name": "ROPHARMA SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "RRC",
+      "quoteSymbol": "RRC.RO",
+      "name": "ROMPETROL RAFINARE S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "RRD",
+      "quoteSymbol": "RRD.RO",
+      "name": "ROMRADIATOARE S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SAFE",
+      "quoteSymbol": "SAFE.RO",
+      "name": "SAFETECH INNOVATIONS S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SATU",
+      "quoteSymbol": "SATU.RO",
+      "name": "SATURN SA ALBA IULIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SCBC",
+      "quoteSymbol": "SCBC.RO",
+      "name": "SCUT SA BACAU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SCDM",
+      "quoteSymbol": "SCDM.RO",
+      "name": "UNIREA SHOPPING CENTER SA Bucuresti",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SECE",
+      "quoteSymbol": "SECE.RO",
+      "name": "SERVICE NEPTUN 2002 SA NEPTUN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SEOL",
+      "quoteSymbol": "SEOL.RO",
+      "name": "SEMROM OLTENIA SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SEOM",
+      "quoteSymbol": "SEOM.RO",
+      "name": "GERMINA AGRIBUSINESS S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SERC",
+      "quoteSymbol": "SERC.RO",
+      "name": "SERICO SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SEVE",
+      "quoteSymbol": "SEVE.RO",
+      "name": "SEVERNAV SA DR. TR. SEVERIN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SFG",
+      "quoteSymbol": "SFG.RO",
+      "name": "SPHERA FRANCHISE GROUP",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SIDG",
+      "quoteSymbol": "SIDG.RO",
+      "name": "ARCELORMITTAL HUNEDOARA SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SIEP",
+      "quoteSymbol": "SIEP.RO",
+      "name": "SINTER REF SA AZUGA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SIFI",
+      "quoteSymbol": "SIFI.RO",
+      "name": "SIF Imobiliare PLC",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SIGS",
+      "quoteSymbol": "SIGS.RO",
+      "name": "SIGSTRAT SA SIGHETU MARMATIEI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SINA",
+      "quoteSymbol": "SINA.RO",
+      "name": "SINATEX SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SINT",
+      "quoteSymbol": "SINT.RO",
+      "name": "SINTOFARM SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SIRJ",
+      "quoteSymbol": "SIRJ.RO",
+      "name": "SIRAJ AD IMPEX SA IASI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SLBB",
+      "quoteSymbol": "SLBB.RO",
+      "name": "SUPORT LOGISTIC BUCURESTI SA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SMTL",
+      "quoteSymbol": "SMTL.RO",
+      "name": "SIMTEL TEAM",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SNC",
+      "quoteSymbol": "SNC.RO",
+      "name": "SANTIERUL NAVAL CONSTANTA S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SNG",
+      "quoteSymbol": "SNG.RO",
+      "name": "S.N.G.N. ROMGAZ S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SNN",
+      "quoteSymbol": "SNN.RO",
+      "name": "S.N. NUCLEARELECTRICA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SNO",
+      "quoteSymbol": "SNO.RO",
+      "name": "SANTIERUL NAVAL ORSOVA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SNP",
+      "quoteSymbol": "SNP.RO",
+      "name": "OMV PETROM S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SOCP",
+      "quoteSymbol": "SOCP.RO",
+      "name": "SOCEP S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SOMR",
+      "quoteSymbol": "SOMR.RO",
+      "name": "SOMETRA SA COPSA MICA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SOPL",
+      "quoteSymbol": "SOPL.RO",
+      "name": "SOMPLAST SA NASAUD",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SOTA",
+      "quoteSymbol": "SOTA.RO",
+      "name": "SOMETA SA TASNAD",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SPTU",
+      "quoteSymbol": "SPTU.RO",
+      "name": "S.P.I.T. BUCOVINA SA SUCEAVA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "SPX",
+      "quoteSymbol": "SPX.RO",
+      "name": "SIPEX COMPANY",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "STKP",
+      "quoteSymbol": "STKP.RO",
+      "name": "STK PROPERTIES S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "STNM",
+      "quoteSymbol": "STNM.RO",
+      "name": "SANTIERUL NAVAL 2 MAI SA MANGALIA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "STOF",
+      "quoteSymbol": "STOF.RO",
+      "name": "STOFE SA BUHUSI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "STOZ",
+      "quoteSymbol": "STOZ.RO",
+      "name": "STICLOVAL SA VALENII DE MUNTE",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "STZ",
+      "quoteSymbol": "STZ.RO",
+      "name": "SINTEZA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TALD",
+      "quoteSymbol": "TALD.RO",
+      "name": "TALC DOLOMITA SA HUNEDOARA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TBK",
+      "quoteSymbol": "TBK.RO",
+      "name": "TRANSILVANIA BROKER DE ASIGURARE SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TBM",
+      "quoteSymbol": "TBM.RO",
+      "name": "TURBOMECANICA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TEL",
+      "quoteSymbol": "TEL.RO",
+      "name": "C.N.T.E.E. TRANSELECTRICA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TERA",
+      "quoteSymbol": "TERA.RO",
+      "name": "TERRA ESTIVAL 2002 SA NEPTUN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TGN",
+      "quoteSymbol": "TGN.RO",
+      "name": "S.N.T.G.N. TRANSGAZ S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TIGH",
+      "quoteSymbol": "TIGH.RO",
+      "name": "TARNAVA SA SIGHISOARA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TLV",
+      "quoteSymbol": "TLV.RO",
+      "name": "BANCA TRANSILVANIA S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRANSI",
+      "quoteSymbol": "TRANSI.RO",
+      "name": "TRANSILVANIA INVESTMENTS ALLIANCE S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRCS",
+      "quoteSymbol": "TRCS.RO",
+      "name": "TRANSTEC SA TECUCI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRGI",
+      "quoteSymbol": "TRGI.RO",
+      "name": "TRANSPORTURI AUTO GIULESTI SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRIP",
+      "quoteSymbol": "TRIP.RO",
+      "name": "CHRISTIAN '76 TOUR S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRNG",
+      "quoteSymbol": "TRNG.RO",
+      "name": "TRANSGEX SA ORADEA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRP",
+      "quoteSymbol": "TRP.RO",
+      "name": "TERAPLAST SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRSB",
+      "quoteSymbol": "TRSB.RO",
+      "name": "TRANSCOM SA SIBIU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRSK",
+      "quoteSymbol": "TRSK.RO",
+      "name": "TRANSILANA SA GHIMBAV",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TRVM",
+      "quoteSymbol": "TRVM.RO",
+      "name": "TRANSCOM SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TSND",
+      "quoteSymbol": "TSND.RO",
+      "name": "TUSNAD SA BAILE TUSNAD",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TTS",
+      "quoteSymbol": "TTS.RO",
+      "name": "TTS (TRANSPORT TRADE SERVICES) S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "TUAA",
+      "quoteSymbol": "TUAA.RO",
+      "name": "TURISM COVASNA SA COVASNA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UAM",
+      "quoteSymbol": "UAM.RO",
+      "name": "UAMT S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UARG",
+      "quoteSymbol": "UARG.RO",
+      "name": "ARGUS SA Constanta",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UCET",
+      "quoteSymbol": "UCET.RO",
+      "name": "CLABUCET ESTIVAL 2002 SA NEPTUN",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UNIR",
+      "quoteSymbol": "UNIR.RO",
+      "name": "UNIREA SA CLUJ NAPOCA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UNISEM",
+      "quoteSymbol": "UNISEM.RO",
+      "name": "UNISEM SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UPRR",
+      "quoteSymbol": "UPRR.RO",
+      "name": "UPRUC CTR SA FAGARAS",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "URBA",
+      "quoteSymbol": "URBA.RO",
+      "name": "URBANA SA BISTRITA",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "URCB",
+      "quoteSymbol": "URCB.RO",
+      "name": "URC SA VASCAU",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UTGR",
+      "quoteSymbol": "UTGR.RO",
+      "name": "UTILAJ GREU SA MURFATLAR",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UZC",
+      "quoteSymbol": "UZC.RO",
+      "name": "UZUC S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UZIN",
+      "quoteSymbol": "UZIN.RO",
+      "name": "UZINEXPORT SA BUCURESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "UZT",
+      "quoteSymbol": "UZT.RO",
+      "name": "UZTEL S.A.",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "VAC",
+      "quoteSymbol": "VAC.RO",
+      "name": "PRODVINALCO S.A.",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "VESY",
+      "quoteSymbol": "VESY.RO",
+      "name": "VES SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "VIAG",
+      "quoteSymbol": "VIAG.RO",
+      "name": "VINALCOOL ARGES SA PITESTI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "VITK",
+      "quoteSymbol": "VITK.RO",
+      "name": "VITIMAS SA TECUCI",
+      "exchange": "BVB",
+      "market": "AeRO",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "VNC",
+      "quoteSymbol": "VNC.RO",
+      "name": "VRANCART SA",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    },
+    {
+      "ticker": "WINE",
+      "quoteSymbol": "WINE.RO",
+      "name": "PURCARI WINERIES PUBLIC COMPANY LIMITED",
+      "exchange": "BVB",
+      "market": "Regulated",
+      "currency": "RON",
+      "assetClass": "Stock"
+    }
+  ]
+}

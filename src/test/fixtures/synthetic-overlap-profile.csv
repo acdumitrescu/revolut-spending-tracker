@@ -1,0 +1,5 @@
+Started Date,Completed Date,Description,Amount,Type,Currency,Reference
+2026-04-01,2026-04-01,Synthetic Market,-100,card payment,RON,overlap-1
+2026-04-01,2026-04-01,Synthetic Market,-100,card payment,RON,overlap-2
+2026-04-02,2026-04-02,Synthetic Zero,0,card payment,RON,overlap-zero
+,,Synthetic Missing Date,-10,card payment,RON,overlap-invalid

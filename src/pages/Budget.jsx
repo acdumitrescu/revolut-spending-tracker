@@ -1,13 +1,35 @@
 import { useState } from 'react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency, EXPENSE_CATS } from '../lib/utils';
-import { getBudgetEntries, getUniqueMonths } from '../lib/selectors';
-import { X, Plus, WalletCards } from 'lucide-react';
-import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
-import { EmptyState } from '../components/ui';
+import { getBudgetComparison, getBudgetEntries, getBudgetSummary, shiftMonth } from '../lib/selectors';
+import { CalendarDays, ChevronLeft, ChevronRight, Copy, X, Plus, WalletCards } from 'lucide-react';
+import { useToast } from '../components/Toast';
+
+function getCurrentMonth() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function formatMonthLabel(month) {
+  const [year, monthNumber] = month.split('-').map(Number);
+  return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(year, monthNumber - 1, 1)));
+}
+
+function formatOptionalCurrency(value, currency) {
+  return value === null ? '—' : formatCurrency(value, currency);
+}
+
+function formatCurrencyDelta(value, currency) {
+  if (value === null) return '—';
+  if (value === 0) return formatCurrency(0, currency);
+  const formatted = formatCurrency(Math.abs(value), currency);
+  return `${value > 0 ? '+' : '−'}${formatted}`;
+}
 
 export default function Budget() {
-  const { data, setBudget, removeBudget, currencySummary } = useAppContext();
+  const { data, setBudget, removeBudget, copyBudgets } = useAppContext();
+  const toast = useToast();
   const txns = data.transactions;
   const budgets = data.budgets || {};
   const displayCurrency = data.displayCurrency;
@@ -16,17 +38,19 @@ export default function Budget() {
   const [newCat, setNewCat] = useState('');
   const [newAmount, setNewAmount] = useState('');
   const [customCat, setCustomCat] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth);
 
-  const uniqueMonths = getUniqueMonths(txns);
-  const allBudgetMonths = [...new Set([...uniqueMonths, ...Object.keys(budgets)])].sort();
-  const latestMonth = allBudgetMonths.at(-1) || new Date().toISOString().slice(0, 7);
-  const effectiveMonth = selectedMonth && allBudgetMonths.includes(selectedMonth) ? selectedMonth : latestMonth;
+  const effectiveMonth = selectedMonth;
+  const previousMonth = shiftMonth(effectiveMonth, -1);
+  const previousBudgets = budgets[previousMonth] || {};
+  const targetBudgets = budgets[effectiveMonth] || {};
+  const copyableCategoryCount = Object.keys(previousBudgets)
+    .filter((category) => !(category in targetBudgets)).length;
 
   const budgetEntries = getBudgetEntries(budgets, effectiveMonth, txns, selectorOptions);
+  const budgetSummary = getBudgetSummary(budgets, effectiveMonth, txns, selectorOptions);
+  const budgetComparison = getBudgetComparison(budgets, effectiveMonth, txns, selectorOptions);
 
-  const totalBudgeted = budgetEntries.reduce((s, b) => s + b.budgeted, 0);
-  const totalSpent = budgetEntries.reduce((s, b) => s + b.spent, 0);
   const overBudgetCount = budgetEntries.filter(b => b.over).length;
 
   const handleCategoryChange = (e) => {
@@ -50,70 +74,167 @@ export default function Budget() {
     setCustomCat(false);
   };
 
-  const availableCategories = [...EXPENSE_CATS].filter(c => !(budgets[effectiveMonth] || {})[c]);
-
-  if (txns.length === 0) {
-    return (
-      <div>
-        <h2 style={{ marginBottom: '20px' }}>Monthly Budget</h2>
-        <EmptyState icon={WalletCards} title="Start with real spending context" description="Import transactions before setting category limits for a month." />
-      </div>
+  const handleCopyPrevious = () => {
+    copyBudgets(previousMonth, effectiveMonth);
+    toast.success(
+      `Copied ${copyableCategoryCount} missing ${copyableCategoryCount === 1 ? 'category' : 'categories'} from ${formatMonthLabel(previousMonth)}. Existing categories were kept.`
     );
-  }
+  };
+
+  const availableCategories = [...EXPENSE_CATS].filter(c => !(budgets[effectiveMonth] || {})[c]);
 
   return (
     <div>
       <h2 style={{ marginBottom: '20px' }}>Monthly Budget</h2>
-      {currencySummary.hasMixedCurrencies && (
-        <div style={{ marginBottom: '20px' }}>
-          <MixedCurrencyNotice currencies={currencySummary.currencies} />
-        </div>
-      )}
-      <div className="card" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <div>
-          <div style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Budget Month</div>
-          <select className="input" value={effectiveMonth} onChange={(e) => setSelectedMonth(e.target.value)} style={{ marginTop: '6px' }}>
-            {allBudgetMonths.map((month) => (
-              <option key={month} value={month}>{month}</option>
-            ))}
-            {!allBudgetMonths.includes(effectiveMonth) && <option value={effectiveMonth}>{effectiveMonth}</option>}
-          </select>
-        </div>
-          <div style={{ color: 'var(--muted)', fontSize: '12px' }}>
-          Budgets are saved per month in RON so rollovers do not overwrite earlier plans.
+      <div className="card" style={{ marginBottom: '20px', display: 'flex', alignItems: 'flex-end', gap: '12px', flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 220px' }}>
+          <label htmlFor="budget-month" style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Budget Month</label>
+          <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
+            <button className="btn" type="button" aria-label="Previous budget month" onClick={() => setSelectedMonth(previousMonth)}>
+              <ChevronLeft size={16} />
+            </button>
+            <input
+              id="budget-month"
+              className="input"
+              type="month"
+              value={effectiveMonth}
+              onChange={(event) => event.target.value && setSelectedMonth(event.target.value)}
+              style={{ minWidth: '150px' }}
+            />
+            <button className="btn" type="button" aria-label="Next budget month" onClick={() => setSelectedMonth(shiftMonth(effectiveMonth, 1))}>
+              <ChevronRight size={16} />
+            </button>
           </div>
         </div>
+        <button className="btn" type="button" onClick={() => setSelectedMonth(getCurrentMonth())}>
+          <CalendarDays size={15} /> Current month
+        </button>
+        <button
+          className="btn"
+          type="button"
+          disabled={copyableCategoryCount === 0}
+          onClick={handleCopyPrevious}
+          title={copyableCategoryCount === 0 ? `No missing categories to copy from ${previousMonth}` : `Copy ${copyableCategoryCount} missing categories from ${previousMonth}`}
+        >
+          <Copy size={15} /> Copy previous
+        </button>
+        <div style={{ flex: '2 1 280px', color: 'var(--muted)', fontSize: '12px' }}>
+          Plans are stored per month in RON. Copying a prior month fills only missing categories.
+        </div>
+      </div>
 
-      {budgetEntries.length > 0 && (
-        <div className="kpi-grid" style={{ marginBottom: '20px' }}>
-          <div className="kpi blue">
-            <div className="lbl">Total Budgeted</div>
-            <div className="val">{formatCurrency(totalBudgeted, displayCurrency)}</div>
-          </div>
-          <div className="kpi red">
-            <div className="lbl">Total Spent</div>
-            <div className="val">{formatCurrency(totalSpent, displayCurrency)}</div>
-          </div>
-          <div className={`kpi ${totalBudgeted - totalSpent >= 0 ? 'green' : 'red'}`}>
-            <div className="lbl">Remaining</div>
-            <div className="val">{formatCurrency(totalBudgeted - totalSpent, displayCurrency)}</div>
-          </div>
-          {overBudgetCount > 0 && (
-            <div className="kpi amber">
-              <div className="lbl">Over Budget</div>
-              <div className="val">{overBudgetCount} {overBudgetCount === 1 ? 'category' : 'categories'}</div>
-            </div>
-          )}
+      <div className="kpi-grid" style={{ marginBottom: '20px' }}>
+        <div className="kpi blue">
+          <div className="lbl">Imported Income</div>
+          <div className="val">{formatCurrency(budgetSummary.importedIncome, displayCurrency)}</div>
         </div>
-      )}
+        <div className="kpi blue">
+          <div className="lbl">Assigned</div>
+          <div className="val">{formatCurrency(budgetSummary.assigned, displayCurrency)}</div>
+        </div>
+        <div className="kpi red">
+          <div className="lbl">Total Spending</div>
+          <div className="val">{formatCurrency(budgetSummary.totalSpending, displayCurrency)}</div>
+        </div>
+        <div className="kpi red">
+          <div className="lbl">Planned Categories</div>
+          <div className="val">{formatCurrency(budgetSummary.plannedCategorySpending, displayCurrency)}</div>
+        </div>
+        <div className={`kpi ${budgetSummary.remaining >= 0 ? 'green' : 'red'}`}>
+          <div className="lbl">Plan Remaining</div>
+          <div className="val">{formatCurrency(budgetSummary.remaining, displayCurrency)}</div>
+        </div>
+        <div className={`kpi ${budgetSummary.unbudgetedSpending > 0 ? 'amber' : 'green'}`}>
+          <div className="lbl">Unbudgeted Spending</div>
+          <div className="val">{formatCurrency(budgetSummary.unbudgetedSpending, displayCurrency)}</div>
+        </div>
+        <div className={`kpi ${budgetSummary.unassignedIncome === null || budgetSummary.unassignedIncome >= 0 ? 'green' : 'red'}`}>
+          <div className="lbl">Unassigned Income</div>
+          <div className="val">
+            {budgetSummary.unassignedIncome === null
+              ? '—'
+              : formatCurrency(budgetSummary.unassignedIncome, displayCurrency)}
+          </div>
+        </div>
+        {overBudgetCount > 0 && (
+          <div className="kpi amber">
+            <div className="lbl">Over Budget</div>
+            <div className="val">{overBudgetCount} {overBudgetCount === 1 ? 'category' : 'categories'}</div>
+          </div>
+        )}
+      </div>
+
+      <div className="card" style={{ marginBottom: '20px' }}>
+        <div className="card-title">Month Comparison</div>
+        <div style={{ color: 'var(--muted)', fontSize: '12px', marginBottom: '14px' }}>
+          {formatMonthLabel(effectiveMonth)} compared with {formatMonthLabel(previousMonth)}. Positive changes use a plus sign; income-based values stay unavailable until both months contain imported income.
+        </div>
+        <div className="tbl-wrap" style={{ marginBottom: budgetComparison.categories.length > 0 ? '18px' : 0 }}>
+          <table aria-label="Budget month summary comparison">
+            <thead>
+              <tr>
+                <th scope="col">Metric</th>
+                <th scope="col" style={{ textAlign: 'right' }}>{formatMonthLabel(previousMonth)}</th>
+                <th scope="col" style={{ textAlign: 'right' }}>{formatMonthLabel(effectiveMonth)}</th>
+                <th scope="col" style={{ textAlign: 'right' }}>Change</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ['Imported income', 'importedIncome'],
+                ['Assigned', 'assigned'],
+                ['Total spending', 'totalSpending'],
+                ['Planned-category spending', 'plannedCategorySpending'],
+                ['Plan remaining', 'remaining'],
+                ['Unbudgeted spending', 'unbudgetedSpending'],
+                ['Unassigned income', 'unassignedIncome'],
+              ].map(([label, key]) => (
+                <tr key={key}>
+                  <td>{label}</td>
+                  <td style={{ textAlign: 'right' }}>{formatOptionalCurrency(budgetComparison.previous[key], displayCurrency)}</td>
+                  <td style={{ textAlign: 'right' }}>{formatOptionalCurrency(budgetComparison.current[key], displayCurrency)}</td>
+                  <td style={{ textAlign: 'right', fontWeight: 700 }}>{formatCurrencyDelta(budgetComparison.deltas[key], displayCurrency)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {budgetComparison.categories.length > 0 && (
+          <div className="tbl-wrap">
+            <table aria-label="Budget category comparison">
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col" style={{ textAlign: 'right' }}>Previous plan</th>
+                  <th scope="col" style={{ textAlign: 'right' }}>Current plan</th>
+                  <th scope="col" style={{ textAlign: 'right' }}>Plan change</th>
+                  <th scope="col" style={{ textAlign: 'right' }}>Spending change</th>
+                </tr>
+              </thead>
+              <tbody>
+                {budgetComparison.categories.map((row) => (
+                  <tr key={row.category}>
+                    <td>{row.category}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrency(row.previousAssigned, displayCurrency)}</td>
+                    <td style={{ textAlign: 'right' }}>{formatCurrency(row.currentAssigned, displayCurrency)}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 700 }}>{formatCurrencyDelta(row.assignedDelta, displayCurrency)}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 700 }}>{formatCurrencyDelta(row.spendingDelta, displayCurrency)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       <div className="card" style={{ marginBottom: '20px' }}>
         <div className="card-title">Add Budget Category</div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>Category</label>
+            <label htmlFor="budget-category" style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>Category</label>
             {customCat ? (
               <input
+                id="budget-category"
                 type="text"
                 className="input"
                 placeholder="Category name..."
@@ -124,6 +245,7 @@ export default function Budget() {
               />
             ) : (
               <select
+                id="budget-category"
                 className="input"
                 value={newCat}
                 onChange={handleCategoryChange}
@@ -136,8 +258,9 @@ export default function Budget() {
             )}
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>Monthly Limit (stored in RON)</label>
+            <label htmlFor="budget-amount" style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>Monthly Limit (stored in RON)</label>
             <input
+              id="budget-amount"
               type="number"
               className="input"
               placeholder="0"
@@ -146,7 +269,7 @@ export default function Budget() {
               style={{ width: '100%' }}
             />
           </div>
-          <button className="btn btn-primary" onClick={handleAdd}>
+          <button className="btn btn-primary" type="button" onClick={handleAdd}>
             <Plus size={16} /> Add
           </button>
         </div>
@@ -173,6 +296,8 @@ export default function Budget() {
                       </span>
                       <button
                         className="btn"
+                        type="button"
+                        aria-label={`Remove ${b.cat} budget`}
                         onClick={() => removeBudget(effectiveMonth, b.cat)}
                         style={{ padding: '2px 6px', fontSize: '10px', color: 'var(--muted)', borderColor: 'transparent' }}
                       >

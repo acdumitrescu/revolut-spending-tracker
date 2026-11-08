@@ -1,5 +1,7 @@
 # Backup and Restore Runbook
 
+> For the current encrypted personal launcher, see [Local users](local-users.md). It uses separate password-unlocked profiles and per-user recovery downloads. The single-user paths and commands below describe the earlier workflow.
+
 ## What to back up
 
 For `client-only` deployments:
@@ -10,6 +12,7 @@ For `client-only` deployments:
 For `private-sync` deployments:
 
 - exported JSON backups from the app
+- automatic local-development JSON backups under `backups/automatic/`
 - the Docker volume `app-state`
 - for personal local Docker, the Docker volume `ssb-personal_app-state`
 
@@ -30,12 +33,18 @@ scripts/backup-personal-volume.sh
 
 The backup is written under `backups/`, which is ignored by git.
 
+## Trusted local-development backups
+
+When the app is launched with `ssb start`, every confirmed real CSV import is backed up before its state is committed. One idempotent, UI-restorable JSON file is retained per import batch under `backups/automatic/`. Synthetic demo imports and backup restoration are excluded.
+
+Use **Import & backup → Create backup now** for an additional manual restore point. Automatic and manual files are retained until you remove them intentionally; starting or stopping the app never creates or deletes them.
+
 ## Browser recovery
 
 Use this when browser storage is lost or cleared:
 
 1. Open the app.
-2. Use `Restore backup JSON`.
+2. Use `Restore private backup` and select either a downloaded JSON export or a file from `backups/automatic/`.
 3. Confirm balances, budgets, goals, and import history.
 4. Export a new JSON backup after validation.
 

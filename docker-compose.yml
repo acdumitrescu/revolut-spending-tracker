@@ -18,6 +18,8 @@ services:
     tmpfs:
       - /var/cache/nginx:rw,noexec,nosuid,size=16m
       - /var/run:rw,noexec,nosuid,size=1m
+      # The entrypoint writes the rendered config here at start.
+      - /etc/nginx/conf.d:rw,noexec,nosuid,size=1m
       - /tmp:rw,noexec,nosuid,size=8m
     depends_on:
       api:
@@ -39,6 +41,8 @@ services:
       VENDOR_OBSERVATIONS_FILE: /data/vendor-observations.json
       APP_STATE_MAX_BYTES: 5242880
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3176,http://127.0.0.1:3176}
+      SSB_ALLOWED_HOSTS: ${SSB_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      SSB_SYNC_TOKEN: ${SSB_SYNC_TOKEN:?Set SSB_SYNC_TOKEN before starting private sync}
     volumes:
       - app-state:/data
     healthcheck:

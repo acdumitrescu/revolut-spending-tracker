@@ -1,8 +1,19 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { APP_HUBS } from '../app/navigation';
+
+function isSectionActive(location, item) {
+  if (item.id === 'mappings') {
+    return location.pathname === '/app/insights/vendors' && location.hash === '#mappings';
+  }
+  if (item.id === 'vendors') {
+    return location.pathname === item.to && location.hash !== '#mappings';
+  }
+  return location.pathname === item.to;
+}
 
 export default function HubLayout({ hubId }) {
   const hub = APP_HUBS.find((item) => item.id === hubId);
+  const location = useLocation();
 
   return (
     <div className="hub-layout">
@@ -13,13 +24,14 @@ export default function HubLayout({ hubId }) {
         </div>
         <nav className="hub-tabs" aria-label={`${hub.label} sections`}>
           {hub.children.map((item) => (
-            <NavLink
+            <Link
               key={item.id}
               to={item.to}
-              className={({ isActive }) => `hub-tab${isActive ? ' active' : ''}`}
+              className={`hub-tab${isSectionActive(location, item) ? ' active' : ''}`}
+              aria-current={isSectionActive(location, item) ? 'page' : undefined}
             >
               {item.label}
-            </NavLink>
+            </Link>
           ))}
         </nav>
       </header>

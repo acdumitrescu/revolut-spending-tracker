@@ -4,16 +4,32 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "local": "node scripts/startPersonalDev.mjs --use-saved-token --open",
     "dev": "vite",
+    "dev:personal": "node scripts/startPersonalDev.mjs",
+    "setup:personal-dev": "npm install --prefix backend",
     "build": "vite build",
+    "check:bundle": "node scripts/checkBundleBudget.mjs",
     "build:vendor-knowledge": "node scripts/buildVendorKnowledge.mjs",
+    "build:bvb-instruments": "node scripts/buildBvbInstruments.mjs",
     "discover:vendor-knowledge:ro": "node scripts/discoverRomanianVendors.mjs",
     "lint": "eslint .",
+    "privacy:scan": "scripts/privacy-scan.sh",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "npm run test:frontend && npm run test:backend && npm run test:git-privacy",
+    "test:frontend": "vitest run src/test",
+    "test:backend": "vitest run backend/*.test.js",
+    "test:contract": "vitest run backend/contract",
+    "test:git-privacy": "vitest run scripts/*.test.js",
     "test:watch": "vitest",
     "test:smoke": "vitest run --reporter=verbose",
-    "check": "npm run lint && npm run test"
+    "check": "npm run lint && npm run test && npm run build && npm run check:bundle && npm run privacy:scan",
+    "check:release": "npm run check",
+    "auto-unlock": "node scripts/autoUnlock.mjs",
+    "recovery:setup": "node scripts/recoverySetup.mjs",
+    "recovery:password": "node scripts/passwordRecoverySetup.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "chart.js": "^4.5.1",
@@ -39,7 +55,11 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
     "jsdom": "^29.1.1",
+    "prettier": "^3.9.10",
     "vite": "^8.0.12",
     "vitest": "^4.1.8"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

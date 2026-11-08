@@ -1,19 +1,21 @@
 export default function AppLogo({ size = 22 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
       <path
-        d="M12 2.3 19.1 5.2v5.26c0 4.47-2.59 8.52-6.61 10.33L12 21l-.49-.21c-4.02-1.81-6.61-5.86-6.61-10.33V5.2L12 2.3Z"
+        d="M16 2.6 27 7v8.3c0 6.55-3.85 12.42-9.84 14.83L16 30.6l-1.16-.47C8.85 27.72 5 21.85 5 15.3V7l11-4.4Z"
         fill="currentColor"
       />
       <path
-        d="M12 5.15 16.58 7v3.39c0 3.03-1.71 5.8-4.58 7.25-2.87-1.45-4.58-4.22-4.58-7.25V7L12 5.15Z"
-        fill="white"
+        d="M16 6.25 23.35 9.2v5.92c0 4.43-2.45 8.5-6.25 10.43L16 26.1l-1.1-.55c-3.8-1.93-6.25-6-6.25-10.43V9.2L16 6.25Z"
+        fill="#071827"
       />
       <path
-        d="M12 7.25 14.72 8.34v2.1c0 1.87-1.03 3.6-2.72 4.61-1.69-1.01-2.72-2.74-2.72-4.61v-2.1L12 7.25Z"
-        fill="currentColor"
-        opacity="0.2"
+        d="M20.65 11.2h-6.7a2.35 2.35 0 0 0 0 4.7h4.1a2.35 2.35 0 1 1 0 4.7h-6.7"
+        stroke="#F4F8FB"
+        strokeWidth="2.25"
+        strokeLinecap="round"
       />
+      <path d="M16 9.35v2M16 20.6v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

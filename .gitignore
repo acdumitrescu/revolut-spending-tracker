@@ -39,6 +39,7 @@ backups/
 exports/
 imports/
 tmp-data/
+XTB/
 PRIVATE_NOTES.md
 SETUP-NOTES.md
 REPORT-20*.md
@@ -59,3 +60,7 @@ REPORT-20*.md
 
 # Keep the public demo dataset
 !public/demo-revolut.csv
+
+# Local-user encrypted recovery bundles
+*.ssbuser
+

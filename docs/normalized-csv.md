@@ -2,6 +2,8 @@
 
 The normalized CSV format is the stable manual import option for SimpleSafeBanking.
 
+You can download a ready-to-edit template from **Import & backup → Download CSV template**.
+
 Use it when:
 
 - you want a predictable import shape
@@ -45,5 +47,8 @@ Date,Description,Category,Subcategory,Amount,Flow,Type,Currency,Reference
 ## Notes
 
 - normalized CSV is parsed locally in the browser
+- every file is reviewed before anything is added
+- exact duplicates already in the app or repeated in the same file are excluded
+- invalid rows show their source row number and can be downloaded with duplicate details as a review report
 - this format is intended for clean manual imports, not raw Revolut export preservation
 - if you are importing a raw Revolut export, use the CSV directly and let the profile parser detect it
