@@ -1,4 +1,5 @@
 import { runtimeConfig } from './runtimeConfig';
+import { getSyncAuthorizationHeaders } from './serverSync';
 
 function observationsUrl(path = '') {
   return `${runtimeConfig.apiBasePath}/vendor-observations${path}`;
@@ -11,7 +12,9 @@ export function vendorObservationsEnabled() {
 async function readJson(response) {
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(body?.error || 'Vendor observations request failed');
+    const error = new Error(body?.error || 'Vendor observations request failed');
+    error.status = response.status;
+    throw error;
   }
   return body;
 }
@@ -23,6 +26,7 @@ export async function loadVendorObservations(signal) {
 
   const response = await fetch(observationsUrl(), {
     method: 'GET',
+    headers: getSyncAuthorizationHeaders(),
     signal,
   });
   return readJson(response);
@@ -35,7 +39,7 @@ export async function recordVendorObservations(observations, signal) {
 
   const response = await fetch(observationsUrl('/collect'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getSyncAuthorizationHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({ observations }),
     signal,
   });
@@ -49,7 +53,7 @@ export async function resolveVendorObservation(resolution, signal) {
 
   const response = await fetch(observationsUrl('/resolve'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getSyncAuthorizationHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(resolution),
     signal,
   });

@@ -1,0 +1,5 @@
+Started Date,Completed Date,Description,Amount,Type,Currency,Reference
+2026-01-05,2026-01-05,Synthetic Salary,5000,bank transfer,RON,personal-salary-1
+2026-01-07,2026-01-07,Synthetic Uber,-25,card payment,RON,personal-ride-1
+2026-01-09,2026-01-09,Synthetic Card Refund,25,refund,RON,personal-refund-1
+2026-01-10,2026-01-10,Synthetic Savings Top Up,-300,top up,RON,personal-topup-1

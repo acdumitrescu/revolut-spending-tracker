@@ -1,0 +1,3 @@
+Transaction started (UTC),Transaction completed (UTC),Transaction Description,Transaction Type,Payment Currency,Amount (Payment Currency),Transaction ID,Account
+2026-02-01T08:00:00Z,2026-02-01T08:05:00Z,Synthetic Amazon Marketplace,card payment,USD,-19.99,business-tx-1,Synthetic Main
+2026-02-02T08:00:00Z,2026-02-02T08:05:00Z,Synthetic Transfer,bank transfer,RON,5000,business-tx-2,Synthetic Main

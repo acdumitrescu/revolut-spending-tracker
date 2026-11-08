@@ -4,7 +4,6 @@ import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { convertAmountToDisplay } from '../lib/fx';
 import { getDailySpend, getUniqueMonths } from '../lib/selectors';
-import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 import { EmptyState } from '../components/ui';
 
 function getColor(intensity) {
@@ -22,7 +21,7 @@ function buildCalendarGrid(days) {
 }
 
 export default function Heatmap() {
-  const { data, currencySummary } = useAppContext();
+  const { data } = useAppContext();
   const txns = data.transactions;
   const displayCurrency = data.displayCurrency;
   const selectorOptions = { displayCurrency, fxRates: data.fxRates };
@@ -91,11 +90,6 @@ export default function Heatmap() {
           </button>
         </div>
       </div>
-      {currencySummary.hasMixedCurrencies && (
-        <div style={{ marginBottom: '20px' }}>
-          <MixedCurrencyNotice currencies={currencySummary.currencies} />
-        </div>
-      )}
 
       <div className="kpi-grid" style={{ marginBottom: '20px' }}>
         <div className="kpi red">

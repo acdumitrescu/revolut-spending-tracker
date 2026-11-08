@@ -1,5 +1,5 @@
 import { createPersistedAppState } from './appState';
-import { sanitizePersistedAppState } from './validation';
+import { AppDataSchema, PersistedAppStateSchema, sanitizePersistedAppState } from './validation';
 
 export function loadLocalAppState(storageKey, storage = localStorage) {
   try {
@@ -42,5 +42,11 @@ export function serializeBackupState(persistedState) {
 
 export function parseImportedAppState(text) {
   const parsed = JSON.parse(text);
-  return sanitizePersistedAppState(parsed);
+  // Only the documented raw legacy shape may omit a version. Never recover
+  // arbitrary imports using the permissive local-storage repair path.
+  const result = parsed && Object.hasOwn(parsed, 'schemaVersion')
+    ? PersistedAppStateSchema.safeParse(parsed)
+    : AppDataSchema.safeParse(parsed);
+  if (!result.success) throw new Error('Invalid or unsupported SimpleSafeBanking backup. Nothing was replaced.');
+  return sanitizePersistedAppState(result.data);
 }

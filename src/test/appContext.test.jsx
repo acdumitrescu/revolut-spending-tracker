@@ -10,7 +10,7 @@ function BackupHarness() {
       { date: '2024-05-01', ym: '2024-05', desc: 'Salary', cat: 'Income', sub: 'Income', amt: 5000, flow: 'Credit', type: 'Bank Transfer', currency: 'RON' },
     ],
     customVendors: { uber: ['Transport', 'Taxi'] },
-    accounts: [{ id: 'acc-1', name: 'Savings', currency: 'EUR', balances: { '2024-05': 1000 }, monthlyContribution: 200 }],
+    accounts: [{ id: 'acc-1', name: 'Savings', currency: 'EUR', balances: { '2024-05': 1000 }, notes: { '2024-05': 'Opening balance' } }],
     budgets: { '2024-05': { Groceries: 800 } },
     goals: [{ id: 'goal-1', name: 'Fund', targetAmount: 15000, targetMonth: '2025-12' }],
     baseCurrency: 'RON',
@@ -27,7 +27,7 @@ function BackupHarness() {
       <div data-testid="display-currency">{data.displayCurrency}</div>
       <div data-testid="eur-rate">{data.fxRates.EUR}</div>
       <div data-testid="account-currency">{data.accounts[0]?.currency || ''}</div>
-      <div data-testid="account-contribution">{data.accounts[0]?.monthlyContribution || 0}</div>
+      <div data-testid="account-note">{data.accounts[0]?.notes?.['2024-05'] || ''}</div>
       <div data-testid="budget-groceries">{data.budgets['2024-05']?.Groceries || 0}</div>
       <div data-testid="goal-name">{data.goals[0]?.name || ''}</div>
     </div>
@@ -72,7 +72,7 @@ describe('AppContext trust behavior', () => {
     expect(screen.getByTestId('display-currency')).toHaveTextContent('USD');
     expect(screen.getByTestId('eur-rate')).toHaveTextContent('4.95');
     expect(screen.getByTestId('account-currency')).toHaveTextContent('EUR');
-    expect(screen.getByTestId('account-contribution')).toHaveTextContent('200');
+    expect(screen.getByTestId('account-note')).toHaveTextContent('Opening balance');
     expect(screen.getByTestId('budget-groceries')).toHaveTextContent('800');
     expect(screen.getByTestId('goal-name')).toHaveTextContent('Fund');
   });

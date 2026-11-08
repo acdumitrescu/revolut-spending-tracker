@@ -1,5 +1,7 @@
 # Local Workflow
 
+> For the current encrypted personal launcher, see [Local users](local-users.md). It uses separate password-unlocked profiles and per-user recovery downloads. The single-user paths and commands below describe the earlier workflow.
+
 This repo is split into two concerns:
 
 - public code that can be pushed to GitHub
@@ -86,6 +88,27 @@ scripts/personal-app.sh start
 
 Do not use `docker compose down -v` in normal use. That deletes server-side state. If you intentionally need to erase the personal Docker volume, stop first, export a JSON backup from the app, run `scripts/backup-personal-volume.sh`, and then delete the volume manually.
 
+## Personal development without Docker
+
+Run this once after installing the root dependencies:
+
+```bash
+npm run setup:personal-dev
+```
+
+Then use:
+
+```bash
+export SSB_SYNC_TOKEN="$(openssl rand -hex 32)"
+npm run dev:personal
+```
+
+The command starts the frontend and private persistence API on loopback only and opens the Overview at `/app`. The trusted Vite development proxy adds the saved bearer token to `/api/*` requests server-side; the browser receives no token and needs no unlock step. Direct access to port `3177` remains bearer-token protected. Durable state is written to `private-data/dev-sync/app-state.json`; the previous readable state is retained as `app-state.json.bak`.
+
+Confirmed real CSV imports create a portable JSON backup in `backups/automatic/` before the import is committed. A backup failure leaves the import uncommitted. The **Create backup now** action uses the same private directory. Demo imports, restores, starts, and stops do not create backups. All of these paths are ignored and must never be committed.
+
+Plain `npm run dev` remains browser-only and is intended for public or disposable UI testing.
+
 ## Private data rules
 
 - never place real CSV exports in tracked folders like `src/`, `public/`, or the repo root
@@ -99,6 +122,8 @@ Install the local pre-push guard once per worktree:
 ```bash
 scripts/install-git-hooks.sh
 ```
+
+The installer seeds a trusted public-history marker from `origin/main` and records append-only private-lineage markers, so the guard still recognizes earlier personal commits after a branch rename or rebase. Re-run it after intentionally rebasing personal work or after advancing public `main`; it refuses to trust a `main` that contains recorded personal history. On first installation, it fails closed if private history exists but neither an existing marker nor `origin/main` can establish the public baseline. If a verified local `main` legitimately leads `origin/main` and is an ancestor of `personal`, initialize it deliberately with `SSB_TRUST_INITIAL_MAIN=1 scripts/install-git-hooks.sh`.
 
 The hook blocks pushes from `personal` and runs the privacy scan before other pushes.
 

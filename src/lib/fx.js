@@ -1,9 +1,5 @@
-export const BASE_CURRENCY = 'RON';
-export const SUPPORTED_DISPLAY_CURRENCIES = ['RON', 'EUR', 'USD'];
-export const DEFAULT_FX_RATES = {
-  EUR: 5,
-  USD: 4.6,
-};
+import { BASE_CURRENCY, SUPPORTED_DISPLAY_CURRENCIES, DEFAULT_FX_RATES } from '../../backend/stateConstants.js';
+export { BASE_CURRENCY, SUPPORTED_DISPLAY_CURRENCIES, DEFAULT_FX_RATES };
 
 export function normalizeCurrencyCode(currency) {
   if (typeof currency !== 'string' || !currency.trim()) return BASE_CURRENCY;
@@ -52,7 +48,10 @@ export function convertAmount(amount, fromCurrency = BASE_CURRENCY, toCurrency =
 
   const sourceRate = getRateForCurrency(source, fxRates);
   const targetRate = getRateForCurrency(target, fxRates);
-  if (!sourceRate || !targetRate) return numericAmount;
+  if (!sourceRate || !targetRate) {
+    const missingCurrency = !sourceRate ? source : target;
+    throw new Error(`Missing FX rate for ${missingCurrency}; aggregate conversion was blocked.`);
+  }
 
   const amountInRon = source === BASE_CURRENCY ? numericAmount : numericAmount * sourceRate;
   return target === BASE_CURRENCY ? amountInRon : amountInRon / targetRate;
@@ -61,4 +60,3 @@ export function convertAmount(amount, fromCurrency = BASE_CURRENCY, toCurrency =
 export function convertAmountToDisplay(amount, fromCurrency, displayCurrency, fxRates = DEFAULT_FX_RATES) {
   return convertAmount(amount, fromCurrency, displayCurrency, fxRates);
 }
-

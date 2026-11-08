@@ -119,6 +119,7 @@ export default function ChartWrapper({
       },
     };
   } else {
+    const isHorizontal = horizontal || options.indexAxis === 'y';
     const verticalScales = {
       x: {
         type: 'category',
@@ -180,7 +181,7 @@ export default function ChartWrapper({
     mergedOptions = {
       ...DEFAULT_OPTIONS,
       ...options,
-      indexAxis: horizontal ? 'y' : options.indexAxis,
+      indexAxis: isHorizontal ? 'y' : options.indexAxis,
       plugins: {
         ...DEFAULT_OPTIONS.plugins,
         ...(options.plugins || {}),
@@ -192,7 +193,7 @@ export default function ChartWrapper({
           borderColor,
           borderWidth: 1,
           callbacks: {
-            label: (context) => `${context.dataset.label || 'Value'}: ${formatCurrency(context.parsed.x ?? context.parsed.y ?? context.raw, currency)}`,
+            label: (context) => `${context.dataset.label || 'Value'}: ${formatCurrency(context.parsed?.[isHorizontal ? 'x' : 'y'] ?? context.raw, currency)}`,
           },
           ...(options.plugins?.tooltip || {}),
         },
@@ -206,7 +207,7 @@ export default function ChartWrapper({
           display: showLegend,
         },
       },
-      scales: horizontal
+      scales: isHorizontal
         ? {
             x: {
               ...horizontalScales.x,

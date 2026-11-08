@@ -52,18 +52,21 @@ Use this when you want a private VPS or home-server deployment with browser-loca
    - `VITE_DEPLOYMENT_PROFILE=private-sync`
    - `VITE_PRIVATE_SYNC_ENABLED=true`
    - `ALLOWED_ORIGINS=https://your-private-host.example`
+   - `SSB_SYNC_TOKEN` to a long random secret such as the output of `openssl rand -hex 32`
 2. Keep the `api` service internal to Docker Compose.
 3. Put external protection in front of the site:
    - recommended: reverse proxy Basic Auth or another private access gate
    - keep `/api` inaccessible from unauthenticated public traffic
 4. Mount the named volume `app-state` for persistent private sync state.
 5. Run `docker compose up -d --build`.
+6. Enter the same token in Settings after opening the app. It remains in the current browser tab only.
 
 Behavior:
 
 - browser-local state remains primary
 - the app still works if private sync is unavailable
 - the API stores one versioned private state blob for the deployment
+- every private API read and write requires the configured bearer token
 
 ### Local Docker workflow
 
@@ -72,6 +75,7 @@ Use this when you want the private-sync app available on localhost without keepi
 Start:
 
 ```bash
+export SSB_SYNC_TOKEN="$(openssl rand -hex 32)"
 docker compose up -d --build
 ```
 
@@ -106,9 +110,12 @@ Local Docker behavior:
 
 - only `127.0.0.1:3176` is published on the host
 - the API stays internal to Compose and is reached through `/api`
+- the API still requires the private sync token proxied from the browser
 - nginx serves the built frontend from a read-only container filesystem
 - app state and vendor observations persist in the `ssb-personal_app-state` volume when using `scripts/personal-app.sh`
 - memory and process limits keep the background footprint small
+
+The trusted `ssb start` Vite workflow is intentionally different: it injects the token in the loopback development proxy and exposes only client-visible capability booleans. Docker and other private-sync deployments retain the manual browser-session unlock flow.
 
 For GitHub-safe public testing, use the client-only profile:
 

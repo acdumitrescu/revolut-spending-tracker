@@ -1,0 +1,19 @@
+.money-flow .flow-heading { display: flex; justify-content: space-between; align-items: start; gap: 20px; flex-wrap: wrap; }
+.money-flow label { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.money-flow .flow-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.money-flow .flow-form h3, .money-flow .flow-form > p, .money-flow .flow-form .flow-actions { grid-column: 1 / -1; }
+.money-flow .flow-actions, .money-flow .flow-summary { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.money-flow .flow-summary { padding: 16px; background: var(--bg); border-radius: 10px; justify-content: space-between; }
+.money-flow .flow-transfers { list-style: none; padding: 0; }
+.money-flow .flow-transfers li { border-top: 1px solid var(--border); padding: 16px 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+.money-flow .flow-warning { color: var(--danger, #e79557); }
+.money-flow p, .money-flow strong { overflow-wrap: anywhere; }
+.brd-cashflow { min-width: 0; }
+.brd-cashflow .brd-table { overflow-x: auto; max-height: 420px; margin: 16px 0; }
+.brd-cashflow table { width: 100%; min-width: 600px; border-collapse: collapse; }
+.brd-cashflow th, .brd-cashflow td { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+.brd-cashflow small { display: block; }
+.brd-cashflow fieldset { border: 0; padding: 16px 0; min-width: 0; }
+.brd-cashflow form.flow-form > fieldset { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 640px) { .brd-cashflow form.flow-form > fieldset { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .money-flow .flow-form { grid-template-columns: 1fr; } .money-flow .flow-summary { flex-direction: column; } }

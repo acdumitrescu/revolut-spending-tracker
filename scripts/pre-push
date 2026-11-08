@@ -1,0 +1,41 @@
+#!/bin/sh
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+. "$ROOT/scripts/git-privacy-guards.sh"
+
+remote_name="${1:-}"
+
+while read -r local_ref local_oid remote_ref remote_oid; do
+  if ssb_is_zero_oid "$local_oid"; then
+    continue
+  fi
+
+  case "$local_ref:$remote_ref" in
+    "$SSB_PERSONAL_REF":*|*:"$SSB_PERSONAL_REF"|"$SSB_PRIVATE_MARKER_PREFIX"/*:*|*:"$SSB_PRIVATE_MARKER_PREFIX"/*|"$SSB_PUBLIC_MARKER_REF":*|*:"$SSB_PUBLIC_MARKER_REF")
+      echo 'Refusing to push a local-only privacy marker or the "personal" branch.' >&2
+      exit 1
+      ;;
+  esac
+
+  local_commit="$(ssb_resolve_commit "$local_oid")"
+  if [ -z "$local_commit" ]; then
+    echo "Refusing to push non-commit object $local_ref because its history cannot be inspected safely." >&2
+    exit 1
+  fi
+
+  if ssb_commit_contains_private_history "$local_commit" "$remote_name"; then
+    echo "Refusing to push $local_ref because it contains local-only personal history." >&2
+    exit 1
+  fi
+
+  if private_match="$(ssb_find_private_path_in_outgoing_history "$local_commit" "$remote_oid" "$remote_name")"; then
+    echo "Refusing to push $local_ref because outgoing history contains a private-only path: $private_match" >&2
+    exit 1
+  fi
+done
+
+if [ -x "scripts/privacy-scan.sh" ]; then
+  scripts/privacy-scan.sh
+fi

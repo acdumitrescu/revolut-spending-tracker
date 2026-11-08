@@ -45,6 +45,7 @@ This app is a strong fit if you:
 - Savings goals based on tracked balances
 - Recurring bill detection
 - Multi-currency account tracking
+- Manual portfolio tracking with opt-in Yahoo market-price refresh in private-sync deployments
 - Display currency switching for `RON`, `EUR`, and `USD`
 - JSON backup/restore
 - Excel workbook export for spreadsheet review
@@ -83,6 +84,13 @@ Current supported import paths:
 
 Current import behavior:
 
+- validates CSV extension, non-empty content, and a 10 MB size limit before parsing
+- reviews ready, duplicate, and invalid rows before committing any transaction
+- excludes exact duplicates already stored or repeated inside the selected file
+- provides row-level rejected details and a downloadable CSV review report
+- provides a downloadable normalized CSV template for manual transformations
+- records confirmed imports in reversible local history
+
 - dates, amounts, flow, and currency are normalized before analytics
 - format detection is profile-based rather than one fixed CSV assumption
 - localized and expanded Revolut header sets are supported where known
@@ -111,11 +119,37 @@ The normalized CSV fallback format is documented in [docs/normalized-csv.md](doc
 - `Vendors`: top merchants plus custom category mapping management
 - `Transactions`: searchable transaction history with source currency visibility
 - `Accounts`: tracked balances, per-account currency, and cashflow kept separate from implied net worth
-- `Budget`: month-aware budgets with progress and over-budget visibility
+- `Budget`: month-aware planning, non-destructive prior-month copying, spending progress, over-budget visibility, and month-over-month comparisons
 - `Heatmap`: multi-month spending intensity with daily drilldown
 - `Forecast`: savings and expense planning based on tracked balances and current assumptions
 - `Goals`: savings targets based on entered balances
 - `Recurring`: repeating charges and bill estimates
+- `Portfolio`: manual holdings, per-account currency summaries, and optional market-price refresh
+
+## Portfolio price updates
+
+Portfolio prices are manual by default. In a `private-sync` deployment, the Portfolio page can request
+best-effort quotes from Yahoo through the authenticated backend:
+
+- Yahoo symbols are configurable per holding (for example, `TLV.RO` for a Bucharest-listed symbol)
+- the holding form includes an offline BVB shares catalog (regulated market and AeRO) plus curated common global stocks and ETFs
+- when no local match is suitable, an explicit Yahoo search can find an instrument and save its chosen symbol locally
+- only quote symbols are sent to Yahoo; quantities, costs, accounts, and calculated portfolio values are not
+- successful quotes are cached by the server for 15 minutes
+- refresh is manual unless the user enables the session-only 15-minute refresh option
+- a returned quote is ignored when its currency differs from the holding currency
+- saved manual or previous prices remain active whenever a lookup fails
+
+This uses an unofficial Yahoo Finance endpoint, so quotes may be delayed, unavailable, or changed without
+notice. It is not a trading feed and should not be treated as real-time market data.
+
+Refresh the checked-in BVB share catalog when needed with:
+
+```bash
+npm run build:bvb-instruments
+```
+
+The catalog is public market-reference data only; it contains no personal holdings or transactions.
 
 ## Demo data and screenshots
 
@@ -182,10 +216,11 @@ See [docs/deployment.md](docs/deployment.md) and [docs/backup-runbook.md](docs/b
 For private local use without running Vite or Node manually:
 
 ```bash
+export SSB_SYNC_TOKEN="$(openssl rand -hex 32)"
 scripts/personal-app.sh start
 ```
 
-Then open `http://127.0.0.1:3176`.
+Then open `http://127.0.0.1:3176` and enter the token in Settings.
 
 The personal Docker profile serves the production frontend through nginx, keeps the API internal to Compose, and stores private sync data in the `ssb-personal_app-state` Docker volume. Stop it with:
 
@@ -209,6 +244,31 @@ Only run a Docker volume delete command when you intentionally want to erase pri
 npm install
 npm run dev
 ```
+
+For the personal test environment, use filesystem-backed private persistence instead of browser-only development mode:
+
+```bash
+npm run setup:personal-dev
+export SSB_SYNC_TOKEN="$(openssl rand -hex 32)"
+npm run dev:personal
+```
+
+After the token has been saved to `private-data/dev-sync/session-token`, start both services and open the app with:
+
+```bash
+npm run local
+```
+
+For background start/stop commands, point a shell alias named `ssb` at `scripts/ssb-local.sh`, then use:
+
+```bash
+ssb start
+ssb stop
+```
+
+`ssb start` opens the Overview at `http://127.0.0.1:5173/app`. In this trusted loopback workflow, Vite adds the saved bearer token to `/api/*` requests server-side, so the browser never receives or stores it. Direct requests to port `3177` still require authentication. Private state stays under ignored `private-data/dev-sync/`, is written atomically, and retains a last-known-good `.bak` copy. A populated server remains authoritative during bootstrap so empty or stale browser storage cannot overwrite it.
+
+Every confirmed real CSV import must first create a portable JSON backup under ignored `backups/automatic/`; the import is not committed if that backup fails. Use **Import & backup → Create backup now** for an on-demand server backup. Synthetic demo imports, backup restoration, `ssb start`, and `ssb stop` do not create automatic backups.
 
 Checks:
 
@@ -238,7 +298,7 @@ npm run build
 
 - stronger Revolut parser coverage and import summaries
 - better normalized CSV import documentation
-- budgeting v2 polish and richer monthly comparisons
+- budgeting v2 follow-up with explicit rollover and category-funding rules
 - better filtering, search, and recurring transaction refinement
 - clearer forecast assumptions and UX wording
 
