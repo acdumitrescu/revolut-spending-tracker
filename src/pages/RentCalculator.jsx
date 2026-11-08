@@ -6,11 +6,11 @@ import { calculateRentAffordability } from '../lib/rentAffordability';
 import { formatCurrency } from '../lib/utils';
 
 const DEFAULT_SCENARIO = {
-  netIncomeRon: 9000,
-  rentEur: 550,
-  utilitiesRon: 600,
-  otherFixedCostsRon: 1000,
-  savingsTargetPct: 20,
+  netIncomeRon: 0,
+  rentEur: 0,
+  utilitiesRon: 0,
+  otherFixedCostsRon: 0,
+  savingsTargetPct: 0,
 };
 
 function Field({ label, name, value, suffix, min = 0, max, step = 1, onChange }) {

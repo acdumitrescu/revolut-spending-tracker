@@ -43,6 +43,9 @@ describe('car lease page', () => {
 describe('car lease budget slider', () => {
   it('shows the maximum price for a budget and applies it to the simulator', () => {
     render(<AppProvider><CarLease /></AppProvider>);
+    expect(screen.getByLabelText(/Car price/)).toHaveValue(0); // no pre-filled personal figures
+    fireEvent.change(screen.getByLabelText(/Net monthly income/), { target: { value: '9000' } });
+    fireEvent.change(screen.getByLabelText(/Annual interest rate/), { target: { value: '7.5' } });
     const slider = screen.getByLabelText(/Total monthly car budget/);
     expect(slider).toHaveAttribute('type', 'range');
     fireEvent.change(slider, { target: { value: '3000' } });
