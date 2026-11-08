@@ -7,6 +7,7 @@ import {
   serializeBackupState,
 } from '../lib/persistence';
 import { createPersistedAppState } from '../lib/appState';
+import { resolveTransactionCategories } from '../lib/transactionCategories';
 
 describe('persistence', () => {
   it('recovers from corrupted local state without throwing', () => {
@@ -34,6 +35,45 @@ describe('persistence', () => {
 
     expect(storage.setItem).toHaveBeenCalledWith('key', JSON.stringify(persisted));
     expect(storage.removeItem).toHaveBeenCalledWith('key');
+  });
+
+  it('restores saved custom mappings and reapplies them after reload', () => {
+    let savedValue = null;
+    const storage = {
+      getItem: vi.fn(() => savedValue),
+      setItem: vi.fn((...args) => {
+        savedValue = args[1];
+      }),
+      removeItem: vi.fn(),
+    };
+    const persisted = createPersistedAppState({
+      ...createPersistedAppState().data,
+      transactions: [{
+        date: '2026-06-01',
+        desc: 'Synthetic Merchant Location',
+        cat: 'Other',
+        sub: '',
+        amt: -20,
+        flow: 'Debit',
+        type: 'Card Payment',
+        ym: '2026-06',
+        currency: 'RON',
+      }],
+      customVendors: {
+        'Synthetic Merchant': ['Shopping', 'General'],
+      },
+    });
+
+    saveLocalAppState('key', persisted, storage);
+    const reloaded = loadLocalAppState('key', storage).persistedState;
+    const [resolved] = resolveTransactionCategories(
+      reloaded.data.transactions,
+      reloaded.data.customVendors
+    );
+
+    expect(reloaded.data.customVendors).toEqual(persisted.data.customVendors);
+    expect(resolved.cat).toBe('Shopping');
+    expect(resolved.categorySource).toBe('custom');
   });
 
   it('parses legacy raw backups and upgrades them into the versioned contract', () => {

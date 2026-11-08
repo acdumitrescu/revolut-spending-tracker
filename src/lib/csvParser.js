@@ -21,7 +21,7 @@ const PROFILE_REGISTRY = [
     label: 'Revolut Personal CSV',
     source: 'revolut-personal',
     requiredGroups: [['description'], ['amount', 'amount_payment'], ['date_completed', 'date_started', 'date']],
-    optionalGroups: [['type'], ['currency', 'currency_payment', 'currency_original'], ['reference']],
+    optionalGroups: [['type'], ['currency', 'currency_payment', 'currency_original'], ['reference'], ['state']],
     datePriority: ['date_completed', 'date_started', 'date'],
     amountPriority: ['amount', 'amount_payment'],
     currencyPriority: ['currency', 'currency_payment', 'currency_original'],
@@ -90,6 +90,7 @@ const HEADER_ALIASES = {
   category: ['category', 'expense category name', 'nume categorie de cheltuieli', 'nombre de la categoria de gasto', 'nazev kategorie vydaju'],
   subcategory: ['subcategory'],
   account: ['account'],
+  state: ['state', 'status'],
 };
 
 function normalizeHeader(value) {
@@ -129,6 +130,7 @@ function normalizeType(type, desc) {
 
   if (rawType.includes('cash')) return 'Cash Withdrawal';
   if (rawType.includes('transfer') || rawDesc.includes('bank transfer')) return 'Bank Transfer';
+  if (rawType.includes('exchange')) return 'Exchange';
   if (rawType.includes('card')) return 'Card Payment';
   if (rawType.includes('top up') || rawDesc.includes('top up')) return 'Top Up';
   if (rawType.includes('refund') || rawDesc.includes('refund') || rawDesc.includes('reversal')) return 'Refund';
@@ -150,7 +152,6 @@ function buildHeaderLookup(columns) {
         actualByCanonical[canonical].push(column);
         recognizedHeaders.add(column);
         matched = true;
-        break;
       }
     }
 
@@ -259,6 +260,18 @@ function categorizeNormalizedTransaction(description, amount, type, customVendor
     };
   }
 
+  // Moving money between your own currency balances is neither income nor spending.
+  if (lowerType.includes('exchange')) {
+    return {
+      category: 'Transfers',
+      subcategory: 'Transfers',
+      matchedVendor: 'Currency exchange',
+      matchedAlias: normalizedType,
+      matchSource: 'system',
+      confidence: 'high',
+    };
+  }
+
   if (lowerType.includes('top up')) {
     return {
       category: 'Savings',
@@ -282,6 +295,15 @@ function categorizeNormalizedTransaction(description, amount, type, customVendor
   }
 
   return categorizeTransactionDetailed(description, amount, customVendors);
+}
+
+export function categorizeTransactionRecord(transaction, customVendors = {}) {
+  return categorizeNormalizedTransaction(
+    transaction?.desc,
+    Number(transaction?.amt) || 0,
+    transaction?.type,
+    customVendors
+  );
 }
 
 function buildWarnings(profile, headerLookup) {
@@ -401,6 +423,11 @@ function mergeVendorObservations(observations) {
 }
 
 function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
+  const state = String(getFirstMappedValue(row, headerLookup, ['state']) || '').trim();
+  if (profile.source.startsWith('revolut') && state && normalizeText(state) !== 'completed') {
+    return { error: { rowNumber: rowIndex, reason: 'non-completed transaction skipped' } };
+  }
+
   const rawDate = getFirstMappedValue(row, headerLookup, profile.datePriority);
   const date = normalizeDate(rawDate);
   const desc = String(getFirstMappedValue(row, headerLookup, profile.descriptionPriority) || '').trim();
@@ -408,19 +435,26 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
   const rawType = getFirstMappedValue(row, headerLookup, profile.typePriority);
   const type = normalizeType(rawType, desc);
   const currency = String(getFirstMappedValue(row, headerLookup, profile.currencyPriority) || '').trim().toUpperCase();
-  const ref = String(getFirstMappedValue(row, headerLookup, profile.referencePriority) || '').trim();
+  const importedRef = String(getFirstMappedValue(row, headerLookup, profile.referencePriority) || '').trim();
+  const startedAt = String(getFirstMappedValue(row, headerLookup, ['date_started']) || '').trim();
+  const completedAt = String(getFirstMappedValue(row, headerLookup, ['date_completed']) || '').trim();
+  const ref = importedRef || (
+    profile.id === 'revolut-personal-raw' && (completedAt || startedAt)
+      ? `revolut:${completedAt || startedAt}|${startedAt}`
+      : ''
+  );
 
   if (!date) {
-    return { error: `Row ${rowIndex}: missing or invalid date` };
+    return { error: { rowNumber: rowIndex, reason: 'missing or invalid date' } };
   }
   if (!desc) {
-    return { error: `Row ${rowIndex}: missing description` };
+    return { error: { rowNumber: rowIndex, reason: 'missing description' } };
   }
   if (Number.isNaN(amount)) {
-    return { error: `Row ${rowIndex}: invalid amount` };
+    return { error: { rowNumber: rowIndex, reason: 'invalid amount' } };
   }
   if (amount === 0) {
-    return { error: `Row ${rowIndex}: zero-value transaction skipped` };
+    return { error: { rowNumber: rowIndex, reason: 'zero-value transaction skipped' } };
   }
 
   let cat = String(getFirstMappedValue(row, headerLookup, ['category']) || '').trim();
@@ -437,11 +471,24 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
     confidence: 'none',
   };
 
-  if (!cat || !sub || cat === 'nan' || sub === 'nan') {
-    const derived = categorizeNormalizedTransaction(desc, amount, type, customVendors);
-    cat = derived.category;
-    sub = derived.subcategory;
-    classification = derived;
+  const hasImportedCategory = cat && sub && cat !== 'nan' && sub !== 'nan';
+  let baseCat = cat;
+  let baseSub = sub;
+
+  if (!hasImportedCategory) {
+    const baseClassification = categorizeNormalizedTransaction(desc, amount, type, {});
+    baseCat = baseClassification.category;
+    baseSub = baseClassification.subcategory;
+    cat = baseCat;
+    sub = baseSub;
+    classification = baseClassification;
+  }
+
+  const customClassification = categorizeNormalizedTransaction(desc, amount, type, customVendors);
+  if (customClassification.matchSource === 'custom') {
+    cat = customClassification.category;
+    sub = customClassification.subcategory;
+    classification = customClassification;
   }
 
   return {
@@ -450,6 +497,8 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
       desc,
       cat,
       sub,
+      baseCat,
+      baseSub,
       amt: amount,
       flow,
       type,
@@ -483,6 +532,7 @@ export function parseCSV(file, customVendors = {}) {
         if (data.length === 0) {
           resolve({
             transactions: [],
+            rejectedRows: [],
             summary: {
               detectedProfileId: 'empty',
               detectedProfileLabel: 'Empty CSV',
@@ -506,16 +556,26 @@ export function parseCSV(file, customVendors = {}) {
         }
 
         const { warnings, validationCategories } = buildWarnings(profile, headerLookup);
+        const parserWarnings = [...new Set((results.errors || []).map((error) => {
+          const row = Number.isInteger(error.row) ? ` (data row ${error.row + 1})` : '';
+          return `CSV parser: ${error.message}${row}`;
+        }))];
+        warnings.push(...parserWarnings);
+        if (parserWarnings.length > 0) {
+          validationCategories['parser-warning'] = parserWarnings.length;
+        }
         const processed = [];
         const vendorObservations = [];
+        const rejectedRows = [];
         const skippedDetails = [];
         const skippedReasonCounts = {};
 
         for (const [index, row] of data.entries()) {
           const result = buildTransaction(row, profile, headerLookup, customVendors, index + 2);
           if (result.error) {
-            skippedDetails.push(result.error);
-            const reason = result.error.split(': ').at(-1);
+            rejectedRows.push(result.error);
+            skippedDetails.push(`Row ${result.error.rowNumber}: ${result.error.reason}`);
+            const reason = result.error.reason;
             skippedReasonCounts[reason] = (skippedReasonCounts[reason] || 0) + 1;
             if (reason.includes('invalid amount')) {
               validationCategories['suspicious-amount'] = (validationCategories['suspicious-amount'] || 0) + 1;
@@ -525,6 +585,8 @@ export function parseCSV(file, customVendors = {}) {
               validationCategories['missing-description'] = (validationCategories['missing-description'] || 0) + 1;
             } else if (reason.includes('zero-value')) {
               validationCategories['zero-value-row'] = (validationCategories['zero-value-row'] || 0) + 1;
+            } else if (reason.includes('non-completed')) {
+              validationCategories['non-completed-transaction'] = (validationCategories['non-completed-transaction'] || 0) + 1;
             }
             continue;
           }
@@ -536,6 +598,7 @@ export function parseCSV(file, customVendors = {}) {
 
         const payload = {
           transactions: processed,
+          rejectedRows,
           summary: {
             detectedProfileId: profile.id,
             detectedProfileLabel: profile.label,
@@ -566,21 +629,67 @@ export function parseCSV(file, customVendors = {}) {
   });
 }
 
+// The key uses the currency the row was imported with (baseCurrency), so a manual
+// currency correction does not change identity: re-imports still dedupe and
+// category overrides still match.
 export function txKey(t) {
-  return [t.date, t.desc, t.amt, t.type, t.flow, t.currency || '', t.ref || ''].join('|');
+  const importedCurrency = t.baseCurrency !== undefined ? t.baseCurrency : t.currency;
+  return [t.date, t.desc, t.amt, t.type, t.flow, importedCurrency || '', t.ref || ''].join('|');
+}
+
+function legacyTxKey(t) {
+  return [t.date, t.desc, t.amt, t.type, t.flow, t.currency || ''].join('|');
+}
+
+export function analyzeTransactionImport(existing, incoming) {
+  const existingReferenceKeys = new Set(existing.filter((transaction) => transaction.ref).map(txKey));
+  const remainingLegacyCounts = new Map();
+  for (const transaction of existing.filter((candidate) => !candidate.ref)) {
+    const key = legacyTxKey(transaction);
+    remainingLegacyCounts.set(key, (remainingLegacyCounts.get(key) || 0) + 1);
+  }
+  const seenIncomingKeys = new Set();
+  const acceptedTransactions = [];
+  const duplicateTransactions = [];
+  let existingDuplicateCount = 0;
+  let fileDuplicateCount = 0;
+
+  for (const transaction of incoming) {
+    const key = txKey(transaction);
+    const legacyKey = legacyTxKey(transaction);
+    const remainingLegacyCount = remainingLegacyCounts.get(legacyKey) || 0;
+    let duplicateSource = null;
+
+    if (transaction.ref && existingReferenceKeys.has(key)) {
+      duplicateSource = 'existing';
+    } else if (remainingLegacyCount > 0) {
+      duplicateSource = 'existing';
+      remainingLegacyCounts.set(legacyKey, remainingLegacyCount - 1);
+    } else if (seenIncomingKeys.has(key)) {
+      duplicateSource = 'file';
+    }
+
+    seenIncomingKeys.add(key);
+    if (duplicateSource) {
+      duplicateTransactions.push({ transaction, duplicateSource });
+      if (duplicateSource === 'existing') existingDuplicateCount += 1;
+      else fileDuplicateCount += 1;
+      continue;
+    }
+
+    acceptedTransactions.push(transaction);
+  }
+
+  return {
+    acceptedTransactions,
+    duplicateTransactions,
+    duplicateCount: duplicateTransactions.length,
+    existingDuplicateCount,
+    fileDuplicateCount,
+  };
 }
 
 export function mergeTransactions(existing, newTxns) {
-  const existingKeys = new Set(existing.map(txKey));
-  const added = [];
-
-  for (const t of newTxns) {
-    const key = txKey(t);
-    if (!existingKeys.has(key)) {
-      existingKeys.add(key);
-      added.push(t);
-    }
-  }
-
-  return [...existing, ...added].sort((a, b) => a.date.localeCompare(b.date));
+  const { acceptedTransactions } = analyzeTransactionImport(existing, newTxns);
+  return [...existing, ...acceptedTransactions].sort((a, b) => a.date.localeCompare(b.date));
 }

@@ -39,6 +39,7 @@ backups/
 exports/
 imports/
 tmp-data/
+XTB/
 PRIVATE_NOTES.md
 SETUP-NOTES.md
 REPORT-20*.md
@@ -59,3 +60,15 @@ REPORT-20*.md
 
 # Keep the public demo dataset
 !public/demo-revolut.csv
+
+# Local-user encrypted recovery bundles
+*.ssbuser
+
+# Desktop (Tauri) build outputs: bundled runtime, staged resources, built app
+dist-desktop/
+src-tauri/target/
+src-tauri/binaries/
+src-tauri/resources/staged/
+src-tauri/gen/
+desktop/cache/
+*.dmg

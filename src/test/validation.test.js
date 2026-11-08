@@ -33,7 +33,7 @@ describe('AppDataSchema', () => {
     const data = {
       transactions: [],
       customVendors: { uber: ['Transport', 'Taxi'] },
-      accounts: [{ id: '1', name: 'Bank', currency: 'EUR', balances: { '2024-01': 1000 }, monthlyContribution: 500 }],
+      accounts: [{ id: '1', name: 'Bank', currency: 'EUR', balances: { '2024-01': 1000 }, notes: { '2024-01': 'Opening balance' } }],
       budgets: { '2024-01': { Groceries: 1200 } },
       goals: [{ id: 'goal-1', name: 'Emergency Fund', targetAmount: 10000, targetMonth: '2024-12' }],
       baseCurrency: 'RON',
@@ -42,7 +42,7 @@ describe('AppDataSchema', () => {
       fxRates: { EUR: 5, USD: 4.6 },
       fxUpdatedAt: 1705312801000,
       fxSource: 'Frankfurter',
-      importMeta: { latestSummary: null },
+      importMeta: { latestSummary: null, history: [] },
       syncInfo: { lastSuccessfulSyncAt: null, lastRemoteVersion: 0, lastRemoteUpdatedAt: null },
       lastUpdated: 1705312800000,
     };
@@ -77,6 +77,7 @@ describe('sanitizeAppData', () => {
       transactions: [],
       customVendors: {},
       accounts: [],
+      portfolioHoldings: [],
       budgets: {},
       goals: [],
       baseCurrency: 'RON',
@@ -85,11 +86,11 @@ describe('sanitizeAppData', () => {
       fxRates: { EUR: 5, USD: 4.6 },
       fxUpdatedAt: null,
       fxSource: 'manual-default',
-      importMeta: { latestSummary: null },
+      importMeta: { latestSummary: null, history: [] },
       syncInfo: { lastSuccessfulSyncAt: null, lastRemoteVersion: 0, lastRemoteUpdatedAt: null },
       lastUpdated: null,
     };
-    expect(sanitizeAppData(data)).toEqual(data);
+    expect(sanitizeAppData(data)).toEqual({ ...data, moneyFlow: { incomes: [], transfers: [] }, creditRecords: [], subscriptions: [], carListings: [] });
   });
 
   it('filters out invalid transactions', () => {
@@ -132,6 +133,46 @@ describe('sanitizeAppData', () => {
     expect(result.transactions).toEqual([]);
     expect(result.customVendors).toEqual({});
     expect(result.accounts).toEqual([]);
+    expect(result.portfolioHoldings).toEqual([]);
+  });
+
+  it('keeps valid manual holdings and rejects invalid quantities', () => {
+    const result = sanitizeAppData({
+      transactions: [], customVendors: {}, accounts: [], goals: [], lastUpdated: null,
+      portfolioHoldings: [
+        { id: 'ok', ticker: 'TEST', name: 'Synthetic', assetClass: 'Stock', quantity: 2, avgCost: 10, currentPrice: 12, currency: 'RON' },
+        { id: 'bad', ticker: 'BAD', name: 'Invalid', assetClass: 'Stock', quantity: 0, avgCost: 10, currentPrice: 12, currency: 'RON' },
+      ],
+    });
+    expect(result.portfolioHoldings).toHaveLength(1);
+    expect(result.portfolioHoldings[0].ticker).toBe('TEST');
+    expect(result.portfolioHoldings[0].priceSource).toBe('manual');
+    expect(result.portfolioHoldings[0].priceUpdatedAt).toBeUndefined();
+  });
+
+  it('preserves supported Yahoo quote metadata', () => {
+    const result = sanitizeAppData({
+      transactions: [], customVendors: {}, accounts: [], goals: [], lastUpdated: null,
+      portfolioHoldings: [{
+        id: 'quoted',
+        ticker: 'TLV',
+        quoteSymbol: 'TLV.RO',
+        name: 'Synthetic',
+        assetClass: 'Stock',
+        quantity: 2,
+        avgCost: 10,
+        currentPrice: 12,
+        currency: 'RON',
+        priceSource: 'yahoo',
+        priceUpdatedAt: 1_720_000_000_000,
+      }],
+    });
+
+    expect(result.portfolioHoldings[0]).toMatchObject({
+      quoteSymbol: 'TLV.RO',
+      priceSource: 'yahoo',
+      priceUpdatedAt: 1_720_000_000_000,
+    });
   });
 
   it('preserves valid data on mixed input', () => {
@@ -170,11 +211,11 @@ describe('sanitizeAppData', () => {
     expect(result.budgets).toEqual({ '2024-02': { Groceries: 800 } });
   });
 
-  it('preserves account monthly contributions', () => {
+  it('preserves account month notes and removes retired contribution data', () => {
     const data = {
       transactions: [],
       customVendors: {},
-      accounts: [{ id: '1', name: 'Bank', currency: 'USD', balances: {}, monthlyContribution: 250 }],
+      accounts: [{ id: '1', name: 'Bank', currency: 'USD', balances: {}, notes: { '2026-09': 'Estimate' }, monthlyContribution: 250 }],
       budgets: {},
       goals: [],
       baseCurrency: 'RON',
@@ -182,7 +223,8 @@ describe('sanitizeAppData', () => {
       lastUpdated: null,
     };
     const result = sanitizeAppData(data);
-    expect(result.accounts[0].monthlyContribution).toBe(250);
+    expect(result.accounts[0].notes).toEqual({ '2026-09': 'Estimate' });
+    expect(result.accounts[0].monthlyContribution).toBeUndefined();
     expect(result.accounts[0].currency).toBe('USD');
   });
 
@@ -197,9 +239,9 @@ describe('sanitizeAppData', () => {
     });
     expect(result.baseCurrency).toBe('RON');
     expect(result.displayCurrency).toBe('RON');
-    expect(result.themeMode).toBe('light');
+    expect(result.themeMode).toBe('dark');
     expect(result.fxRates).toEqual({ EUR: 5, USD: 4.6 });
-    expect(result.importMeta).toEqual({ latestSummary: null });
+    expect(result.importMeta).toEqual({ latestSummary: null, history: [] });
     expect(result.syncInfo).toEqual({
       lastSuccessfulSyncAt: null,
       lastRemoteVersion: 0,
@@ -211,7 +253,7 @@ describe('sanitizeAppData', () => {
     const result = sanitizeAppData({
       transactions: [],
       customVendors: {},
-      accounts: [{ id: '1', name: 'Legacy Bank', balances: { '2024-01': 1000 }, monthlyContribution: 200 }],
+      accounts: [{ id: '1', name: 'Legacy Bank', balances: { '2024-01': 1000 } }],
       budgets: {},
       goals: [],
       lastUpdated: null,

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- V8 (the bundled Node sidecar) JIT-compiles JavaScript; under the hardened
+       runtime it cannot reserve executable memory without this. -->
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+  <!-- REQUIRED while the app is ad-hoc signed (no Developer ID). Verified: without it
+       Node refuses to load the SQLCipher addon ("mapping process and mapped file
+       (non-platform) have different Team IDs"). With a real Team ID that signs both
+       Node and the addon, remove this entitlement (docs/desktop/security-checklist.md). -->
+  <key>com.apple.security.cs.disable-library-validation</key>
+  <true/>
+</dict>
+</plist>

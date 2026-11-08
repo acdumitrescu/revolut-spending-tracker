@@ -1,0 +1,2 @@
+Tranzacție inițiată (UTC),Tranzacție finalizată (UTC),ID tranzacție,Tipul tranzacției,Descriere tranzacție,Monedă origine,Sumă inițială (monedă inițială),Moneda de plată,Sumă (monedă plată)
+2026-03-01T10:00:00Z,2026-03-01T10:10:00Z,expense-ro-1,card payment,Synthetic Starbucks,USD,-5.00,RON,-24.50

@@ -35,8 +35,7 @@ Goal: make the core spending workflow stronger before broadening the product.
 
 Priority work:
 
-- budgeting v2 polish
-- better monthly comparisons
+- budgeting v2 follow-up after month planning and comparisons, with explicit rollover and category-funding rules
 - improved filters and search
 - recurring detection improvements
 - clearer forecast assumptions and explanations

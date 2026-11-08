@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   getAccountTotalsByMonth,
   getAccountCurrency,
+  getAccountEntryMonths,
+  getLatestAccountTotalsByCurrency,
   getBudgetEntries,
+  getBudgetComparison,
+  getBudgetSummary,
   getRolling12MonthSummary,
   getCurrencySummary,
   getDailySpend,
@@ -11,8 +15,9 @@ import {
   getMonthlyExpense,
   getMonthlyIncome,
   getMonthlySummary,
+  getPortfolioSummary,
   getUniqueYears,
-  getTotalAccountContributions,
+  shiftMonth,
 } from '../lib/selectors';
 
 const transactions = [
@@ -66,8 +71,8 @@ describe('selectors', () => {
 
   it('aggregates account balances by month', () => {
     const balances = getAccountTotalsByMonth([
-      { id: '1', name: 'A', currency: 'RON', balances: { '2024-01': 1000, '2024-02': 1200 }, monthlyContribution: 100 },
-      { id: '2', name: 'B', currency: 'RON', balances: { '2024-02': 400 }, monthlyContribution: 50 },
+      { id: '1', name: 'A', currency: 'RON', balances: { '2024-01': 1000, '2024-02': 1200 } },
+      { id: '2', name: 'B', currency: 'RON', balances: { '2024-02': 400 } },
     ]);
     expect(balances).toEqual([
       { month: '2024-01', total: 1000 },
@@ -77,20 +82,31 @@ describe('selectors', () => {
 
   it('converts multicurrency account balances into the selected display currency', () => {
     const balances = getAccountTotalsByMonth([
-      { id: '1', name: 'RON Savings', currency: 'RON', balances: { '2024-02': 1000 }, monthlyContribution: 0 },
-      { id: '2', name: 'EUR Vault', currency: 'EUR', balances: { '2024-02': 100 }, monthlyContribution: 0 },
+      { id: '1', name: 'RON Savings', currency: 'RON', balances: { '2024-02': 1000 } },
+      { id: '2', name: 'EUR Vault', currency: 'EUR', balances: { '2024-02': 100 } },
     ], { displayCurrency: 'RON', fxRates: { EUR: 5, USD: 4.6 } });
     expect(balances).toEqual([
       { month: '2024-02', total: 1500 },
     ]);
   });
 
-  it('converts multicurrency account contributions through shared helpers', () => {
-    const total = getTotalAccountContributions([
-      { id: '1', name: 'USD Savings', currency: 'USD', balances: {}, monthlyContribution: 10 },
-      { id: '2', name: 'RON Savings', currency: 'RON', balances: {}, monthlyContribution: 100 },
-    ], { displayCurrency: 'RON', fxRates: { EUR: 5, USD: 4 } });
-    expect(total).toBe(140);
+  it('summarizes each currency using every account latest recorded balance', () => {
+    expect(getLatestAccountTotalsByCurrency([
+      { id: '1', name: 'USD Broker', currency: 'USD', balances: { '2026-08': 100, '2026-09': 120 } },
+      { id: '2', name: 'USD Cash', currency: 'USD', balances: { '2026-08': 20 } },
+      { id: '3', name: 'RON Bank', currency: 'RON', balances: { '2026-09': 500 } },
+    ])).toEqual([
+      { currency: 'RON', total: 500, accounts: 1 },
+      { currency: 'USD', total: 140, accounts: 2 },
+    ]);
+  });
+
+  it('shows account-entry months from the earliest saved month through December', () => {
+    expect(getAccountEntryMonths([
+      { balances: { '2026-08': 100, '2026-09': 120 }, notes: {} },
+    ], new Date('2026-09-26T00:00:00Z'))).toEqual([
+      '2026-08', '2026-09', '2026-10', '2026-11', '2026-12',
+    ]);
   });
 
   it('defaults missing account currency to RON', () => {
@@ -106,6 +122,94 @@ describe('selectors', () => {
       remaining: 400,
       over: false,
     });
+  });
+
+  it('moves between planning months across year boundaries', () => {
+    expect(shiftMonth('2024-01', -1)).toBe('2023-12');
+    expect(shiftMonth('2024-12', 1)).toBe('2025-01');
+  });
+
+  it('supports empty future plans without inventing income', () => {
+    expect(getBudgetSummary({}, '2030-01', [])).toEqual({
+      importedIncome: 0,
+      assigned: 0,
+      totalSpending: 0,
+      plannedCategorySpending: 0,
+      remaining: 0,
+      unbudgetedSpending: 0,
+      unassignedIncome: null,
+    });
+  });
+
+  it('summarizes refunds, custom plans, overspend, and mixed currencies', () => {
+    const mixedTransactions = [
+      { date: '2024-03-01', ym: '2024-03', desc: 'Salary', cat: 'Income', sub: '', amt: 100, flow: 'Credit', type: 'Bank Transfer', currency: 'EUR' },
+      { date: '2024-03-02', ym: '2024-03', desc: 'Groceries', cat: 'Groceries', sub: '', amt: -30, flow: 'Debit', type: 'Card Payment', currency: 'USD' },
+      { date: '2024-03-03', ym: '2024-03', desc: 'Other spending', cat: 'Other', sub: '', amt: -50, flow: 'Debit', type: 'Card Payment', currency: 'RON' },
+      { date: '2024-03-04', ym: '2024-03', desc: 'Refund', cat: 'Refunds', sub: '', amt: 10, flow: 'Credit', type: 'Refund', currency: 'RON' },
+      { date: '2024-03-05', ym: '2024-03', desc: 'Pet supplies', cat: 'Pet fund', sub: '', amt: -20, flow: 'Debit', type: 'Card Payment', currency: 'RON' },
+    ];
+    const budgets = { '2024-03': { Groceries: 100, 'Pet fund': 50 } };
+    const options = { displayCurrency: 'RON', fxRates: { EUR: 5, USD: 4 } };
+
+    expect(getBudgetSummary(budgets, '2024-03', mixedTransactions, options)).toEqual({
+      importedIncome: 500,
+      assigned: 150,
+      totalSpending: 180,
+      plannedCategorySpending: 140,
+      remaining: 10,
+      unbudgetedSpending: 40,
+      unassignedIncome: 350,
+    });
+    expect(getBudgetEntries(budgets, '2024-03', mixedTransactions, options)).toEqual([
+      expect.objectContaining({ cat: 'Groceries', budgeted: 100, spent: 120, remaining: -20, over: true }),
+      expect.objectContaining({ cat: 'Pet fund', budgeted: 50, spent: 20, remaining: 30, over: false }),
+    ]);
+  });
+
+  it('leaves unassigned income unavailable when a month has no imported income', () => {
+    const summary = getBudgetSummary(
+      { '2024-04': { Groceries: 500 } },
+      '2024-04',
+      [{ date: '2024-04-01', ym: '2024-04', desc: 'Groceries', cat: 'Groceries', sub: '', amt: -600, flow: 'Debit', type: 'Card Payment' }]
+    );
+    expect(summary.unassignedIncome).toBeNull();
+    expect(summary.remaining).toBe(-100);
+  });
+
+  it('compares monthly budget totals and planned categories', () => {
+    const comparisonTransactions = [
+      { date: '2024-04-01', ym: '2024-04', desc: 'Salary', cat: 'Income', sub: '', amt: 1000, flow: 'Credit', type: 'Bank Transfer' },
+      { date: '2024-04-02', ym: '2024-04', desc: 'Groceries', cat: 'Groceries', sub: '', amt: -80, flow: 'Debit', type: 'Card Payment' },
+      { date: '2024-04-03', ym: '2024-04', desc: 'Utilities', cat: 'Utilities', sub: '', amt: -100, flow: 'Debit', type: 'Bank Transfer' },
+      { date: '2024-05-01', ym: '2024-05', desc: 'Salary', cat: 'Income', sub: '', amt: 1200, flow: 'Credit', type: 'Bank Transfer' },
+      { date: '2024-05-02', ym: '2024-05', desc: 'Groceries', cat: 'Groceries', sub: '', amt: -120, flow: 'Debit', type: 'Card Payment' },
+      { date: '2024-05-03', ym: '2024-05', desc: 'Pet supplies', cat: 'Pet fund', sub: '', amt: -20, flow: 'Debit', type: 'Card Payment' },
+      { date: '2024-05-04', ym: '2024-05', desc: 'Unplanned', cat: 'Other', sub: '', amt: -30, flow: 'Debit', type: 'Card Payment' },
+    ];
+    const comparison = getBudgetComparison({
+      '2024-04': { Groceries: 100, Utilities: 200 },
+      '2024-05': { Groceries: 150, 'Pet fund': 50 },
+    }, '2024-05', comparisonTransactions);
+
+    expect(comparison.deltas).toEqual({
+      importedIncome: 200,
+      assigned: -100,
+      totalSpending: -10,
+      plannedCategorySpending: -40,
+      remaining: -60,
+      unbudgetedSpending: 30,
+      unassignedIncome: 300,
+    });
+    expect(comparison.categories).toEqual([
+      expect.objectContaining({ category: 'Groceries', assignedDelta: 50, spendingDelta: 40 }),
+      expect.objectContaining({ category: 'Pet fund', assignedDelta: 50, spendingDelta: 20 }),
+      expect.objectContaining({ category: 'Utilities', assignedDelta: -200, spendingDelta: -100 }),
+    ]);
+  });
+
+  it('does not invent an unassigned-income delta for empty comparison months', () => {
+    expect(getBudgetComparison({}, '2030-01', []).deltas.unassignedIncome).toBeNull();
   });
 
   it('detects mixed currencies safely', () => {
@@ -177,5 +281,36 @@ describe('selectors', () => {
     expect(summary).toEqual([
       { month: '2024-04', inc: 200, exp: 20, net: 180 },
     ]);
+  });
+
+  it('blocks aggregates when a transaction currency has no FX rate', () => {
+    const unsupportedCurrency = [{
+      date: '2024-04-01',
+      ym: '2024-04',
+      desc: 'Synthetic GBP purchase',
+      cat: 'Groceries',
+      sub: 'Food',
+      amt: -10,
+      flow: 'Debit',
+      type: 'Card Payment',
+      currency: 'GBP',
+    }];
+
+    expect(() => getMonthlySummary(
+      unsupportedCurrency,
+      { displayCurrency: 'RON', fxRates: { EUR: 5, USD: 4.6 } }
+    )).toThrow('Missing FX rate for GBP');
+  });
+
+  it('summarizes synthetic manual portfolio holdings across currencies', () => {
+    const summary = getPortfolioSummary([
+      { id: 'ron', ticker: 'RONX', name: 'RON Holding', assetClass: 'Stock', quantity: 2, avgCost: 100, currentPrice: 120, currency: 'RON' },
+      { id: 'eur', ticker: 'EURX', name: 'EUR Holding', assetClass: 'ETF', quantity: 1, avgCost: 10, currentPrice: 12, currency: 'EUR' },
+    ], { displayCurrency: 'RON', fxRates: { EUR: 5, USD: 4.6 } });
+
+    expect(summary.totalMarketValue).toBe(300);
+    expect(summary.totalCostBasis).toBe(250);
+    expect(summary.unrealizedGainLoss).toBe(50);
+    expect(summary.byAssetClass).toEqual({ Stock: 240, ETF: 60 });
   });
 });

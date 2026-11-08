@@ -2,18 +2,22 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAppContext } from '../lib/AppContext';
 import { formatCurrency, EXPENSE_CATS, getColorForCategory } from '../lib/utils';
 import { convertAmountToDisplay } from '../lib/fx';
-import { Pencil, X, Plus, Trash2, Search, Store } from 'lucide-react';
-import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
+import { Pencil, Sparkles, Store } from 'lucide-react';
 import { filterTransactionsByPeriod, getUniqueYears } from '../lib/selectors';
 import { EmptyState } from '../components/ui';
+import { useLocation } from 'react-router-dom';
+import { getOtherVendorGroups } from '../lib/vendorReview';
+import CustomMappings from '../components/CustomMappings';
+import UnknownVendorReview from '../components/UnknownVendorReview';
 
 export default function Vendors() {
+  const location = useLocation();
   const {
     data,
     updateCustomVendor,
     removeCustomVendor,
-    currencySummary,
     runtimeConfig,
+    syncStatus,
     loadVendorObservations,
     resolveVendorObservation,
   } = useAppContext();
@@ -23,14 +27,7 @@ export default function Vendors() {
   
   const [timeFilter, setTimeFilter] = useState('ALL TIME');
   const [yearFilter, setYearFilter] = useState('ALL');
-  const [editing, setEditing] = useState(null);
-  const [editCat, setEditCat] = useState('');
-  const [editSub, setEditSub] = useState('');
-  const [showAddVendor, setShowAddVendor] = useState(false);
-  const [newVendor, setNewVendor] = useState('');
-  const [newVendorCat, setNewVendorCat] = useState('');
-  const [newVendorSub, setNewVendorSub] = useState('');
-  const [mappingSearch, setMappingSearch] = useState('');
+  const [mappingRequest, setMappingRequest] = useState(null);
   const [unknownObservations, setUnknownObservations] = useState([]);
   const [unknownLoading, setUnknownLoading] = useState(false);
   const [unknownError, setUnknownError] = useState('');
@@ -52,18 +49,24 @@ export default function Vendors() {
   });
 
   const sorted = Object.entries(vendors).map(([v, d]) => ({ v, ...d })).sort((a, b) => b.total - a.total).slice(0, 100);
-  const filteredMappings = Object.entries(customVendors).filter(([vendor, [cat, sub]]) => {
-    const haystack = `${vendor} ${cat} ${sub}`.toLowerCase();
-    return haystack.includes(mappingSearch.toLowerCase());
-  });
-  const pendingUnknownObservations = unknownObservations.filter((observation) => (observation.status || 'pending') === 'pending');
+  const otherVendorGroups = useMemo(
+    () => getOtherVendorGroups(txns, displayCurrency, data.fxRates),
+    [data.fxRates, displayCurrency, txns]
+  );
 
   useEffect(() => {
     loadVendorObservationsRef.current = loadVendorObservations;
   }, [loadVendorObservations]);
 
   useEffect(() => {
-    if (!runtimeConfig.privateSyncEnabled) return undefined;
+    if (location.hash !== '#mappings') return;
+    window.requestAnimationFrame(() => {
+      document.getElementById('mappings')?.scrollIntoView({ block: 'start' });
+    });
+  }, [location.hash]);
+
+  useEffect(() => {
+    if (!runtimeConfig.privateSyncEnabled || syncStatus.phase !== 'synced') return undefined;
 
     let cancelled = false;
     const controller = new AbortController();
@@ -93,36 +96,25 @@ export default function Vendors() {
       cancelled = true;
       controller.abort();
     };
-  }, [runtimeConfig.privateSyncEnabled]);
+  }, [runtimeConfig.privateSyncEnabled, syncStatus.phase]);
 
-  const handleStartEdit = (vendorName) => {
+  const openMappingEditor = (vendorName) => {
     const existing = customVendors[vendorName];
-    if (existing) {
-      setEditCat(existing[0]);
-      setEditSub(existing[1]);
-    } else {
-      const auto = vendors[vendorName];
-      setEditCat(auto ? auto.cat : '');
-      setEditSub('');
-    }
-    setEditing(vendorName);
+    const auto = vendors[vendorName];
+    setMappingRequest({
+      mode: 'edit',
+      vendor: vendorName,
+      cat: existing ? existing[0] : auto?.cat || '',
+      sub: existing ? existing[1] : '',
+    });
   };
 
-  const handleSaveEdit = (vendorName) => {
-    if (editCat.trim()) {
-      updateCustomVendor(vendorName, editCat.trim(), editSub.trim());
-    }
-    setEditing(null);
+  const handleSuggestedOtherMapping = (group, candidate) => {
+    updateCustomVendor(group.vendorKey, candidate.category, candidate.subcategory);
   };
 
-  const handleAddVendor = () => {
-    if (newVendor.trim() && newVendorCat.trim()) {
-      updateCustomVendor(newVendor.trim(), newVendorCat.trim(), newVendorSub.trim());
-      setNewVendor('');
-      setNewVendorCat('');
-      setNewVendorSub('');
-      setShowAddVendor(false);
-    }
+  const handleManualOtherMapping = (group) => {
+    setMappingRequest({ mode: 'add', vendor: group.vendorKey });
   };
 
   const handleApplyObservation = async (observation, candidate) => {
@@ -145,14 +137,15 @@ export default function Vendors() {
     }
   };
 
-  const handleMarkPublicCandidate = async (observation) => {
+  const handleMapObservation = (observation) => {
+    setMappingRequest({ mode: 'add', vendor: observation.normalizedDescription });
+  };
+
+  const handleIgnoreObservation = async (observation) => {
     try {
       const result = await resolveVendorObservation({
         normalizedDescription: observation.normalizedDescription,
-        status: 'candidate-public',
-        resolution: {
-          candidate: observation.suggestedCandidates?.[0] || null,
-        },
+        status: 'ignored',
       });
       setUnknownObservations(result.observations || []);
     } catch (error) {
@@ -206,199 +199,89 @@ export default function Vendors() {
       </div>
 
       {runtimeConfig.privateSyncEnabled && (
+        <UnknownVendorReview
+          observations={unknownObservations}
+          customVendors={customVendors}
+          loading={unknownLoading}
+          error={unknownError}
+          onApply={handleApplyObservation}
+          onMap={handleMapObservation}
+          onIgnore={handleIgnoreObservation}
+        />
+      )}
+
+      {otherVendorGroups.length > 0 && (
         <div className="card" style={{ marginBottom: '0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <div>
-              <div className="card-title" style={{ marginBottom: '4px' }}>Unknown Vendor Review</div>
+              <div className="card-title" style={{ marginBottom: '4px' }}>Other Vendor Review</div>
               <div className="section-note" style={{ marginBottom: 0 }}>
-                Repeated unresolved merchants are cached privately so you can map them once instead of reclassifying them every import.
+                Review uncategorized vendors using only the bundled local knowledge base. Merchant descriptions are not sent to an external service.
               </div>
             </div>
-            <div className="tag-pill">{pendingUnknownObservations.length} pending</div>
+            <div className="tag-pill">{otherVendorGroups.length} vendors</div>
           </div>
 
-          {unknownLoading && (
-            <div className="section-note" style={{ paddingTop: '12px' }}>Loading private vendor observations…</div>
-          )}
-
-          {unknownError && (
-            <div className="section-note" style={{ paddingTop: '12px', color: 'var(--danger)' }}>{unknownError}</div>
-          )}
-
-          {!unknownLoading && pendingUnknownObservations.length === 0 && (
-            <div className="section-note" style={{ paddingTop: '12px' }}>
-              No unresolved vendor clusters are waiting for review.
-            </div>
-          )}
-
-          {!unknownLoading && pendingUnknownObservations.length > 0 && (
-            <div style={{ display: 'grid', gap: '10px', marginTop: '14px' }}>
-              {pendingUnknownObservations.slice(0, 12).map((observation) => {
-                const topCandidate = observation.suggestedCandidates?.[0];
-                return (
-                  <div
-                    key={observation.normalizedDescription}
-                    style={{
-                      border: '1px solid var(--border)',
-                      borderRadius: '14px',
-                      padding: '14px',
-                      background: 'var(--surface-subtle)',
-                    }}
+          <div style={{ display: 'grid', gap: '10px', marginTop: '14px' }}>
+            {otherVendorGroups.map((group) => (
+              <div
+                key={group.vendorKey}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '14px',
+                  padding: '12px 14px',
+                  border: '1px solid var(--border)',
+                  borderRadius: '14px',
+                  background: 'var(--surface-subtle)',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div style={{ minWidth: '220px', flex: 1 }}>
+                  <strong style={{ display: 'block' }}>{group.samples[0]}</strong>
+                  <span className="section-note" style={{ marginBottom: 0 }}>
+                    {group.count} {group.count === 1 ? 'transaction' : 'transactions'} · {formatCurrency(group.total, displayCurrency)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {group.suggestions.map((candidate) => (
+                    <button
+                      key={`${group.vendorKey}-${candidate.canonicalName}-${candidate.alias}`}
+                      type="button"
+                      className="btn"
+                      onClick={() => handleSuggestedOtherMapping(group, candidate)}
+                      title={`Local similarity score ${candidate.score}; lower is closer`}
+                    >
+                      <Sparkles size={13} /> {candidate.category}{candidate.subcategory ? ` / ${candidate.subcategory}` : ''}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => handleManualOtherMapping(group)}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-                      <div>
-                        <strong style={{ display: 'block', marginBottom: '4px' }}>{observation.rawSamples?.[0] || observation.normalizedDescription}</strong>
-                        <div className="section-note" style={{ marginBottom: 0 }}>
-                          {observation.count} occurrences · last seen {observation.lastSeenAt}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        {topCandidate && (
-                          <button className="btn btn-primary" onClick={() => handleApplyObservation(observation, topCandidate)}>
-                            Map to {topCandidate.category} / {topCandidate.subcategory}
-                          </button>
-                        )}
-                        <button className="btn" onClick={() => handleMarkPublicCandidate(observation)}>
-                          Mark public override
-                        </button>
-                      </div>
-                    </div>
-
-                    {observation.suggestedCandidates?.length > 0 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '10px' }}>
-                        {observation.suggestedCandidates.map((candidate) => (
-                          <div
-                            key={`${observation.normalizedDescription}-${candidate.canonicalName}-${candidate.alias}`}
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              padding: '6px 10px',
-                              borderRadius: '999px',
-                              background: 'var(--surface)',
-                              border: '1px solid var(--border)',
-                              fontSize: '11px',
-                            }}
-                          >
-                            <span style={{ fontWeight: 600 }}>{candidate.canonicalName}</span>
-                            <span style={{ color: 'var(--muted)' }}>{candidate.category} / {candidate.subcategory}</span>
-                            <span style={{ color: 'var(--muted)' }}>score {candidate.score}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="card" style={{ marginBottom: '0' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="card-title" style={{ marginBottom: 0 }}>Custom Category Mappings</div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <div style={{ position: 'relative' }}>
-              <Search size={14} style={{ position: 'absolute', top: '50%', left: '10px', transform: 'translateY(-50%)', color: 'var(--muted)' }} />
-              <input className="input" value={mappingSearch} onChange={(e) => setMappingSearch(e.target.value)} placeholder="Search mappings..." style={{ paddingLeft: '32px', fontSize: '12px', minWidth: '220px' }} />
-            </div>
-            <button className="btn btn-primary" onClick={() => setShowAddVendor(!showAddVendor)} style={{ fontSize: '12px' }}>
-              <Plus size={14} /> Add Mapping
-            </button>
-          </div>
-        </div>
-        <div className="section-note" style={{ marginTop: '6px', marginBottom: '14px' }}>
-          Override vendor categorization. Built-in matching is local-first, case-insensitive, trims punctuation and legal suffix noise, prefers stronger aliases first, and falls back to low-confidence keyword hints only when needed.
-        </div>
-
-        {showAddVendor && (
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', marginBottom: '14px', padding: '14px', background: 'var(--surface-subtle)', borderRadius: '16px', flexWrap: 'wrap' }}>
-            <div style={{ flex: 2 }}>
-              <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Vendor Name</label>
-              <input type="text" className="input" placeholder="e.g. STARBUCKS" value={newVendor} onChange={e => setNewVendor(e.target.value)} style={{ width: '100%' }} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Category</label>
-              <select className="input" value={newVendorCat} onChange={e => setNewVendorCat(e.target.value)} style={{ width: '100%' }}>
-                <option value="">Select...</option>
-                {[...EXPENSE_CATS, 'Income', 'Savings', 'Transfers'].map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Subcategory</label>
-              <input type="text" className="input" placeholder="e.g. Coffee" value={newVendorSub} onChange={e => setNewVendorSub(e.target.value)} style={{ width: '100%' }} />
-            </div>
-            <button className="btn btn-primary" onClick={handleAddVendor} style={{ flexShrink: 0 }}>Save</button>
-          </div>
-        )}
-
-        {Object.keys(customVendors).length === 0 && !showAddVendor ? (
-          <div className="section-note" style={{ textAlign: 'center', padding: '12px' }}>
-            No custom mappings yet. Click "Add Mapping" to create one.
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            {filteredMappings.map(([vendor, [cat, sub]]) => (
-              <div key={vendor} style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'var(--surface-subtle)',
-                border: '1px solid var(--border)',
-                borderRadius: '999px',
-                padding: '7px 12px',
-                fontSize: '12px',
-              }}>
-                <span style={{ color: getColorForCategory(cat), fontWeight: 600 }}>{vendor}</span>
-                <span style={{ color: 'var(--muted)' }}>→</span>
-                <span>{cat}{sub ? ` / ${sub}` : ''}</span>
-                <button
-                  onClick={() => handleStartEdit(vendor)}
-                  style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: 0, display: 'flex' }}
-                >
-                  <Pencil size={12} />
-                </button>
-                <button
-                  onClick={() => removeCustomVendor(vendor)}
-                  style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', padding: 0, display: 'flex' }}
-                >
-                  <Trash2 size={12} />
-                </button>
+                    Map manually
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-        )}
+        </div>
+      )}
 
-        {editing && (
-          <div style={{ marginTop: '14px', padding: '14px', background: 'var(--surface-subtle)', borderRadius: '16px', display: 'flex', gap: '10px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Category</label>
-              <select className="input" value={editCat} onChange={e => setEditCat(e.target.value)} style={{ width: '100%' }}>
-                <option value="">Select...</option>
-                {[...EXPENSE_CATS, 'Income', 'Savings', 'Transfers'].map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Subcategory</label>
-              <input type="text" className="input" value={editSub} onChange={e => setEditSub(e.target.value)} style={{ width: '100%' }} />
-            </div>
-            <button className="btn btn-primary" onClick={() => handleSaveEdit(editing)} style={{ flexShrink: 0 }}>Save</button>
-            <button className="btn" onClick={() => setEditing(null)} style={{ flexShrink: 0 }}><X size={14} /></button>
-          </div>
-        )}
-      </div>
-      
+      <CustomMappings
+        customVendors={customVendors}
+        onSave={updateCustomVendor}
+        onRemove={removeCustomVendor}
+        request={mappingRequest}
+      />
+
       <div className="card" style={{ marginBottom: '0' }}>
         <div className="card-title">Top 100 Vendors {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}</div>
         <div className="section-note" style={{ marginBottom: '14px' }}>
           Total spend reflects expense-only transactions in the selected period, converted to your current display currency.
         </div>
-        {currencySummary.hasMixedCurrencies && (
-          <div style={{ marginBottom: '12px' }}>
-            <MixedCurrencyNotice currencies={currencySummary.currencies} compact />
-          </div>
-        )}
         <div className="tbl-wrap">
           {sorted.length === 0 ? (
             <div className="section-note" style={{ padding: '20px', textAlign: 'center' }}>No vendors match the selected filters.</div>
@@ -419,7 +302,7 @@ export default function Vendors() {
                       <button
                         className="btn"
                         style={{ padding: '2px 6px', fontSize: '10px' }}
-                        onClick={() => handleStartEdit(v.v)}
+                        onClick={() => openMappingEditor(v.v)}
                       >
                         <Pencil size={11} />
                       </button>

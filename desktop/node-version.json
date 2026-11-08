@@ -1,0 +1,11 @@
+{
+  "comment": "Node runtime bundled into the desktop app as the backend sidecar. Change version + sha256 together; see docs/desktop/building.md.",
+  "version": "24.22.1",
+  "modulesAbi": 137,
+  "platforms": {
+    "aarch64-apple-darwin": {
+      "archive": "node-v24.22.1-darwin-arm64.tar.gz",
+      "sha256": "89c682593d76cd44233fa53b1563264e7de9cbb189cad169135c5b4fadfbc0a7"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+dist
+node_modules
+backend/node_modules
+private-data
+personal-data
+backups
+exports
+imports
+tmp-data
+XTB
+dist-desktop
+desktop/cache
+src-tauri/target
+src-tauri/resources
+src-tauri/gen

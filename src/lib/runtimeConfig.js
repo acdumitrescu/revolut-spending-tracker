@@ -22,10 +22,27 @@ function parsePositiveInt(value, fallback) {
 
 const deploymentProfile = normalizeDeploymentProfile(readEnv('VITE_DEPLOYMENT_PROFILE'));
 const privateSyncEnabled = deploymentProfile === 'private-sync' && parseBoolean(readEnv('VITE_PRIVATE_SYNC_ENABLED'), true);
+const privateSyncAutoAuth = privateSyncEnabled && parseBoolean(readEnv('VITE_PRIVATE_SYNC_AUTO_AUTH'), false);
+// Dev server only (import.meta.env.DEV is false in production builds): lets a local testing
+// session unlock itself from private-data/dev-sync/auto-login.testing.
+const devAutoLoginUser = import.meta.env.DEV ? readEnv('VITE_DEV_AUTO_LOGIN_USER') : '';
+const devAutoLoginPassword = import.meta.env.DEV ? readEnv('VITE_DEV_AUTO_LOGIN_PASSWORD') : '';
+
+// True inside the desktop app shell (window.__SSB_DESKTOP__ is injected before page scripts).
+// Use only for presentation tweaks; behaviour must stay identical across hosts (docs/adr/0002).
+const isDesktop = typeof window !== 'undefined' && Boolean(window.__SSB_DESKTOP__);
 
 export const runtimeConfig = {
   deploymentProfile,
+  isDesktop,
   privateSyncEnabled,
+  privateSyncAutoAuth,
+  localUsers: privateSyncEnabled && parseBoolean(readEnv('VITE_LOCAL_USERS'), false),
+  devAutoLogin: privateSyncEnabled && devAutoLoginUser && devAutoLoginPassword
+    ? { name: devAutoLoginUser, password: devAutoLoginPassword }
+    : null,
+  encryptedStorage: privateSyncEnabled && parseBoolean(readEnv('VITE_ENCRYPTED_STORAGE'), false),
+  privateBackupEnabled: privateSyncEnabled && parseBoolean(readEnv('VITE_PRIVATE_BACKUP_ENABLED'), false),
   apiBasePath: readEnv('VITE_API_BASE_PATH') || '/api',
   fxRefreshEnabled: parseBoolean(readEnv('VITE_FX_REFRESH_ENABLED'), true),
   fxRefreshRetries: parsePositiveInt(readEnv('VITE_FX_REFRESH_RETRIES'), 2),

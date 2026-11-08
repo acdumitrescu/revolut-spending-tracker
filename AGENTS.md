@@ -68,3 +68,11 @@ If staged files look like personal finance data, backups, or local notes, stop a
 
 Any agent working in this repository must follow these rules and prioritize privacy over convenience.
 When in doubt, assume a file is private and keep it out of git until the user explicitly confirms it is safe to publish.
+
+## Desktop app
+
+- The Tauri desktop app lives in `src-tauri/`, `scripts/desktop/` and `docs/desktop/`.
+- Never commit build outputs or runtime data: `src-tauri/target/`, `src-tauri/binaries/`, `src-tauri/resources/staged/`, `dist-desktop/`, `desktop/cache/`, `*.dmg`, or anything under `backups/` (including `backups/desktop-import/`, which holds real encrypted user data).
+- Do not open, delete or overwrite `~/Library/Application Support/SimpleSafeBanking/`. Test against a scratch folder with `SSB_DESKTOP_DATA_DIR`.
+- UI and backend talk only over HTTP (`docs/desktop/backend-contract.md`). Change the contract doc and `backend/contract/` tests together with any API or env change.
+- Read `docs/desktop/security-checklist.md` (including its Resolved section) before changing the per-folder instance lock, the unlock throttle or the startup alert. The throttle must count failures only, never refund or clear on success.

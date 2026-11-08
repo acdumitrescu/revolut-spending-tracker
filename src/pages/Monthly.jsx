@@ -4,11 +4,10 @@ import { useAppContext } from '../lib/AppContext';
 import { formatCurrency } from '../lib/utils';
 import { getDailySpend, getMonthlySummary, getUniqueMonths } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
-import MixedCurrencyNotice from '../components/MixedCurrencyNotice';
 import { EmptyState } from '../components/ui';
 
 export default function Monthly() {
-  const { data, currencySummary } = useAppContext();
+  const { data } = useAppContext();
   const txns = data.transactions;
   const displayCurrency = data.displayCurrency;
   
@@ -120,11 +119,6 @@ export default function Monthly() {
         </div>
         <div className="topbar-meta">Last updated: {lastUpdated}</div>
       </div>
-      {currencySummary.hasMixedCurrencies && (
-        <div style={{ marginBottom: '20px' }}>
-          <MixedCurrencyNotice currencies={currencySummary.currencies} />
-        </div>
-      )}
 
       <div className="card" style={{ marginBottom: '0' }}>
         <div className="filter-row">

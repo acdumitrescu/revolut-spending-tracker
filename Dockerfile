@@ -20,7 +20,10 @@ RUN npm run build
 FROM nginx:alpine
 ARG NGINX_CONF=nginx.conf
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY ${NGINX_CONF} /etc/nginx/conf.d/default.conf
+# The official entrypoint renders templates into conf.d at start. Only variables prefixed
+# SSB_NGINX_ (none are defined) are substituted, so nginx variables such as $uri are left alone.
+ENV NGINX_ENVSUBST_FILTER=^SSB_NGINX_
+COPY ${NGINX_CONF} /etc/nginx/templates/default.conf.template
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1
 CMD ["nginx", "-g", "daemon off;"]

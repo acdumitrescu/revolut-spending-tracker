@@ -1,0 +1,27 @@
+.custom-mappings { scroll-margin-top: 18px; }
+.custom-mappings-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.custom-mappings-head .card-title { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.custom-mappings-head .section-note { margin: 0; max-width: 56ch; }
+.custom-mappings-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.custom-mappings-search { position: relative; display: block; }
+.custom-mappings-search svg { position: absolute; top: 50%; left: 10px; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.custom-mappings-search .input { padding-left: 32px; min-width: 220px; font-size: 12px; }
+.custom-mappings-form { display: grid; grid-template-columns: minmax(160px, 2fr) minmax(130px, 1fr) minmax(130px, 1fr) auto auto; gap: 8px; padding: 12px; margin-bottom: 14px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 14px; }
+.custom-mappings-empty { text-align: center; color: var(--muted); padding: 18px 8px; margin: 0; }
+.custom-mappings-table { width: 100%; }
+.custom-mappings-vendor { font-weight: 600; overflow-wrap: anywhere; }
+.custom-mappings-sub { color: var(--muted); }
+.custom-mappings-cat { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; }
+.custom-mappings-cat::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--cat-color); }
+.custom-mappings-actions { display: flex; justify-content: flex-end; gap: 6px; white-space: nowrap; }
+.custom-mappings-actions .btn { padding: 5px 8px; }
+.custom-mappings-delete { color: var(--red); }
+.custom-mappings-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.custom-mappings-table tr.is-editing td { background: var(--surface-subtle); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 720px) {
+  .custom-mappings-form { grid-template-columns: 1fr 1fr; }
+  .custom-mappings-form > :first-child { grid-column: 1 / -1; }
+  .custom-mappings-search, .custom-mappings-search .input { width: 100%; }
+  .custom-mappings-inline { grid-template-columns: 1fr; }
+}

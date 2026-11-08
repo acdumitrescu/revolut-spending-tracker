@@ -46,6 +46,7 @@ scripts/public-test.sh stop
 Use this from the `SimpleSafeBanking-personal` worktree:
 
 ```bash
+export SSB_SYNC_TOKEN="$(openssl rand -hex 32)"
 scripts/personal-app.sh start
 ```
 
@@ -56,6 +57,7 @@ http://127.0.0.1:3176
 ```
 
 This profile runs Docker Compose project `ssb-personal` and stores server-side local state in the `ssb-personal_app-state` volume.
+Enter the generated token in Settings to unlock private sync for the current browser tab.
 
 Stop it with:
 
@@ -96,6 +98,8 @@ The hook blocks pushes from `personal` and runs:
 ```bash
 scripts/privacy-scan.sh
 ```
+
+Installation seeds a trusted public-history marker from `origin/main` and records append-only private-lineage markers in the shared local Git metadata. The hook uses them to reject renamed refs, earlier personal-only commits, a contaminated `main`, and outgoing history that ever contained a private-only path. Re-run the installer after intentionally rebasing personal work or advancing public `main`; it refuses to trust a `main` that contains recorded personal history. On first installation, it fails closed if private history exists but neither an existing marker nor `origin/main` can establish the public baseline. If a verified local `main` legitimately leads `origin/main` and is an ancestor of `personal`, initialize it deliberately with `SSB_TRUST_INITIAL_MAIN=1 scripts/install-git-hooks.sh`.
 
 Before committing or pushing public work, check:
 
