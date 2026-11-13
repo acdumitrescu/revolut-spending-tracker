@@ -32,13 +32,16 @@ describe('effective transaction categories', () => {
   });
 
   it('keeps a manual transaction edit above a vendor mapping', () => {
-    const resolved = resolveTransactionCategory({
-      ...baseTransaction,
-      manualCat: 'Health',
-      manualSub: 'Nutrition',
-    }, {
-      'mega image': ['Shopping', 'Household'],
-    });
+    const resolved = resolveTransactionCategory(
+      {
+        ...baseTransaction,
+        manualCat: 'Health',
+        manualSub: 'Nutrition',
+      },
+      {
+        'mega image': ['Shopping', 'Household'],
+      },
+    );
 
     expect(resolved.cat).toBe('Health');
     expect(resolved.sub).toBe('Nutrition');
@@ -46,15 +49,18 @@ describe('effective transaction categories', () => {
   });
 
   it('preserves legacy manual edits that predate explicit provenance fields', () => {
-    const resolved = resolveTransactionCategory({
-      ...baseTransaction,
-      cat: 'Health',
-      sub: 'Nutrition',
-      baseCat: undefined,
-      baseSub: undefined,
-    }, {
-      'mega image': ['Shopping', 'Household'],
-    });
+    const resolved = resolveTransactionCategory(
+      {
+        ...baseTransaction,
+        cat: 'Health',
+        sub: 'Nutrition',
+        baseCat: undefined,
+        baseSub: undefined,
+      },
+      {
+        'mega image': ['Shopping', 'Household'],
+      },
+    );
 
     expect(resolved.cat).toBe('Health');
     expect(resolved.sub).toBe('Nutrition');
@@ -63,12 +69,15 @@ describe('effective transaction categories', () => {
   });
 
   it('falls back to the base category after a custom mapping is removed', () => {
-    const resolved = resolveTransactionCategory({
-      ...baseTransaction,
-      cat: 'Shopping',
-      sub: 'Household',
-      matchSource: 'custom',
-    }, {});
+    const resolved = resolveTransactionCategory(
+      {
+        ...baseTransaction,
+        cat: 'Shopping',
+        sub: 'Household',
+        matchSource: 'custom',
+      },
+      {},
+    );
 
     expect(resolved.cat).toBe('Groceries');
     expect(resolved.sub).toBe('Supermarket');
@@ -76,30 +85,36 @@ describe('effective transaction categories', () => {
   });
 
   it('does not let a vendor mapping reclassify a system transfer', () => {
-    const resolved = resolveTransactionCategory({
-      ...baseTransaction,
-      desc: 'Transfer to Mega Image',
-      cat: 'Transfers',
-      sub: 'Transfers',
-      baseCat: 'Transfers',
-      baseSub: 'Transfers',
-      type: 'Bank Transfer',
-    }, {
-      'mega image': ['Shopping', 'Household'],
-    });
+    const resolved = resolveTransactionCategory(
+      {
+        ...baseTransaction,
+        desc: 'Transfer to Mega Image',
+        cat: 'Transfers',
+        sub: 'Transfers',
+        baseCat: 'Transfers',
+        baseSub: 'Transfers',
+        type: 'Bank Transfer',
+      },
+      {
+        'mega image': ['Shopping', 'Household'],
+      },
+    );
 
     expect(resolved.cat).toBe('Transfers');
     expect(resolved.categorySource).not.toBe('custom');
   });
 
   it('prefers the longest matching custom vendor alias', () => {
-    const resolved = resolveTransactionCategory({
-      ...baseTransaction,
-      desc: 'Fresh Market Bucuresti',
-    }, {
-      fresh: ['Shopping', 'General'],
-      'fresh market': ['Groceries', 'Supermarket'],
-    });
+    const resolved = resolveTransactionCategory(
+      {
+        ...baseTransaction,
+        desc: 'Fresh Market Bucuresti',
+      },
+      {
+        fresh: ['Shopping', 'General'],
+        'fresh market': ['Groceries', 'Supermarket'],
+      },
+    );
 
     expect(resolved.cat).toBe('Groceries');
     expect(resolved.sub).toBe('Supermarket');
@@ -123,10 +138,12 @@ describe('effective transaction categories', () => {
   });
 
   it('compiles normalized mappings deterministically without transaction data', () => {
-    expect(compileCustomVendorMappings({
-      'Shop SRL POS 445566': ['Shopping', 'General'],
-      'Shop Express': ['Groceries', 'Convenience'],
-    })).toMatchObject([
+    expect(
+      compileCustomVendorMappings({
+        'Shop SRL POS 445566': ['Shopping', 'General'],
+        'Shop Express': ['Groceries', 'Convenience'],
+      }),
+    ).toMatchObject([
       { vendor: 'Shop Express', normalizedVendor: 'shop express' },
       { vendor: 'Shop SRL POS 445566', normalizedVendor: 'shop' },
     ]);
@@ -139,14 +156,15 @@ describe('effective transaction categories', () => {
       return `synthetic vendor ${first}${second}`;
     });
     const mappings = Object.fromEntries(
-      vendorNames.map((vendor) => [vendor, ['Shopping', 'Synthetic']])
+      vendorNames.map((vendor) => [vendor, ['Shopping', 'Synthetic']]),
     );
     const transactions = Array.from({ length: 7_500 }, (_, index) => ({
       date: '2026-06-01',
       ym: '2026-06',
-      desc: index % 5 === 0
-        ? `${vendorNames[index % vendorNames.length]} location`
-        : `unmatched synthetic merchant ${index}`,
+      desc:
+        index % 5 === 0
+          ? `${vendorNames[index % vendorNames.length]} location`
+          : `unmatched synthetic merchant ${index}`,
       cat: 'Other',
       sub: '',
       amt: -10,
@@ -160,25 +178,46 @@ describe('effective transaction categories', () => {
     const duration = performance.now() - startedAt;
 
     expect(resolved).toHaveLength(7_500);
-    expect(resolved.filter((transaction) => transaction.categorySource === 'custom')).toHaveLength(1_500);
+    expect(resolved.filter((transaction) => transaction.categorySource === 'custom')).toHaveLength(
+      1_500,
+    );
     expect(duration).toBeLessThan(250);
   });
 });
 
 describe('currency exchange', () => {
-  const exchange = (overrides) => ({ ...baseTransaction, desc: 'Exchanged to EUR', type: 'Exchange', cat: 'Other', sub: 'Other', baseCat: 'Other', baseSub: 'Other', ...overrides });
+  const exchange = (overrides) => ({
+    ...baseTransaction,
+    desc: 'Exchanged to EUR',
+    type: 'Exchange',
+    cat: 'Other',
+    sub: 'Other',
+    baseCat: 'Other',
+    baseSub: 'Other',
+    ...overrides,
+  });
 
   it('is a transfer, never spending or income, even when stored as Other/Income by an older import', () => {
     const [out, back] = resolveTransactionCategories([
       exchange({ amt: -1000 }),
-      exchange({ desc: 'Exchanged to RON', amt: 200, flow: 'Credit', cat: 'Income', sub: 'Income', baseCat: 'Income', baseSub: 'Income' }),
+      exchange({
+        desc: 'Exchanged to RON',
+        amt: 200,
+        flow: 'Credit',
+        cat: 'Income',
+        sub: 'Income',
+        baseCat: 'Income',
+        baseSub: 'Income',
+      }),
     ]);
     expect(out).toMatchObject({ cat: 'Transfers', baseCat: 'Transfers' });
     expect(back).toMatchObject({ cat: 'Transfers', baseCat: 'Transfers' });
   });
 
   it('still respects a manual category override', () => {
-    const [row] = resolveTransactionCategories([exchange({ amt: -50, manualCat: 'Fees', manualSub: 'Fees' })]);
+    const [row] = resolveTransactionCategories([
+      exchange({ amt: -50, manualCat: 'Fees', manualSub: 'Fees' }),
+    ]);
     expect(row.cat).toBe('Fees');
   });
 });

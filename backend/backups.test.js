@@ -98,19 +98,23 @@ describe('private portable backups', () => {
   it('rejects unversioned state and unsafe import batch identifiers', async () => {
     const backupDir = await createBackupDirectory();
 
-    await expect(writePortableBackup({
-      backupDir,
-      data: { data: { transactions: [], accounts: [] } },
-      reason: 'manual',
-      maxPayloadBytes: 1024 * 1024,
-    })).rejects.toMatchObject({ status: 400 });
+    await expect(
+      writePortableBackup({
+        backupDir,
+        data: { data: { transactions: [], accounts: [] } },
+        reason: 'manual',
+        maxPayloadBytes: 1024 * 1024,
+      }),
+    ).rejects.toMatchObject({ status: 400 });
 
-    await expect(writePortableBackup({
-      backupDir,
-      data: sampleState(),
-      reason: 'import',
-      importBatchId: '../../private-data',
-      maxPayloadBytes: 1024 * 1024,
-    })).rejects.toMatchObject({ status: 400 });
+    await expect(
+      writePortableBackup({
+        backupDir,
+        data: sampleState(),
+        reason: 'import',
+        importBatchId: '../../private-data',
+        maxPayloadBytes: 1024 * 1024,
+      }),
+    ).rejects.toMatchObject({ status: 400 });
   });
 });

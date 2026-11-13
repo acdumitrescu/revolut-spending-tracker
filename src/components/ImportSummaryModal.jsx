@@ -34,12 +34,23 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
         }}
         onClick={(event) => event.stopPropagation()}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: '16px',
+            marginBottom: '18px',
+          }}
+        >
           <div>
-            <div className="card-title" style={{ marginBottom: '6px' }}>Import Summary</div>
+            <div className="card-title" style={{ marginBottom: '6px' }}>
+              Import Summary
+            </div>
             <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.5 }}>
               {fileName ? `File: ${fileName}` : 'Imported file'} was parsed locally in your browser.
-              If private sync is enabled for this deployment, only the resulting app state may later sync to your own server.
+              If private sync is enabled for this deployment, only the resulting app state may later
+              sync to your own server.
             </div>
           </div>
           <button className="btn" type="button" onClick={onClose} style={{ whiteSpace: 'nowrap' }}>
@@ -47,10 +58,19 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '18px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: '12px',
+            marginBottom: '18px',
+          }}
+        >
           <div className="kpi blue">
             <div className="lbl">Detected Profile</div>
-            <div className="val" style={{ fontSize: '18px' }}>{summary.detectedProfileLabel}</div>
+            <div className="val" style={{ fontSize: '18px' }}>
+              {summary.detectedProfileLabel}
+            </div>
           </div>
           <div className="kpi green">
             <div className="lbl">Processed</div>
@@ -66,11 +86,25 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '16px',
+          }}
+        >
           <section className="card" style={{ margin: 0 }}>
             <div className="card-title">Warnings</div>
             {summary.warnings?.length ? (
-              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--text)', lineHeight: 1.6 }}>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: '18px',
+                  fontSize: '13px',
+                  color: 'var(--text)',
+                  lineHeight: 1.6,
+                }}
+              >
                 {summary.warnings.map((warning) => (
                   <li key={warning}>{warning}</li>
                 ))}
@@ -85,7 +119,15 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
           <section className="card" style={{ margin: 0 }}>
             <div className="card-title">Top Skip Reasons</div>
             {topSkipReasons.length ? (
-              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--text)', lineHeight: 1.6 }}>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: '18px',
+                  fontSize: '13px',
+                  color: 'var(--text)',
+                  lineHeight: 1.6,
+                }}
+              >
                 {topSkipReasons.map(([reason, count]) => (
                   <li key={reason}>
                     {reason} ({count})
@@ -93,16 +135,22 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
                 ))}
               </ul>
             ) : (
-              <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
-                No rows were skipped.
-              </div>
+              <div style={{ fontSize: '13px', color: 'var(--muted)' }}>No rows were skipped.</div>
             )}
           </section>
 
           <section className="card" style={{ margin: 0 }}>
             <div className="card-title">Validation Categories</div>
             {Object.keys(summary.validationCategories || {}).length ? (
-              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--text)', lineHeight: 1.6 }}>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: '18px',
+                  fontSize: '13px',
+                  color: 'var(--text)',
+                  lineHeight: 1.6,
+                }}
+              >
                 {Object.entries(summary.validationCategories).map(([category, count]) => (
                   <li key={category}>
                     {category} ({count})
@@ -120,9 +168,24 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
         {summary.skippedDetails?.length > 0 && (
           <section className="card" style={{ margin: '16px 0 0' }}>
             <div className="card-title">Skipped Row Details</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--text)' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                fontSize: '13px',
+                color: 'var(--text)',
+              }}
+            >
               {summary.skippedDetails.slice(0, 8).map((detail) => (
-                <div key={detail} style={{ padding: '8px 10px', borderRadius: '8px', background: 'var(--surface2)' }}>
+                <div
+                  key={detail}
+                  style={{
+                    padding: '8px 10px',
+                    borderRadius: '8px',
+                    background: 'var(--surface2)',
+                  }}
+                >
                   {detail}
                 </div>
               ))}
@@ -135,8 +198,11 @@ export default function ImportSummaryModal({ summary, fileName, onClose }) {
           </section>
         )}
 
-        <div style={{ marginTop: '16px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
-          Keep real CSVs and generated backups in ignored local folders such as <code>imports/</code>, <code>exports/</code>, or <code>backups/</code>.
+        <div
+          style={{ marginTop: '16px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}
+        >
+          Keep real CSVs and generated backups in ignored local folders such as{' '}
+          <code>imports/</code>, <code>exports/</code>, or <code>backups/</code>.
         </div>
       </div>
     </div>

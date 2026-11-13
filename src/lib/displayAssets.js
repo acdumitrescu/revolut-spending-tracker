@@ -5,7 +5,12 @@ const BRAND_VISUALS = [
   { key: 'aliexpress', aliases: ['aliexpress', 'ali express'], className: 'aliexpress', text: 'A' },
   { key: 'dedeman', aliases: ['dedeman'], className: 'dedeman', text: 'D' },
   { key: 'omv', aliases: ['omv'], className: 'omv', text: 'O' },
-  { key: 'exchange', aliases: ['exchanged to eur', 'exchanged to usd', 'currency exchange'], className: 'exchange', text: '€' },
+  {
+    key: 'exchange',
+    aliases: ['exchanged to eur', 'exchanged to usd', 'currency exchange'],
+    className: 'exchange',
+    text: '€',
+  },
   { key: 'mega-image', aliases: ['mega image'], className: 'mega-image', text: 'M' },
   { key: 'profi', aliases: ['profi'], className: 'profi', text: 'P' },
   { key: 'heyblu', aliases: ['heyblu'], className: 'heyblu', text: 'H' },
@@ -14,7 +19,12 @@ const BRAND_VISUALS = [
   { key: 'orange', aliases: ['orange romania', 'orange'], className: 'orange', text: 'O' },
   { key: 'youtube', aliases: ['youtube'], className: 'youtube', text: '▶' },
   { key: 'microsoft', aliases: ['microsoft 365', 'microsoft'], className: 'microsoft', text: 'M' },
-  { key: 'google', aliases: ['google one', 'google', 'youtube premium'], className: 'google', text: 'G' },
+  {
+    key: 'google',
+    aliases: ['google one', 'google', 'youtube premium'],
+    className: 'google',
+    text: 'G',
+  },
   { key: 'bolt', aliases: ['bolt food', 'bolt'], className: 'bolt', text: 'B' },
   { key: 'uber', aliases: ['uber eats', 'uber'], className: 'uber', text: 'U' },
   { key: 'amazon', aliases: ['amazon prime', 'amazon'], className: 'amazon', text: 'a' },
@@ -38,7 +48,7 @@ export function normalizeVisualLabel(value) {
 export function getVendorVisual(label) {
   const normalized = normalizeVisualLabel(label);
   const match = BRAND_VISUALS.find((visual) =>
-    visual.aliases.some((alias) => normalized === alias || normalized.includes(alias))
+    visual.aliases.some((alias) => normalized === alias || normalized.includes(alias)),
   );
 
   if (match) {
@@ -51,11 +61,22 @@ export function getVendorVisual(label) {
 
   return {
     className: 'bill-logo generic',
-    text: String(label || '?').trim().slice(0, 1).toUpperCase() || '?',
+    text:
+      String(label || '?')
+        .trim()
+        .slice(0, 1)
+        .toUpperCase() || '?',
     key: 'generic',
   };
 }
 
 export function getCurrencyBadge(currency) {
-  return CURRENCY_BADGES[currency] || { code: currency, symbol: currency, className: 'currency-badge generic', label: currency };
+  return (
+    CURRENCY_BADGES[currency] || {
+      code: currency,
+      symbol: currency,
+      className: 'currency-badge generic',
+      label: currency,
+    }
+  );
 }

@@ -60,7 +60,9 @@ function appendIssue(setter, issue) {
 }
 
 function isValidRemoteState(rawState) {
-  return PersistedAppStateSchema.safeParse(rawState).success || AppDataSchema.safeParse(rawState).success;
+  return (
+    PersistedAppStateSchema.safeParse(rawState).success || AppDataSchema.safeParse(rawState).success
+  );
 }
 
 async function saveSnapshotWithRetry(persistedState, version, signal) {
@@ -81,22 +83,26 @@ async function saveSnapshotWithRetry(persistedState, version, signal) {
 }
 
 export function AppProvider({ children }) {
-  const [initialLoad] = useState(() => runtimeConfig.encryptedStorage
-    ? { persistedState: createPersistedAppState(), issues: [] }
-    : loadLocalAppState(LS_KEY));
+  const [initialLoad] = useState(() =>
+    runtimeConfig.encryptedStorage
+      ? { persistedState: createPersistedAppState(), issues: [] }
+      : loadLocalAppState(LS_KEY),
+  );
   const [appState, dispatch] = useReducer(appReducer, initialLoad.persistedState);
   const [runtimeIssues, setRuntimeIssues] = useState(initialLoad.issues);
   const [fxRuntime, setFxRuntime] = useState({
     status: runtimeConfig.fxRefreshEnabled ? 'idle' : 'disabled',
-    message: runtimeConfig.fxRefreshEnabled ? '' : 'FX refresh disabled for this deployment profile.',
+    message: runtimeConfig.fxRefreshEnabled
+      ? ''
+      : 'FX refresh disabled for this deployment profile.',
   });
-  const [syncRuntime, setSyncRuntime] = useState(() => (
+  const [syncRuntime, setSyncRuntime] = useState(() =>
     runtimeConfig.privateSyncEnabled
       ? hasPrivateSyncAccess()
         ? { phase: 'syncing', enabled: true, message: 'Checking private server sync...' }
         : { phase: 'auth-required', enabled: true, message: 'Unlock private sync in Settings.' }
-      : { phase: 'local-only', enabled: false, message: 'Running in client-only mode.' }
-  ));
+      : { phase: 'local-only', enabled: false, message: 'Running in client-only mode.' },
+  );
   const [syncAuthRevision, setSyncAuthRevision] = useState(0);
   const [databaseLoaded, setDatabaseLoaded] = useState(!runtimeConfig.encryptedStorage);
 
@@ -126,7 +132,8 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = appState.data.themeMode || 'dark';
-    document.documentElement.style.colorScheme = appState.data.themeMode === 'dark' ? 'dark' : 'light';
+    document.documentElement.style.colorScheme =
+      appState.data.themeMode === 'dark' ? 'dark' : 'light';
   }, [appState.data.themeMode]);
 
   useEffect(() => {
@@ -225,8 +232,13 @@ export function AppProvider({ children }) {
             message: 'Private server state loaded.',
           });
         } else if (localTime > 0) {
-          const saved = await saveSnapshotWithRetry(persistedStateRef.current, snapshot.version, controller.signal);
-          lastSyncedLocalUpdatedAtRef.current = persistedStateRef.current.data.lastUpdated || localTime;
+          const saved = await saveSnapshotWithRetry(
+            persistedStateRef.current,
+            snapshot.version,
+            controller.signal,
+          );
+          lastSyncedLocalUpdatedAtRef.current =
+            persistedStateRef.current.data.lastUpdated || localTime;
           dispatch({
             type: 'set_sync_info',
             syncInfo: {
@@ -266,7 +278,9 @@ export function AppProvider({ children }) {
           setSyncRuntime({
             phase: 'sync-delayed',
             enabled: true,
-            message: runtimeConfig.encryptedStorage ? 'Encrypted database unavailable. Do not edit or close unsaved work.' : 'Private server sync is unavailable. Local mode remains active.',
+            message: runtimeConfig.encryptedStorage
+              ? 'Encrypted database unavailable. Do not edit or close unsaved work.'
+              : 'Private server sync is unavailable. Local mode remains active.',
           });
         }
       } finally {
@@ -287,7 +301,8 @@ export function AppProvider({ children }) {
     if (!runtimeConfig.encryptedStorage) return;
     const warn = (event) => {
       if (persistedStateRef.current.data.lastUpdated !== lastSyncedLocalUpdatedAtRef.current) {
-        event.preventDefault(); event.returnValue = '';
+        event.preventDefault();
+        event.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', warn);
@@ -326,7 +341,7 @@ export function AppProvider({ children }) {
         const saved = await saveSnapshotWithRetry(
           snapshot,
           snapshot.data.syncInfo?.lastRemoteVersion || 0,
-          controller.signal
+          controller.signal,
         );
         lastSyncedLocalUpdatedAtRef.current = snapshot.data.lastUpdated || 0;
         dispatch({
@@ -361,9 +376,16 @@ export function AppProvider({ children }) {
           const conflict = getConflictSnapshot(error);
           const remoteLogicalUpdatedAt = getRemoteLogicalUpdatedAt(conflict);
 
-          if (!runtimeConfig.encryptedStorage && snapshot.data.lastUpdated > remoteLogicalUpdatedAt) {
+          if (
+            !runtimeConfig.encryptedStorage &&
+            snapshot.data.lastUpdated > remoteLogicalUpdatedAt
+          ) {
             try {
-              const retried = await saveSnapshotWithRetry(snapshot, conflict.version, controller.signal);
+              const retried = await saveSnapshotWithRetry(
+                snapshot,
+                conflict.version,
+                controller.signal,
+              );
               lastSyncedLocalUpdatedAtRef.current = snapshot.data.lastUpdated || 0;
               dispatch({
                 type: 'set_sync_info',
@@ -392,12 +414,18 @@ export function AppProvider({ children }) {
               try {
                 conflictBackup = await createPrivateBackup(persistedStateRef.current, 'recovery');
               } catch {
-                setSyncRuntime({ phase: 'sync-delayed', enabled: true, message: 'A database conflict occurred. Your unsaved edits remain in this tab because a recovery backup could not be created. Export a recovery copy before reloading.' });
+                setSyncRuntime({
+                  phase: 'sync-delayed',
+                  enabled: true,
+                  message:
+                    'A database conflict occurred. Your unsaved edits remain in this tab because a recovery backup could not be created. Export a recovery copy before reloading.',
+                });
                 return;
               }
             }
             const conflictState = sanitizePersistedAppState(conflict.data);
-            lastSyncedLocalUpdatedAtRef.current = conflictState.data.lastUpdated || remoteLogicalUpdatedAt;
+            lastSyncedLocalUpdatedAtRef.current =
+              conflictState.data.lastUpdated || remoteLogicalUpdatedAt;
             dispatch({ type: 'replace_state', payload: conflictState.data });
             dispatch({
               type: 'set_sync_info',
@@ -410,7 +438,9 @@ export function AppProvider({ children }) {
             setSyncRuntime({
               phase: 'synced',
               enabled: true,
-              message: conflictBackup ? `A database conflict occurred. Your unsaved edits were preserved in ${conflictBackup.filename}; the current server state is now loaded.` : 'A sync conflict occurred. The server state was restored because it was newer.',
+              message: conflictBackup
+                ? `A database conflict occurred. Your unsaved edits were preserved in ${conflictBackup.filename}; the current server state is now loaded.`
+                : 'A sync conflict occurred. The server state was restored because it was newer.',
             });
             return;
           }
@@ -420,7 +450,9 @@ export function AppProvider({ children }) {
         setSyncRuntime({
           phase: 'sync-delayed',
           enabled: true,
-          message: runtimeConfig.encryptedStorage ? 'Database save failed. Changes are only in memory; keep this tab open and export a recovery copy.' : 'Private server sync is delayed. Local changes remain safe in this browser.',
+          message: runtimeConfig.encryptedStorage
+            ? 'Database save failed. Changes are only in memory; keep this tab open and export a recovery copy.'
+            : 'Private server sync is delayed. Local changes remain safe in this browser.',
         });
       } finally {
         if (saveRequestRef.current === controller) {
@@ -440,7 +472,8 @@ export function AppProvider({ children }) {
 
   const resumeUserSession = async () => {
     const snapshot = await loadServerSnapshot();
-    if (!snapshot.data || !isValidRemoteState(snapshot.data)) throw new Error('Unable to validate this user’s saved workspace');
+    if (!snapshot.data || !isValidRemoteState(snapshot.data))
+      throw new Error('Unable to validate this user’s saved workspace');
     const current = persistedStateRef.current;
     let message = '';
     if (snapshot.version !== current.data.syncInfo?.lastRemoteVersion) {
@@ -449,12 +482,24 @@ export function AppProvider({ children }) {
         message = `Another save changed this workspace. Your unsaved edits were preserved in ${backup.filename}; the current saved workspace is loaded.`;
       }
       const remote = sanitizePersistedAppState(snapshot.data);
-      lastSyncedLocalUpdatedAtRef.current = remote.data.lastUpdated || getRemoteLogicalUpdatedAt(snapshot);
+      lastSyncedLocalUpdatedAtRef.current =
+        remote.data.lastUpdated || getRemoteLogicalUpdatedAt(snapshot);
       dispatch({ type: 'replace_state', payload: remote.data });
     }
     syncReadyRef.current = true;
-    dispatch({ type: 'set_sync_info', syncInfo: { lastSuccessfulSyncAt: Date.now(), lastRemoteVersion: snapshot.version, lastRemoteUpdatedAt: snapshot.remoteServerUpdatedAt || null } });
-    setSyncRuntime({ phase: 'synced', enabled: true, message: message || 'User unlocked. Pending edits can now be saved.' });
+    dispatch({
+      type: 'set_sync_info',
+      syncInfo: {
+        lastSuccessfulSyncAt: Date.now(),
+        lastRemoteVersion: snapshot.version,
+        lastRemoteUpdatedAt: snapshot.remoteServerUpdatedAt || null,
+      },
+    });
+    setSyncRuntime({
+      phase: 'synced',
+      enabled: true,
+      message: message || 'User unlocked. Pending edits can now be saved.',
+    });
     return message;
   };
 
@@ -476,28 +521,47 @@ export function AppProvider({ children }) {
     const controller = new AbortController();
     saveRequestRef.current = controller;
     try {
-      const saved = await saveSnapshotWithRetry(snapshot, snapshot.data.syncInfo?.lastRemoteVersion || 0, controller.signal);
+      const saved = await saveSnapshotWithRetry(
+        snapshot,
+        snapshot.data.syncInfo?.lastRemoteVersion || 0,
+        controller.signal,
+      );
       lastSyncedLocalUpdatedAtRef.current = snapshot.data.lastUpdated || 0;
-      dispatch({ type: 'set_sync_info', syncInfo: { lastSuccessfulSyncAt: Date.now(), lastRemoteVersion: saved.version, lastRemoteUpdatedAt: saved.remoteServerUpdatedAt || null } });
-    } finally { saveRequestRef.current = null; }
+      dispatch({
+        type: 'set_sync_info',
+        syncInfo: {
+          lastSuccessfulSyncAt: Date.now(),
+          lastRemoteVersion: saved.version,
+          lastRemoteUpdatedAt: saved.remoteServerUpdatedAt || null,
+        },
+      });
+    } finally {
+      saveRequestRef.current = null;
+    }
   }, []);
 
-  useEffect(() => () => {
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    if (saveRequestRef.current) saveRequestRef.current.abort();
-  }, []);
+  useEffect(
+    () => () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      if (saveRequestRef.current) saveRequestRef.current.abort();
+    },
+    [],
+  );
 
-  const effectiveTransactions = useMemo(() => resolveTransactionCategories(
-    appState.data.transactions,
-    appState.data.customVendors
-  ), [appState.data.transactions, appState.data.customVendors]);
-  const data = useMemo(() => ({
-    ...appState.data,
-    transactions: effectiveTransactions,
-  }), [appState.data, effectiveTransactions]);
+  const effectiveTransactions = useMemo(
+    () => resolveTransactionCategories(appState.data.transactions, appState.data.customVendors),
+    [appState.data.transactions, appState.data.customVendors],
+  );
+  const data = useMemo(
+    () => ({
+      ...appState.data,
+      transactions: effectiveTransactions,
+    }),
+    [appState.data, effectiveTransactions],
+  );
   const currencySummary = useMemo(
     () => getCurrencySummary(effectiveTransactions),
-    [effectiveTransactions]
+    [effectiveTransactions],
   );
   const fxStatus = {
     source: data.fxSource || 'manual-default',
@@ -513,14 +577,23 @@ export function AppProvider({ children }) {
     lastRemoteUpdatedAt: data.syncInfo?.lastRemoteUpdatedAt || null,
   };
 
-  const addTransactions = (transactions) => dispatch({
-    type: 'set_transactions',
-    transactions: mergeTransactions(persistedStateRef.current.data.transactions, transactions),
-  });
+  const addTransactions = (transactions) =>
+    dispatch({
+      type: 'set_transactions',
+      transactions: mergeTransactions(persistedStateRef.current.data.transactions, transactions),
+    });
 
-  const commitTransactionImport = async ({ fileName, transactions, summary, batchId: requestedBatchId, isDemo = false }) => {
-    const batchId = requestedBatchId || globalThis.crypto?.randomUUID?.()
-      || `import-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  const commitTransactionImport = async ({
+    fileName,
+    transactions,
+    summary,
+    batchId: requestedBatchId,
+    isDemo = false,
+  }) => {
+    const batchId =
+      requestedBatchId ||
+      globalThis.crypto?.randomUUID?.() ||
+      `import-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     const action = {
       type: 'commit_transaction_import',
       batchId,
@@ -541,22 +614,26 @@ export function AppProvider({ children }) {
     return { batchId, backup };
   };
 
-  const createBackupNow = () => createPrivateBackup(
-    persistedStateRef.current,
-    'manual'
-  );
+  const createBackupNow = () => createPrivateBackup(persistedStateRef.current, 'manual');
 
   const commitBrdStatement = async (request) => {
-    if (runtimeConfig.privateSyncEnabled && !syncReadyRef.current) throw new Error('Wait for private sync before importing.');
+    if (runtimeConfig.privateSyncEnabled && !syncReadyRef.current)
+      throw new Error('Wait for private sync before importing.');
     await flushPendingChanges();
     const base = persistedStateRef.current;
     const prepared = prepareBrdImport(base.data, request);
-    const next = createPersistedAppState({ ...base.data, moneyFlow: prepared.moneyFlow, accounts: prepared.accounts, lastUpdated: Date.now() });
+    const next = createPersistedAppState({
+      ...base.data,
+      moneyFlow: prepared.moneyFlow,
+      accounts: prepared.accounts,
+      lastUpdated: Date.now(),
+    });
     if (runtimeConfig.privateBackupEnabled) {
       await createPrivateBackup(base, 'recovery');
       await createPrivateBackup(next, 'import', `brd-${crypto.randomUUID()}`);
     }
-    if (persistedStateRef.current.data.lastUpdated !== base.data.lastUpdated) throw new Error('Workspace changed while preparing the backup. Review and retry the import.');
+    if (persistedStateRef.current.data.lastUpdated !== base.data.lastUpdated)
+      throw new Error('Workspace changed while preparing the backup. Review and retry the import.');
     dispatch({ type: 'replace_state', payload: next.data });
     return { added: prepared.added, duplicates: prepared.duplicates };
   };
@@ -627,18 +704,37 @@ export function AppProvider({ children }) {
         lockPrivateSync,
         fxStatus,
         currencySummary,
-        upsertSubscription: (subscription) => dispatch({ type: 'upsert_subscription', subscription: SubscriptionSchema.parse(subscription) }),
-        upsertCarListing: (listing) => dispatch({ type: 'upsert_car_listing', listing: CarListingSchema.parse(listing) }),
+        upsertSubscription: (subscription) =>
+          dispatch({
+            type: 'upsert_subscription',
+            subscription: SubscriptionSchema.parse(subscription),
+          }),
+        upsertCarListing: (listing) =>
+          dispatch({ type: 'upsert_car_listing', listing: CarListingSchema.parse(listing) }),
         removeCarListing: (id) => dispatch({ type: 'remove_car_listing', id }),
-        setMoneyFlow: (moneyFlow) => dispatch({ type: 'set_money_flow', moneyFlow: MoneyFlowSchema.parse(moneyFlow) }),
+        setMoneyFlow: (moneyFlow) =>
+          dispatch({ type: 'set_money_flow', moneyFlow: MoneyFlowSchema.parse(moneyFlow) }),
         commitBrdStatement,
-        upsertCardPurchase: (accountId, purchase) => dispatch({ type: 'upsert_card_purchase', accountId, purchase: CardPurchaseSchema.parse(purchase) }),
-        archiveCardPurchase: (accountId, purchaseId) => dispatch({ type: 'archive_card_purchase', accountId, purchaseId }),
-        deleteCardPurchase: (accountId, purchaseId) => dispatch({ type: 'delete_card_purchase', accountId, purchaseId }),
-        reopenCardPurchase: (accountId, purchaseId) => dispatch({ type: 'reopen_card_purchase', accountId, purchaseId }),
+        upsertCardPurchase: (accountId, purchase) =>
+          dispatch({
+            type: 'upsert_card_purchase',
+            accountId,
+            purchase: CardPurchaseSchema.parse(purchase),
+          }),
+        archiveCardPurchase: (accountId, purchaseId) =>
+          dispatch({ type: 'archive_card_purchase', accountId, purchaseId }),
+        deleteCardPurchase: (accountId, purchaseId) =>
+          dispatch({ type: 'delete_card_purchase', accountId, purchaseId }),
+        reopenCardPurchase: (accountId, purchaseId) =>
+          dispatch({ type: 'reopen_card_purchase', accountId, purchaseId }),
         upsertCreditRecord: (record) => {
           const validated = CreditRecordSchema.parse(record);
-          if (validated.kind === 'card' && !persistedStateRef.current.data.accounts.some((account) => account.id === validated.accountId)) {
+          if (
+            validated.kind === 'card' &&
+            !persistedStateRef.current.data.accounts.some(
+              (account) => account.id === validated.accountId,
+            )
+          ) {
             throw new Error('The linked account no longer exists. Choose an account again.');
           }
           dispatch({ type: 'upsert_credit_record', record: validated });
@@ -647,116 +743,156 @@ export function AppProvider({ children }) {
         addTransactions,
         commitTransactionImport,
         createBackupNow,
-        undoTransactionImport: (batchId) => dispatch({
-          type: 'undo_transaction_import',
-          batchId,
-          undoneAt: Date.now(),
-        }),
-        updateTransactionCategory: (transactionKey, category, subcategory) => dispatch({
-          type: 'update_transaction_category',
-          transactionKey,
-          category,
-          subcategory,
-          getTransactionKey: txKey,
-        }),
-        clearTransactionCategoryOverride: (transactionKey, baseCategory, baseSubcategory) => dispatch({
-          type: 'clear_transaction_category_override',
-          transactionKey,
-          baseCategory,
-          baseSubcategory,
-          getTransactionKey: txKey,
-        }),
-        setTransactionCurrency: (transactionKey, currency) => dispatch({
-          type: 'set_transaction_currency',
-          transactionKey,
-          currency,
-          getTransactionKey: txKey,
-        }),
-        updateCustomVendor: (vendorName, category, subcategory) => dispatch({
-          type: 'update_custom_vendor',
-          vendorName,
-          category,
-          subcategory,
-        }),
+        undoTransactionImport: (batchId) =>
+          dispatch({
+            type: 'undo_transaction_import',
+            batchId,
+            undoneAt: Date.now(),
+          }),
+        updateTransactionCategory: (transactionKey, category, subcategory) =>
+          dispatch({
+            type: 'update_transaction_category',
+            transactionKey,
+            category,
+            subcategory,
+            getTransactionKey: txKey,
+          }),
+        clearTransactionCategoryOverride: (transactionKey, baseCategory, baseSubcategory) =>
+          dispatch({
+            type: 'clear_transaction_category_override',
+            transactionKey,
+            baseCategory,
+            baseSubcategory,
+            getTransactionKey: txKey,
+          }),
+        setTransactionCurrency: (transactionKey, currency) =>
+          dispatch({
+            type: 'set_transaction_currency',
+            transactionKey,
+            currency,
+            getTransactionKey: txKey,
+          }),
+        updateCustomVendor: (vendorName, category, subcategory) =>
+          dispatch({
+            type: 'update_custom_vendor',
+            vendorName,
+            category,
+            subcategory,
+          }),
         removeCustomVendor: (vendorName) => dispatch({ type: 'remove_custom_vendor', vendorName }),
-        addAccount: (name, currency) => dispatch({
-          type: 'add_account',
-          name,
-          currency,
-        }),
-        setAccountGroup: (accountId, group) => dispatch({type:'set_account_group',accountId,group}),
-        undoAccountBalance: (accountId, month, previous, expected) => dispatch({type:'undo_account_balance',accountId,month,previous,expected}),
-        updateAccountCurrency: (accountId, currency) => dispatch({
-          type: 'update_account_currency',
-          accountId,
-          currency,
-        }),
-        updateAccountBalance: (accountId, month, balance) => dispatch({
-          type: 'update_account_balance',
-          accountId,
-          month,
-          balance,
-        }),
-        updateAccountNote: (accountId, month, note) => dispatch({
-          type: 'update_account_note',
-          accountId,
-          month,
-          note,
-        }),
+        addAccount: (name, currency) =>
+          dispatch({
+            type: 'add_account',
+            name,
+            currency,
+          }),
+        setAccountGroup: (accountId, group) =>
+          dispatch({ type: 'set_account_group', accountId, group }),
+        undoAccountBalance: (accountId, month, previous, expected) =>
+          dispatch({ type: 'undo_account_balance', accountId, month, previous, expected }),
+        updateAccountCurrency: (accountId, currency) =>
+          dispatch({
+            type: 'update_account_currency',
+            accountId,
+            currency,
+          }),
+        updateAccountBalance: (accountId, month, balance) =>
+          dispatch({
+            type: 'update_account_balance',
+            accountId,
+            month,
+            balance,
+          }),
+        updateAccountNote: (accountId, month, note) =>
+          dispatch({
+            type: 'update_account_note',
+            accountId,
+            month,
+            note,
+          }),
         removeAccount: (accountId) => dispatch({ type: 'remove_account', accountId }),
-        upsertPortfolioHolding: (holding) => dispatch({ type: 'upsert_portfolio_holding', holding }),
-        removePortfolioHolding: (holdingId) => dispatch({ type: 'remove_portfolio_holding', holdingId }),
-        setBudget: (month, category, amount) => dispatch({
-          type: 'set_budget',
-          month,
-          category,
-          amount,
-        }),
-        removeBudget: (month, category) => dispatch({
-          type: 'remove_budget',
-          month,
-          category,
-        }),
-        copyBudgets: (sourceMonth, targetMonth) => dispatch({
-          type: 'copy_budgets',
-          sourceMonth,
-          targetMonth,
-        }),
+        upsertPortfolioHolding: (holding) =>
+          dispatch({ type: 'upsert_portfolio_holding', holding }),
+        removePortfolioHolding: (holdingId) =>
+          dispatch({ type: 'remove_portfolio_holding', holdingId }),
+        setBudget: (month, category, amount) =>
+          dispatch({
+            type: 'set_budget',
+            month,
+            category,
+            amount,
+          }),
+        removeBudget: (month, category) =>
+          dispatch({
+            type: 'remove_budget',
+            month,
+            category,
+          }),
+        copyBudgets: (sourceMonth, targetMonth) =>
+          dispatch({
+            type: 'copy_budgets',
+            sourceMonth,
+            targetMonth,
+          }),
         addGoal: (goal) => dispatch({ type: 'add_goal', goal }),
         removeGoal: (goalId) => dispatch({ type: 'remove_goal', goalId }),
         updateGoal: (goalId, changes) => dispatch({ type: 'update_goal', goalId, changes }),
         moveGoal: (goalId, direction) => dispatch({ type: 'move_goal', goalId, direction }),
-        addGoalContribution: (goalId, contribution) => dispatch({ type: 'add_goal_contribution', goalId, contribution }),
-        removeGoalContribution: (goalId, contributionId) => dispatch({ type: 'remove_goal_contribution', goalId, contributionId }),
+        addGoalContribution: (goalId, contribution) =>
+          dispatch({ type: 'add_goal_contribution', goalId, contribution }),
+        removeGoalContribution: (goalId, contributionId) =>
+          dispatch({ type: 'remove_goal_contribution', goalId, contributionId }),
         importBackup: async (nextData, expectedUpdatedAt) => {
-          if (expectedUpdatedAt !== undefined && persistedStateRef.current.data.lastUpdated !== expectedUpdatedAt) {
-            throw new Error('Workspace changed while preparing recovery. Review the backup and try again.');
+          if (
+            expectedUpdatedAt !== undefined &&
+            persistedStateRef.current.data.lastUpdated !== expectedUpdatedAt
+          ) {
+            throw new Error(
+              'Workspace changed while preparing recovery. Review the backup and try again.',
+            );
           }
           const validated = AppDataSchema.parse(nextData);
           // A failed recovery write must prevent replacement. Keep this independent
           // of the normal state key so the next persistence effect cannot overwrite it.
           if (runtimeConfig.encryptedStorage) {
             await createPrivateBackup(persistedStateRef.current, 'manual');
-            if (expectedUpdatedAt !== undefined && persistedStateRef.current.data.lastUpdated !== expectedUpdatedAt) throw new Error('Workspace changed during recovery backup; try again.');
+            if (
+              expectedUpdatedAt !== undefined &&
+              persistedStateRef.current.data.lastUpdated !== expectedUpdatedAt
+            )
+              throw new Error('Workspace changed during recovery backup; try again.');
           } else saveLocalAppState(`${LS_KEY}_before_restore`, persistedStateRef.current);
           dispatch({ type: 'import_backup', nextData: validated });
         },
-        recordImportSummary: (fileName, summary) => dispatch({
-          type: 'record_import_summary',
-          fileName,
-          summary,
-        }),
+        recordImportSummary: (fileName, summary) =>
+          dispatch({
+            type: 'record_import_summary',
+            fileName,
+            summary,
+          }),
         setDisplayCurrency: (currency) => dispatch({ type: 'set_display_currency', currency }),
         setThemeMode: (themeMode) => dispatch({ type: 'set_theme_mode', themeMode }),
         setFxRates: (rates, source = 'manual') => dispatch({ type: 'set_fx_rates', rates, source }),
         refreshFxRates,
         loadVendorObservations: (signal) => loadVendorObservations(signal),
-        recordVendorObservations: (observations, signal) => persistVendorObservations(observations, signal),
-        resolveVendorObservation: (resolution, signal) => persistVendorObservationResolution(resolution, signal),
+        recordVendorObservations: (observations, signal) =>
+          persistVendorObservations(observations, signal),
+        resolveVendorObservation: (resolution, signal) =>
+          persistVendorObservationResolution(resolution, signal),
         clearData: () => dispatch({ type: 'clear_data' }),
       }}
     >
-      {databaseLoaded ? children : <main className="card"><h2>Opening encrypted workspace</h2><p>{syncRuntime.message}</p><button className="btn" onClick={() => setSyncAuthRevision((value) => value + 1)}>Retry database connection</button></main>}
+      {databaseLoaded ? (
+        children
+      ) : (
+        <main className="card">
+          <h2>Opening encrypted workspace</h2>
+          <p>{syncRuntime.message}</p>
+          <button className="btn" onClick={() => setSyncAuthRevision((value) => value + 1)}>
+            Retry database connection
+          </button>
+        </main>
+      )}
     </AppContext.Provider>
   );
 }

@@ -1,7 +1,7 @@
 // Planning thresholds for total monthly car cost as a share of net income.
 // These are guides, not lending or financial advice.
 const HEALTHY_CAR_SHARE = 0.15;
-const MANAGEABLE_CAR_SHARE = 0.20;
+const MANAGEABLE_CAR_SHARE = 0.2;
 const OUTER_CAR_SHARE = 0.25;
 
 export const LEASE_TYPES = {
@@ -30,11 +30,17 @@ function financedOffer(input) {
   const months = Math.max(1, Math.round(nonNegativeNumber(input.termMonths)));
   const downPayment = price * (Math.min(90, nonNegativeNumber(input.downPaymentPct)) / 100);
   const fee = price * (nonNegativeNumber(input.adminFeePct) / 100);
-  const balloon = input.type === 'financial'
-    ? price * (Math.min(60, nonNegativeNumber(input.residualPct)) / 100)
-    : 0;
+  const balloon =
+    input.type === 'financial'
+      ? price * (Math.min(60, nonNegativeNumber(input.residualPct)) / 100)
+      : 0;
   const principal = price - downPayment;
-  const monthly = amortizedPayment(principal, nonNegativeNumber(input.annualRatePct), months, balloon);
+  const monthly = amortizedPayment(
+    principal,
+    nonNegativeNumber(input.annualRatePct),
+    months,
+    balloon,
+  );
   return {
     months,
     monthlyPaymentEur: monthly,
@@ -92,7 +98,11 @@ function monthlyRunningCostsRon(input) {
 }
 
 export function effectiveMonthlyIncomeRon(input) {
-  return (nonNegativeNumber(input.netMonthlyIncomeRon) * 12 + nonNegativeNumber(input.annualExtraIncomeRon)) / 12;
+  return (
+    (nonNegativeNumber(input.netMonthlyIncomeRon) * 12 +
+      nonNegativeNumber(input.annualExtraIncomeRon)) /
+    12
+  );
 }
 
 // Default total-monthly-cost budget: the healthy planning share of income.
@@ -114,15 +124,28 @@ export function calculateAffordableCar(input, budgetRon) {
 
   if (input.type === 'cash') return { ...base, supported: false };
   if (input.type === 'operational') {
-    return { ...base, supported: true, maxMonthlyFeeEur: paymentRoomEur, maxPriceEur: null, maxLoanEur: null, upfrontRon: 0 };
+    return {
+      ...base,
+      supported: true,
+      maxMonthlyFeeEur: paymentRoomEur,
+      maxPriceEur: null,
+      maxLoanEur: null,
+      upfrontRon: 0,
+    };
   }
 
   const months = Math.max(1, Math.round(nonNegativeNumber(input.termMonths)));
   const downShare = Math.min(90, nonNegativeNumber(input.downPaymentPct)) / 100;
   const feeShare = nonNegativeNumber(input.adminFeePct) / 100;
-  const residualShare = input.type === 'financial' ? Math.min(60, nonNegativeNumber(input.residualPct)) / 100 : 0;
+  const residualShare =
+    input.type === 'financial' ? Math.min(60, nonNegativeNumber(input.residualPct)) / 100 : 0;
   // The payment is linear in the price, so price one unit of car and scale.
-  const paymentPerEuro = amortizedPayment(1 - downShare, nonNegativeNumber(input.annualRatePct), months, residualShare);
+  const paymentPerEuro = amortizedPayment(
+    1 - downShare,
+    nonNegativeNumber(input.annualRatePct),
+    months,
+    residualShare,
+  );
   const maxPriceEur = paymentPerEuro > 0 ? paymentRoomEur / paymentPerEuro : 0;
   return {
     ...base,
@@ -165,11 +188,12 @@ export function calculateCarLease(input) {
   };
   if (!isValid) return empty;
 
-  const offer = input.type === 'operational'
-    ? operationalOffer(input)
-    : input.type === 'cash'
-      ? cashOffer(input)
-      : financedOffer(input);
+  const offer =
+    input.type === 'operational'
+      ? operationalOffer(input)
+      : input.type === 'cash'
+        ? cashOffer(input)
+        : financedOffer(input);
 
   const runningCostsRon = monthlyRunningCostsRon(input);
 
@@ -179,11 +203,15 @@ export function calculateCarLease(input) {
   const salaryShare = totalMonthlyCostRon / monthlyIncome;
   const blendedShare = annualCostRon / annualIncome;
   const effectiveMonthly = annualIncome / 12;
-  const savingsTargetRon = effectiveMonthly * (Math.min(80, nonNegativeNumber(input.savingsTargetPct)) / 100);
+  const savingsTargetRon =
+    effectiveMonthly * (Math.min(80, nonNegativeNumber(input.savingsTargetPct)) / 100);
   const otherFixed = nonNegativeNumber(input.otherFixedCostsRon);
   const flexibleMoneyRon = effectiveMonthly - totalMonthlyCostRon - otherFixed - savingsTargetRon;
   const upfrontRon = offer.upfrontEur * fxRate;
-  const monthlySaving = Math.max(0, effectiveMonthly - otherFixed - savingsTargetRon - runningCostsRon);
+  const monthlySaving = Math.max(
+    0,
+    effectiveMonthly - otherFixed - savingsTargetRon - runningCostsRon,
+  );
 
   return {
     isValid: true,
@@ -203,7 +231,8 @@ export function calculateCarLease(input) {
     maxMonthlyPaymentRon: Math.max(0, effectiveMonthly * HEALTHY_CAR_SHARE - runningCostsRon),
     flexibleMoneyRon,
     savingsTargetRon,
-    monthsToSaveUpfront: upfrontRon > 0 && monthlySaving > 0 ? Math.ceil(upfrontRon / monthlySaving) : null,
+    monthsToSaveUpfront:
+      upfrontRon > 0 && monthlySaving > 0 ? Math.ceil(upfrontRon / monthlySaving) : null,
     termMonths: offer.months,
   };
 }

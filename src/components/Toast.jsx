@@ -37,16 +37,18 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ addToast, removeToast, success, error, warning, info }}>
       {children}
-      <div style={{
-        position: 'fixed',
-        bottom: '24px',
-        right: '24px',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px',
-        maxWidth: '400px',
-      }}>
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          maxWidth: '400px',
+        }}
+      >
         {toasts.map((toast) => (
           <div
             key={toast.id}
@@ -55,7 +57,14 @@ export function ToastProvider({ children }) {
             style={{
               padding: '12px 16px',
               borderRadius: '8px',
-              background: toast.type === 'error' ? 'var(--red)' : toast.type === 'success' ? 'var(--green)' : toast.type === 'warning' ? 'var(--amber)' : 'var(--surface2)',
+              background:
+                toast.type === 'error'
+                  ? 'var(--red)'
+                  : toast.type === 'success'
+                    ? 'var(--green)'
+                    : toast.type === 'warning'
+                      ? 'var(--amber)'
+                      : 'var(--surface2)',
               color: toast.type === 'info' ? 'var(--text)' : '#fff',
               border: `1px solid ${toast.type === 'error' ? 'var(--red)' : toast.type === 'success' ? 'var(--green)' : toast.type === 'warning' ? 'var(--amber)' : 'var(--border)'}`,
               fontSize: '13px',

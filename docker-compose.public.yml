@@ -5,13 +5,13 @@ services:
       args:
         NGINX_CONF: nginx.public.conf
         VITE_DEPLOYMENT_PROFILE: client-only
-        VITE_PRIVATE_SYNC_ENABLED: "false"
+        VITE_PRIVATE_SYNC_ENABLED: 'false'
         VITE_API_BASE_PATH: /api
         VITE_FX_REFRESH_ENABLED: ${VITE_FX_REFRESH_ENABLED:-true}
         VITE_FX_REFRESH_RETRIES: ${VITE_FX_REFRESH_RETRIES:-2}
         VITE_FX_REFRESH_RETRY_DELAY_MS: ${VITE_FX_REFRESH_RETRY_DELAY_MS:-450}
     ports:
-      - "127.0.0.1:3178:80"
+      - '127.0.0.1:3178:80'
     restart: unless-stopped
     mem_limit: 64m
     pids_limit: 128
@@ -21,7 +21,7 @@ services:
       - /var/run:rw,noexec,nosuid,size=1m
       - /tmp:rw,noexec,nosuid,size=8m
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1/ || exit 1']
       interval: 30s
       timeout: 5s
       retries: 3

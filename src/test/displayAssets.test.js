@@ -21,9 +21,18 @@ describe('display assets', () => {
   });
 
   it('provides local marks for common dashboard merchants', () => {
-    expect(getVendorVisual('AliExpress')).toMatchObject({ className: 'bill-logo aliexpress', text: 'A' });
-    expect(getVendorVisual('Lidl Romania')).toMatchObject({ className: 'bill-logo lidl', text: 'L' });
-    expect(getVendorVisual('Exchanged to EUR')).toMatchObject({ className: 'bill-logo exchange', text: '€' });
+    expect(getVendorVisual('AliExpress')).toMatchObject({
+      className: 'bill-logo aliexpress',
+      text: 'A',
+    });
+    expect(getVendorVisual('Lidl Romania')).toMatchObject({
+      className: 'bill-logo lidl',
+      text: 'L',
+    });
+    expect(getVendorVisual('Exchanged to EUR')).toMatchObject({
+      className: 'bill-logo exchange',
+      text: '€',
+    });
   });
 
   it('falls back to a generic vendor badge', () => {

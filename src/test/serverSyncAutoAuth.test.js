@@ -20,16 +20,25 @@ afterEach(() => {
 
 describe('trusted local automatic authentication', () => {
   it('is ready without browser token storage and sends no client authorization header', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ data: null, version: 0, updatedAt: null }),
-    }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: null, version: 0, updatedAt: null }),
+      }),
+    );
 
     expect(hasPrivateSyncAccess()).toBe(true);
-    expect(getSyncAuthorizationHeaders({ Accept: 'application/json' })).toEqual({ Accept: 'application/json', 'X-SSB-Client': 'private-ui' });
+    expect(getSyncAuthorizationHeaders({ Accept: 'application/json' })).toEqual({
+      Accept: 'application/json',
+      'X-SSB-Client': 'private-ui',
+    });
     await loadServerSnapshot();
 
     expect(window.sessionStorage.getItem('simple_safe_banking_sync_token')).toBeNull();
-    expect(fetch).toHaveBeenCalledWith('/api/data', expect.objectContaining({ headers: { 'X-SSB-Client': 'private-ui' } }));
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/data',
+      expect.objectContaining({ headers: { 'X-SSB-Client': 'private-ui' } }),
+    );
   });
 });

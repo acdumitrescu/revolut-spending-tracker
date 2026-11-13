@@ -43,14 +43,30 @@ describe('appReducer', () => {
 
   it('commits and undoes one import batch without touching earlier transactions', () => {
     const data = createInitialAppData();
-    data.transactions = [{
-      date: '2026-05-01', desc: 'Earlier transaction', cat: 'Other', sub: '', amt: -5,
-      flow: 'Debit', type: 'Card Payment', ym: '2026-05', currency: 'RON',
-    }];
+    data.transactions = [
+      {
+        date: '2026-05-01',
+        desc: 'Earlier transaction',
+        cat: 'Other',
+        sub: '',
+        amt: -5,
+        flow: 'Debit',
+        type: 'Card Payment',
+        ym: '2026-05',
+        currency: 'RON',
+      },
+    ];
     const base = createPersistedAppState(data);
     const importedTransaction = {
-      date: '2026-06-01', desc: 'Imported transaction', cat: 'Groceries', sub: 'Market', amt: -20,
-      flow: 'Debit', type: 'Card Payment', ym: '2026-06', currency: 'RON',
+      date: '2026-06-01',
+      desc: 'Imported transaction',
+      cat: 'Groceries',
+      sub: 'Market',
+      amt: -20,
+      flow: 'Debit',
+      type: 'Card Payment',
+      ym: '2026-06',
+      currency: 'RON',
     };
     const committed = appReducer(base, {
       type: 'commit_transaction_import',
@@ -93,7 +109,9 @@ describe('appReducer', () => {
       status: 'undone',
       undoneAt: 2000,
     });
-    expect(appReducer(undone, { type: 'undo_transaction_import', batchId: 'batch-1' })).toBe(undone);
+    expect(appReducer(undone, { type: 'undo_transaction_import', batchId: 'batch-1' })).toBe(
+      undone,
+    );
   });
 
   it('tracks sync metadata separately from content timestamps', () => {
@@ -119,17 +137,19 @@ describe('appReducer', () => {
 
   it('preserves category inputs across unrelated state updates', () => {
     const data = createInitialAppData();
-    data.transactions = [{
-      date: '2026-06-01',
-      desc: 'Synthetic Merchant',
-      cat: 'Other',
-      sub: '',
-      amt: -10,
-      flow: 'Debit',
-      type: 'Card Payment',
-      ym: '2026-06',
-      currency: 'RON',
-    }];
+    data.transactions = [
+      {
+        date: '2026-06-01',
+        desc: 'Synthetic Merchant',
+        cat: 'Other',
+        sub: '',
+        amt: -10,
+        flow: 'Debit',
+        type: 'Card Payment',
+        ym: '2026-06',
+        currency: 'RON',
+      },
+    ];
     data.customVendors = { synthetic: ['Shopping', 'General'] };
     const base = createPersistedAppState(data);
 
@@ -155,7 +175,9 @@ describe('appReducer', () => {
 
   it('stores and clears a note for an account month', () => {
     const data = createInitialAppData();
-    data.accounts = [{ id: 'account-1', name: 'Savings', currency: 'RON', balances: {}, notes: {} }];
+    data.accounts = [
+      { id: 'account-1', name: 'Savings', currency: 'RON', balances: {}, notes: {} },
+    ];
     const base = createPersistedAppState(data);
 
     const noted = appReducer(base, {
@@ -264,13 +286,26 @@ describe('appReducer', () => {
   });
 
   it('overrides a transaction currency without changing its identity, and restores it', () => {
-    const txn = { date: '2026-10-26', desc: 'Shop', amt: 20, type: 'card', flow: 'Debit', ym: '2026-10', cat: 'Shopping', sub: '', currency: 'RON' };
+    const txn = {
+      date: '2026-10-26',
+      desc: 'Shop',
+      amt: 20,
+      type: 'card',
+      flow: 'Debit',
+      ym: '2026-10',
+      cat: 'Shopping',
+      sub: '',
+      currency: 'RON',
+    };
     const other = { ...txn, desc: 'Other', currency: 'RON' };
     const base = createPersistedAppState({ ...createInitialAppData(), transactions: [txn, other] });
     const originalKey = txKey(txn);
 
     const next = appReducer(base, {
-      type: 'set_transaction_currency', transactionKey: originalKey, currency: 'EUR', getTransactionKey: txKey,
+      type: 'set_transaction_currency',
+      transactionKey: originalKey,
+      currency: 'EUR',
+      getTransactionKey: txKey,
     });
     const changed = next.data.transactions[0];
     expect(changed.currency).toBe('EUR');
@@ -280,41 +315,77 @@ describe('appReducer', () => {
 
     // a second change keeps the first original currency
     const again = appReducer(next, {
-      type: 'set_transaction_currency', transactionKey: originalKey, currency: 'USD', getTransactionKey: txKey,
+      type: 'set_transaction_currency',
+      transactionKey: originalKey,
+      currency: 'USD',
+      getTransactionKey: txKey,
     });
     expect(again.data.transactions[0].baseCurrency).toBe('RON');
 
     const cleared = appReducer(again, {
-      type: 'set_transaction_currency', transactionKey: originalKey, getTransactionKey: txKey,
+      type: 'set_transaction_currency',
+      transactionKey: originalKey,
+      getTransactionKey: txKey,
     });
     expect(cleared.data.transactions[0].currency).toBe('RON');
     expect(cleared.data.transactions[0].baseCurrency).toBeUndefined();
   });
 
   it('restores a missing original currency to missing', () => {
-    const txn = { date: '2026-10-26', desc: 'Shop', amt: 20, type: 'card', flow: 'Debit', ym: '2026-10', cat: 'Shopping', sub: '' };
+    const txn = {
+      date: '2026-10-26',
+      desc: 'Shop',
+      amt: 20,
+      type: 'card',
+      flow: 'Debit',
+      ym: '2026-10',
+      cat: 'Shopping',
+      sub: '',
+    };
     const base = createPersistedAppState({ ...createInitialAppData(), transactions: [txn] });
     const key = txKey(txn);
-    const set = appReducer(base, { type: 'set_transaction_currency', transactionKey: key, currency: 'EUR', getTransactionKey: txKey });
+    const set = appReducer(base, {
+      type: 'set_transaction_currency',
+      transactionKey: key,
+      currency: 'EUR',
+      getTransactionKey: txKey,
+    });
     expect(txKey(set.data.transactions[0])).toBe(key);
-    const cleared = appReducer(set, { type: 'set_transaction_currency', transactionKey: key, getTransactionKey: txKey });
+    const cleared = appReducer(set, {
+      type: 'set_transaction_currency',
+      transactionKey: key,
+      getTransactionKey: txKey,
+    });
     expect('currency' in cleared.data.transactions[0]).toBe(false);
   });
 
   it('adds, updates, and removes manual portfolio holdings without private seed data', () => {
     const base = createPersistedAppState(createInitialAppData());
     const holding = {
-      id: 'holding-1', ticker: 'TEST', name: 'Synthetic Holding', assetClass: 'Stock',
-      quantity: 2, avgCost: 10, currentPrice: 12, currency: 'RON', priceSource: 'manual',
+      id: 'holding-1',
+      ticker: 'TEST',
+      name: 'Synthetic Holding',
+      assetClass: 'Stock',
+      quantity: 2,
+      avgCost: 10,
+      currentPrice: 12,
+      currency: 'RON',
+      priceSource: 'manual',
     };
     const added = appReducer(base, { type: 'upsert_portfolio_holding', holding });
     expect(added.data.portfolioHoldings).toEqual([holding]);
 
     const updatedHolding = { ...holding, currentPrice: 15 };
-    const updated = appReducer(added, { type: 'upsert_portfolio_holding', holding: updatedHolding });
+    const updated = appReducer(added, {
+      type: 'upsert_portfolio_holding',
+      holding: updatedHolding,
+    });
     expect(updated.data.portfolioHoldings).toEqual([updatedHolding]);
 
-    const removed = appReducer(updated, { type: 'remove_portfolio_holding', holdingId: holding.id });
+    const removed = appReducer(updated, {
+      type: 'remove_portfolio_holding',
+      holdingId: holding.id,
+    });
     expect(removed.data.portfolioHoldings).toEqual([]);
   });
 });

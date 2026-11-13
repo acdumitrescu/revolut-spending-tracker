@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { formatCurrency, formatCurrencyK, formatPercentage, CAT_COLORS, EXPENSE_CATS, getColorForCategory } from '../lib/utils';
+import {
+  formatCurrency,
+  formatCurrencyK,
+  formatPercentage,
+  CAT_COLORS,
+  EXPENSE_CATS,
+  getColorForCategory,
+} from '../lib/utils';
 import { convertAmount, convertAmountToDisplay, getEffectiveCurrency } from '../lib/fx';
 
 describe('formatCurrency', () => {
@@ -97,7 +104,10 @@ describe('fx helpers', () => {
   });
 
   it('formats converted display amounts', () => {
-    const result = formatCurrency(convertAmountToDisplay(500, 'RON', 'EUR', { EUR: 5, USD: 4.6 }), 'EUR');
+    const result = formatCurrency(
+      convertAmountToDisplay(500, 'RON', 'EUR', { EUR: 5, USD: 4.6 }),
+      'EUR',
+    );
     expect(result).toContain('100');
   });
 });

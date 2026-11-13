@@ -14,12 +14,9 @@ import {
 
 describe('private sync storage path', () => {
   it('defaults to a repo-local ignored path for local server runs', () => {
-    expect(DEFAULT_APP_STATE_FILE).toBe(path.resolve(
-      process.cwd(),
-      'private-data',
-      'private-sync',
-      'app-state.json'
-    ));
+    expect(DEFAULT_APP_STATE_FILE).toBe(
+      path.resolve(process.cwd(), 'private-data', 'private-sync', 'app-state.json'),
+    );
     expect(resolveAppStateFile()).toBe(DEFAULT_APP_STATE_FILE);
   });
 
@@ -28,12 +25,9 @@ describe('private sync storage path', () => {
   });
 
   it('defaults vendor observations to a repo-local ignored path', () => {
-    expect(DEFAULT_VENDOR_OBSERVATIONS_FILE).toBe(path.resolve(
-      process.cwd(),
-      'private-data',
-      'private-sync',
-      'vendor-observations.json'
-    ));
+    expect(DEFAULT_VENDOR_OBSERVATIONS_FILE).toBe(
+      path.resolve(process.cwd(), 'private-data', 'private-sync', 'vendor-observations.json'),
+    );
     expect(resolveVendorObservationsFile()).toBe(DEFAULT_VENDOR_OBSERVATIONS_FILE);
   });
 });

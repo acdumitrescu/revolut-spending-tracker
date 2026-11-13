@@ -6,12 +6,17 @@ export function getOtherVendorGroups(
   displayCurrency,
   fxRates,
   matcher = defaultVendorMatcher,
-  limit = 25
+  limit = 25,
 ) {
   const grouped = new Map();
 
   for (const transaction of transactions) {
-    if (transaction.flow !== 'Debit' || transaction.cat !== 'Other' || transaction.categorySource === 'manual') continue;
+    if (
+      transaction.flow !== 'Debit' ||
+      transaction.cat !== 'Other' ||
+      transaction.categorySource === 'manual'
+    )
+      continue;
     const vendorKey = normalizeVendorKey(transaction.desc) || transaction.desc.trim();
     const existing = grouped.get(vendorKey) || {
       vendorKey,
@@ -21,12 +26,14 @@ export function getOtherVendorGroups(
     };
     existing.samples.add(transaction.desc);
     existing.count += 1;
-    existing.total += Math.abs(convertAmountToDisplay(
-      transaction.amt,
-      transaction.currency || 'RON',
-      displayCurrency,
-      fxRates
-    ));
+    existing.total += Math.abs(
+      convertAmountToDisplay(
+        transaction.amt,
+        transaction.currency || 'RON',
+        displayCurrency,
+        fxRates,
+      ),
+    );
     grouped.set(vendorKey, existing);
   }
 
