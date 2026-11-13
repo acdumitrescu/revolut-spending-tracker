@@ -133,7 +133,7 @@ export default function CardPurchases({ card, onSave, onArchive, onReopen, onDel
   const summary = getCardPurchaseSummary(card.purchases);
   const money = (amount) =>
     card.currency
-      ? formatCurrency(amount, card.currency)
+      ? formatCurrency(amount, card.currency, { decimals: 2 })
       : `${amount} (account currency unavailable)`;
   const renderPurchase = (item) => {
     const archived = item.status === 'archived';

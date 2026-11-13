@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { FileUp, Pencil, ReceiptText, Search, X } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAppContext } from '../lib/AppContext';
-import { EXPENSE_CATS, formatCurrency, getColorForCategory } from '../lib/utils';
-import { convertAmountToDisplay, SUPPORTED_DISPLAY_CURRENCIES } from '../lib/fx';
+import { EXPENSE_CATS, getColorForCategory } from '../lib/utils';
+import { getEffectiveCurrency, SUPPORTED_DISPLAY_CURRENCIES } from '../lib/fx';
 import { txKey } from '../lib/csvParser';
 import { EmptyState } from '../components/ui';
 
@@ -19,12 +19,82 @@ function getDisplaySubcategory(category, subcategory) {
   return normalizeEditableSubcategory(category, subcategory);
 }
 
+// Rows show the transaction's own amount and currency, with cents. The top-bar display
+// currency only affects totals elsewhere.
+function formatRawAmount(amount, currency) {
+  const code = getEffectiveCurrency(currency);
+  try {
+    return new Intl.NumberFormat('en', {
+      style: 'currency',
+      currency: code,
+      currencyDisplay: 'code',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${code}`;
+  }
+}
+
+// Relabels the currency of every filtered row (all pages). Same rules as the per-row selector:
+// the imported currency is kept in baseCurrency, so identity and re-import dedupe are unchanged.
+function BulkCurrency({ rows, value, onChange, confirm, onAsk, onApply }) {
+  const corrected = rows.filter((row) => row.baseCurrency !== undefined).length;
+  const count = rows.length;
+  const rowsLabel = `${count} filtered row${count === 1 ? '' : 's'}`;
+  return (
+    <div className="transaction-bulk" role="group" aria-label="Currency for all filtered rows">
+      {confirm ? (
+        <>
+          <span>
+            {confirm === 'set'
+              ? `Relabel ${rowsLabel} as ${value}? Amounts are not converted.`
+              : `Restore the imported currency on ${corrected} corrected row${corrected === 1 ? '' : 's'}?`}
+          </span>
+          <button className="btn" type="button" onClick={() => onAsk(null)}>
+            Cancel
+          </button>
+          <button className="btn btn-primary" type="button" onClick={onApply}>
+            Confirm
+          </button>
+        </>
+      ) : (
+        <>
+          <span>Currency for all {rowsLabel}:</span>
+          <select
+            className="input"
+            aria-label="Currency for all filtered rows"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+          >
+            <option value="">Choose…</option>
+            {SUPPORTED_DISPLAY_CURRENCIES.map((code) => (
+              <option key={code} value={code}>
+                {code}
+              </option>
+            ))}
+          </select>
+          <button className="btn" type="button" disabled={!value} onClick={() => onAsk('set')}>
+            Apply to {count}
+          </button>
+          {corrected > 0 && (
+            <button className="btn" type="button" onClick={() => onAsk('restore')}>
+              Restore imported currency ({corrected})
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function Transactions() {
   const {
     data,
     updateTransactionCategory,
     clearTransactionCategoryOverride,
     setTransactionCurrency,
+    setTransactionsCurrency,
   } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('q') || '';
@@ -34,7 +104,8 @@ export default function Transactions() {
   const [editingKey, setEditingKey] = useState(null);
   const [editCategory, setEditCategory] = useState('');
   const [editSubcategory, setEditSubcategory] = useState('');
-  const displayCurrency = data.displayCurrency;
+  const [bulkCurrency, setBulkCurrency] = useState('');
+  const [bulkConfirm, setBulkConfirm] = useState(null); // 'set' | 'restore' | null
   const txns = data.transactions;
 
   const filtered = useMemo(() => {
@@ -71,6 +142,7 @@ export default function Transactions() {
     if (key !== 'page') next.delete('page');
     setSearchParams(next, { replace: true });
     setEditingKey(null);
+    setBulkConfirm(null);
   };
 
   const startEditing = (transaction) => {
@@ -167,6 +239,24 @@ export default function Transactions() {
           </select>
         ))}
       </div>
+
+      {(search || month || category || currency) && filtered.length > 0 && (
+        <BulkCurrency
+          rows={filtered}
+          value={bulkCurrency}
+          onChange={(value) => {
+            setBulkCurrency(value);
+            setBulkConfirm(null);
+          }}
+          confirm={bulkConfirm}
+          onAsk={setBulkConfirm}
+          onApply={() => {
+            const keys = filtered.map(txKey);
+            setTransactionsCurrency(keys, bulkConfirm === 'set' ? bulkCurrency : undefined);
+            setBulkConfirm(null);
+          }}
+        />
+      )}
 
       <div className="card transaction-table-card">
         <div className="tbl-wrap">
@@ -303,17 +393,7 @@ export default function Transactions() {
                       className={`transaction-amount ${transaction.flow.toLocaleLowerCase()}`}
                     >
                       {transaction.flow === 'Credit' ? '+' : '-'}
-                      {formatCurrency(
-                        Math.abs(
-                          convertAmountToDisplay(
-                            transaction.amt,
-                            transaction.currency || 'RON',
-                            displayCurrency,
-                            data.fxRates,
-                          ),
-                        ),
-                        displayCurrency,
-                      )}
+                      {formatRawAmount(Math.abs(transaction.amt), transaction.currency)}
                     </td>
                     <td data-label="Flow">
                       <span className={`badge ${transaction.flow}`}>{transaction.flow}</span>

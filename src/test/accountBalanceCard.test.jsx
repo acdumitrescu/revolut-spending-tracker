@@ -47,7 +47,7 @@ describe('compact account editors', () => {
 
   it('shows native balance, conversion, comparison period and carried-forward freshness', () => {
     render(<AccountBalanceCard {...props()} />);
-    expect(screen.getByText(/600\s*RON equivalent/)).toBeInTheDocument();
+    expect(screen.getByText(/600,00\s*RON equivalent/)).toBeInTheDocument();
     expect(screen.getByText('Change since 2026-08')).toBeInTheDocument();
     expect(screen.getByText('Carried forward')).toBeInTheDocument();
     expect(screen.getByText('Interest paid', { selector: 'span' })).toBeInTheDocument();

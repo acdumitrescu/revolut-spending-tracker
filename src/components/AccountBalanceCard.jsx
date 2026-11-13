@@ -6,6 +6,11 @@ import { getAccountCurrency } from '../lib/selectors';
 import BalanceInput from './BalanceInput';
 import { ACCOUNT_GROUPS, ACCOUNT_GROUP_LABELS, accountGroup } from '../../backend/accountGroups.js';
 
+function daysBetween(from, to) {
+  const ms = Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`);
+  return Number.isFinite(ms) ? Math.max(0, Math.round(ms / 86_400_000)) : null;
+}
+
 export default function AccountBalanceCard({
   account,
   months,
@@ -19,6 +24,8 @@ export default function AccountBalanceCard({
   onDelete,
   onGroup,
   onUndo,
+  today,
+  onReconciled,
 }) {
   const [lastEdit, setLastEdit] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -41,6 +48,8 @@ export default function AccountBalanceCard({
         : latest < asOfMonth
           ? 'Carried forward'
           : 'Not updated this month';
+  const reconciledDays =
+    account.reconciledOn && today ? daysBetween(account.reconciledOn, today) : null;
 
   return (
     <details
@@ -61,12 +70,15 @@ export default function AccountBalanceCard({
         </span>
         <span className="account-metric account-primary-value">
           <span>Latest balance</span>
-          <strong>{balance === null ? '—' : formatCurrency(balance, currency)}</strong>
+          <strong>
+            {balance === null ? '—' : formatCurrency(balance, currency, { decimals: 2 })}
+          </strong>
           {balance !== null && currency !== displayCurrency && (
             <small>
               {formatCurrency(
                 convertAmountToDisplay(balance, currency, displayCurrency, fxRates),
                 displayCurrency,
+                { decimals: 2 },
               )}{' '}
               equivalent
             </small>
@@ -75,7 +87,9 @@ export default function AccountBalanceCard({
         <span className="account-metric">
           <span>{previous ? `Change since ${previous}` : 'Balance change'}</span>
           <strong>
-            {change === null ? '—' : `${change > 0 ? '+' : ''}${formatCurrency(change, currency)}`}
+            {change === null
+              ? '—'
+              : `${change > 0 ? '+' : ''}${formatCurrency(change, currency, { decimals: 2 })}`}
           </strong>
           {percentage !== null && (
             <small>
@@ -88,6 +102,11 @@ export default function AccountBalanceCard({
           <span>Last recorded</span>
           <strong>{latest || 'Not entered'}</strong>
           <small className={latest === currentMonth ? 'account-current' : ''}>{freshness}</small>
+          <small className="account-reconciled">
+            {account.reconciledOn
+              ? `Matches bank as of ${account.reconciledOn}${reconciledDays === null ? '' : ` (${reconciledDays === 0 ? 'today' : `${reconciledDays} day${reconciledDays === 1 ? '' : 's'} ago`})`}`
+              : 'Not checked against the bank'}
+          </small>
         </span>
         <span className="account-edit-affordance">
           <span className="account-edit-label">Edit balances</span>
@@ -105,6 +124,37 @@ export default function AccountBalanceCard({
             </p>
           </div>
         </div>
+        {onReconciled && (
+          <div className="account-reconcile" role="group" aria-label={`${account.name} bank check`}>
+            <span>
+              Checked the balance against your bank app? Record the date so stale balances stand
+              out.
+            </span>
+            <button
+              className="btn"
+              type="button"
+              onClick={() => onReconciled(account.id, today)}
+              disabled={!today || account.reconciledOn === today}
+            >
+              Matches the bank today
+            </button>
+            <label>
+              <span className="visually-hidden">{account.name} matches the bank as of</span>
+              <input
+                className="input"
+                type="date"
+                max={today}
+                value={account.reconciledOn || ''}
+                onChange={(event) => onReconciled(account.id, event.target.value || null)}
+              />
+            </label>
+            {account.reconciledOn && (
+              <button className="btn" type="button" onClick={() => onReconciled(account.id, null)}>
+                Clear
+              </button>
+            )}
+          </div>
+        )}
         {lastEdit && (
           <div role="status">
             <p>Last edit: {lastEdit.month}. Undo is available while this editor remains mounted.</p>

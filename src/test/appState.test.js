@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { appReducer, createInitialAppData, createPersistedAppState } from '../lib/appState';
-import { txKey } from '../lib/csvParser';
+import { mergeTransactions, txKey } from '../lib/csvParser';
 
 describe('appReducer', () => {
   beforeEach(() => {
@@ -387,5 +387,95 @@ describe('appReducer', () => {
       holdingId: holding.id,
     });
     expect(removed.data.portfolioHoldings).toEqual([]);
+  });
+});
+
+describe('record_import_sources', () => {
+  it('records source columns without changing identity or amounts, and is a no-op when nothing matches', () => {
+    const txn = {
+      date: '2026-10-26',
+      desc: 'Shop',
+      amt: -20,
+      type: 'card',
+      flow: 'Debit',
+      ym: '2026-10',
+      cat: 'Shopping',
+      sub: '',
+      currency: 'EUR',
+      ref: 'r1',
+    };
+    const base = createPersistedAppState({ ...createInitialAppData(), transactions: [txn] });
+    const next = appReducer(base, {
+      type: 'record_import_sources',
+      parsedTransactions: [{ ...txn, amountSource: 'amount', currencySource: 'currency' }],
+      getTransactionKey: txKey,
+    });
+    expect(next.data.transactions[0]).toMatchObject({ ...txn, amountSource: 'amount' });
+    expect(txKey(next.data.transactions[0])).toBe(txKey(txn));
+    const same = appReducer(next, {
+      type: 'record_import_sources',
+      parsedTransactions: [],
+      getTransactionKey: txKey,
+    });
+    expect(same).toBe(next);
+  });
+});
+
+describe('bulk currency correction', () => {
+  it('sets, restores, and keeps re-import dedupe working', () => {
+    const file = [
+      {
+        date: '2026-10-01',
+        desc: 'A',
+        amt: -1,
+        type: 'card',
+        flow: 'Debit',
+        ym: '2026-10',
+        cat: 'X',
+        sub: '',
+        currency: 'RON',
+      },
+      {
+        date: '2026-10-02',
+        desc: 'B',
+        amt: -2,
+        type: 'card',
+        flow: 'Debit',
+        ym: '2026-10',
+        cat: 'X',
+        sub: '',
+        currency: 'RON',
+        ref: 'b',
+      },
+      {
+        date: '2026-10-03',
+        desc: 'C',
+        amt: -3,
+        type: 'card',
+        flow: 'Debit',
+        ym: '2026-10',
+        cat: 'X',
+        sub: '',
+        currency: 'RON',
+      },
+    ];
+    const base = createPersistedAppState({ ...createInitialAppData(), transactions: file });
+    const keys = file.slice(0, 2).map(txKey);
+    const set = appReducer(base, {
+      type: 'set_transaction_currency',
+      transactionKeys: keys,
+      currency: 'EUR',
+      getTransactionKey: txKey,
+    });
+    expect(set.data.transactions.map((t) => t.currency)).toEqual(['EUR', 'EUR', 'RON']);
+    expect(set.data.transactions.map(txKey)).toEqual(file.map(txKey));
+    expect(mergeTransactions(set.data.transactions, file)).toHaveLength(3);
+
+    const restored = appReducer(set, {
+      type: 'set_transaction_currency',
+      transactionKeys: keys,
+      getTransactionKey: txKey,
+    });
+    expect(restored.data.transactions).toEqual(base.data.transactions);
   });
 });

@@ -24,6 +24,9 @@ export const TransactionSchema = z.object({
     .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Year-month must be YYYY-MM format with valid month'),
   currency: z.string().optional(),
   baseCurrency: z.string().optional(),
+  // CSV columns the amount and currency came from (multi-column profiles, since 2026-11-13).
+  amountSource: z.string().optional(),
+  currencySource: z.string().optional(),
   ref: z.string().optional(),
   source: z.string().optional(),
   matchedVendor: z.string().optional(),
@@ -115,6 +118,11 @@ export const AccountSchema = z
     currency: z.enum(SUPPORTED_DISPLAY_CURRENCIES).optional().default(BASE_CURRENCY),
     balances: z.record(z.string(), z.number()),
     notes: z.record(z.string(), z.string()).optional().default({}),
+    // "Matches the bank as of" date (YYYY-MM-DD), set by the user after checking the bank app.
+    reconciledOn: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
   })
   .transform((account) => ({
     ...account,

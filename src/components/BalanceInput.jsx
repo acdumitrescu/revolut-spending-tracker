@@ -51,8 +51,12 @@ export default function BalanceInput({
             Review balance change:{' '}
             {referenceValue === undefined
               ? 'Not entered'
-              : formatCurrency(referenceValue, currency)}{' '}
-            → {draft === '' ? 'Not entered' : formatCurrency(Number(draft), currency)}.
+              : formatCurrency(referenceValue, currency, { decimals: 2 })}{' '}
+            →{' '}
+            {draft === ''
+              ? 'Not entered'
+              : formatCurrency(Number(draft), currency, { decimals: 2 })}
+            .
           </p>
           <button
             className="btn"

@@ -47,14 +47,18 @@ export default function NetWorthBreakdown({ data }) {
                 </th>
                 <td>{ACCOUNT_GROUP_LABELS[row.group]}</td>
                 <td>{row.date || 'Not recorded'}</td>
-                <td>{row.value === null ? '—' : formatCurrency(row.value, row.currency)}</td>
+                <td>
+                  {row.value === null
+                    ? '—'
+                    : formatCurrency(row.value, row.currency, { decimals: 2 })}
+                </td>
                 <td>
                   1 {row.currency} = {Number(row.rate.toFixed(6))} {data.displayCurrency}
                 </td>
                 <td>
                   {row.contribution === null
                     ? '—'
-                    : formatCurrency(row.contribution, data.displayCurrency)}
+                    : formatCurrency(row.contribution, data.displayCurrency, { decimals: 2 })}
                 </td>
                 <td>{row.status}</td>
               </tr>
@@ -65,7 +69,7 @@ export default function NetWorthBreakdown({ data }) {
               <th colSpan={5} scope="row">
                 Tracked net worth
               </th>
-              <td colSpan={2}>{formatCurrency(total, data.displayCurrency)}</td>
+              <td colSpan={2}>{formatCurrency(total, data.displayCurrency, { decimals: 2 })}</td>
             </tr>
           </tfoot>
         </table>

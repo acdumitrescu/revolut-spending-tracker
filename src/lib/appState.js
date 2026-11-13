@@ -15,6 +15,7 @@ import {
   GoalSchema,
   sanitizePersistedAppState,
 } from './validation';
+import { applySourceHints } from './importSources';
 
 export function createInitialAppData() {
   return {
@@ -377,13 +378,25 @@ export function appReducer(state, action) {
           }),
         }),
       );
-    case 'set_transaction_currency': // action.currency omitted = restore the imported currency
+    case 'record_import_sources': {
+      // Metadata only (see applySourceHints in currencyAudit.js).
+      const { transactions, updated } = applySourceHints(
+        data.transactions,
+        action.parsedTransactions,
+        action.getTransactionKey,
+      );
+      if (!updated) return state;
+      return createUpdatedPersistedAppState(state, withTimestamp({ ...data, transactions }));
+    }
+    // action.currency omitted = restore the imported currency. transactionKeys = bulk.
+    case 'set_transaction_currency': {
+      const keys = new Set(action.transactionKeys || [action.transactionKey]);
       return createUpdatedPersistedAppState(
         state,
         withTimestamp({
           ...data,
           transactions: data.transactions.map((transaction) => {
-            if (action.transactionKey !== action.getTransactionKey(transaction)) return transaction;
+            if (!keys.has(action.getTransactionKey(transaction))) return transaction;
             const { baseCurrency, currency, ...rest } = transaction;
             if (action.currency)
               return {
@@ -397,6 +410,7 @@ export function appReducer(state, action) {
           }),
         }),
       );
+    }
     case 'update_custom_vendor':
       return createUpdatedPersistedAppState(
         state,
@@ -436,6 +450,22 @@ export function appReducer(state, action) {
           ],
         }),
       );
+    case 'set_account_reconciled': {
+      // action.date null = clear the marker.
+      if (action.date !== null && !/^\d{4}-\d{2}-\d{2}$/.test(String(action.date))) return state;
+      return createUpdatedPersistedAppState(
+        state,
+        withTimestamp({
+          ...data,
+          accounts: data.accounts.map((account) => {
+            if (account.id !== action.accountId) return account;
+            const { reconciledOn: _previous, ...rest } = account;
+            void _previous;
+            return action.date ? { ...rest, reconciledOn: action.date } : rest;
+          }),
+        }),
+      );
+    }
     case 'set_account_group':
       if (!ACCOUNT_GROUPS.includes(action.group)) return state;
       return createUpdatedPersistedAppState(
