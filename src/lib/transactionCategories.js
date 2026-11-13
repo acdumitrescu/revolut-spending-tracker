@@ -11,13 +11,7 @@ const MATCH_METADATA_KEYS = [
   'confidence',
 ];
 
-const PROTECTED_SYSTEM_CATEGORIES = new Set([
-  'Cash',
-  'Income',
-  'Refunds',
-  'Savings',
-  'Transfers',
-]);
+const PROTECTED_SYSTEM_CATEGORIES = new Set(['Cash', 'Income', 'Refunds', 'Savings', 'Transfers']);
 
 function classificationMetadata(classification) {
   return Object.fromEntries(MATCH_METADATA_KEYS.map((key) => [key, classification[key]]));
@@ -34,12 +28,14 @@ function getLegacyAutomaticClassification(transaction) {
 
 function getLegacyManualCategory(transaction) {
   if (transaction.baseCat || transaction.manualCat) return null;
-  if (!transaction.matchSource || ['none', 'custom', 'system'].includes(transaction.matchSource)) return null;
+  if (!transaction.matchSource || ['none', 'custom', 'system'].includes(transaction.matchSource))
+    return null;
 
   const automatic = getLegacyAutomaticClassification(transaction);
   const storedSubcategory = normalizeSubcategory(transaction.cat, transaction.sub);
   const automaticSubcategory = normalizeSubcategory(automatic.category, automatic.subcategory);
-  if (transaction.cat === automatic.category && storedSubcategory === automaticSubcategory) return null;
+  if (transaction.cat === automatic.category && storedSubcategory === automaticSubcategory)
+    return null;
 
   return {
     cat: transaction.cat,
@@ -84,15 +80,17 @@ function isProtectedSystemTransaction(transaction, baseCategory) {
 
   const normalizedType = normalizeText(transaction.type);
   if (
-    normalizedType.includes('transfer')
-    || normalizedType.includes('top up')
-    || normalizedType.includes('cash')
+    normalizedType.includes('transfer') ||
+    normalizedType.includes('top up') ||
+    normalizedType.includes('cash')
   ) {
     return true;
   }
 
-  return PROTECTED_SYSTEM_CATEGORIES.has(baseCategory.cat)
-    && ['Cash', 'Savings', 'Transfers'].includes(baseCategory.cat);
+  return (
+    PROTECTED_SYSTEM_CATEGORIES.has(baseCategory.cat) &&
+    ['Cash', 'Savings', 'Transfers'].includes(baseCategory.cat)
+  );
 }
 
 export function compileCustomVendorMappings(customVendors = {}) {
@@ -111,10 +109,11 @@ export function compileCustomVendorMappings(customVendors = {}) {
       };
     })
     .filter((mapping) => mapping?.category)
-    .sort((a, b) => (
-      b.normalizedVendor.length - a.normalizedVendor.length
-      || a.normalizedVendor.localeCompare(b.normalizedVendor)
-    ));
+    .sort(
+      (a, b) =>
+        b.normalizedVendor.length - a.normalizedVendor.length ||
+        a.normalizedVendor.localeCompare(b.normalizedVendor),
+    );
 }
 
 function matchCustomVendor(transaction, compiledMappings) {
@@ -126,10 +125,9 @@ function matchCustomVendor(transaction, compiledMappings) {
 
   for (const mapping of compiledMappings) {
     const isExact = normalizedDescription === mapping.normalizedVendor;
-    const isBoundaryMatch = (
-      (mapping.normalizedVendor.length >= 4 || mapping.normalizedVendor.includes(' '))
-      && boundaryDescription.includes(mapping.boundaryNeedle)
-    );
+    const isBoundaryMatch =
+      (mapping.normalizedVendor.length >= 4 || mapping.normalizedVendor.includes(' ')) &&
+      boundaryDescription.includes(mapping.boundaryNeedle);
 
     if (!isExact && !isBoundaryMatch) continue;
 
@@ -154,9 +152,9 @@ function resolveWithCompiledMappings(transaction, compiledMappings) {
   const baseCategory = getBaseCategory(transaction, legacyManualCategory);
   const manualCategory = transaction.manualCat
     ? {
-      cat: transaction.manualCat,
-      sub: normalizeSubcategory(transaction.manualCat, transaction.manualSub),
-    }
+        cat: transaction.manualCat,
+        sub: normalizeSubcategory(transaction.manualCat, transaction.manualSub),
+      }
     : legacyManualCategory;
 
   // Currency exchanges imported before they were recognised are stored as Other/Income; they are transfers.
@@ -207,9 +205,8 @@ function resolveWithCompiledMappings(transaction, compiledMappings) {
     };
   }
 
-  const baseClassification = transaction.matchSource === 'custom'
-    ? getLegacyAutomaticClassification(transaction)
-    : null;
+  const baseClassification =
+    transaction.matchSource === 'custom' ? getLegacyAutomaticClassification(transaction) : null;
 
   return {
     ...transaction,
@@ -218,9 +215,12 @@ function resolveWithCompiledMappings(transaction, compiledMappings) {
     baseSub: baseCategory.sub,
     cat: baseCategory.cat,
     sub: baseCategory.sub,
-    categorySource: transaction.matchSource && transaction.matchSource !== 'none' && transaction.matchSource !== 'custom'
-      ? 'automatic'
-      : 'imported',
+    categorySource:
+      transaction.matchSource &&
+      transaction.matchSource !== 'none' &&
+      transaction.matchSource !== 'custom'
+        ? 'automatic'
+        : 'imported',
   };
 }
 
@@ -230,5 +230,7 @@ export function resolveTransactionCategory(transaction, customVendors = {}) {
 
 export function resolveTransactionCategories(transactions, customVendors = {}) {
   const compiledMappings = compileCustomVendorMappings(customVendors);
-  return transactions.map((transaction) => resolveWithCompiledMappings(transaction, compiledMappings));
+  return transactions.map((transaction) =>
+    resolveWithCompiledMappings(transaction, compiledMappings),
+  );
 }

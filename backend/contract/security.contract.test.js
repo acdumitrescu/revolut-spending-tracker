@@ -61,7 +61,11 @@ describe('backend contract: Host guard on every route (DNS rebinding)', () => {
   it('rejects a foreign Host on /healthz and the static UI', async () => {
     const backend = await backendWithSite();
     for (const urlPath of ['/healthz', '/', '/assets/app.js', '/app/budgets']) {
-      const response = await backend.request({ path: urlPath, auth: false, headers: { Host: 'evil.example:80' } });
+      const response = await backend.request({
+        path: urlPath,
+        auth: false,
+        headers: { Host: 'evil.example:80' },
+      });
       expect(response.status, urlPath).toBe(403);
       expect(response.text, urlPath).not.toContain('contract-ui');
     }
@@ -69,13 +73,21 @@ describe('backend contract: Host guard on every route (DNS rebinding)', () => {
 
   it('rejects a foreign Host before authentication is evaluated', async () => {
     const backend = await backendWithSite();
-    const response = await backend.request({ path: '/api/users', auth: false, headers: { Host: 'rebind.example:80' } });
+    const response = await backend.request({
+      path: '/api/users',
+      auth: false,
+      headers: { Host: 'rebind.example:80' },
+    });
     expect(response.status).toBe(403);
   }, 30_000);
 
   it('rejects the right host on the wrong port', async () => {
     const backend = await backendWithSite();
-    const response = await backend.request({ path: '/healthz', auth: false, headers: { Host: `127.0.0.1:${backend.port + 1}` } });
+    const response = await backend.request({
+      path: '/healthz',
+      auth: false,
+      headers: { Host: `127.0.0.1:${backend.port + 1}` },
+    });
     expect(response.status).toBe(403);
   }, 30_000);
 });
@@ -83,7 +95,13 @@ describe('backend contract: Host guard on every route (DNS rebinding)', () => {
 describe('backend contract: static file confinement', () => {
   it('never serves files outside the static directory', async () => {
     const backend = await backendWithSite();
-    for (const urlPath of ['/../secret.txt', '/%2e%2e/secret.txt', '/assets/../../secret.txt', '/%2e%2e%2fsecret.txt', '/..%5csecret.txt']) {
+    for (const urlPath of [
+      '/../secret.txt',
+      '/%2e%2e/secret.txt',
+      '/assets/../../secret.txt',
+      '/%2e%2e%2fsecret.txt',
+      '/..%5csecret.txt',
+    ]) {
       const response = await backend.request({ path: urlPath, auth: false });
       expect(response.text, urlPath).not.toContain('OUTSIDE-THE-SITE-DIRECTORY');
     }
@@ -93,7 +111,11 @@ describe('backend contract: static file confinement', () => {
 describe('backend contract: request limits', () => {
   it('answers an oversized JSON body with 413', async () => {
     const backend = await backendWithSite({ APP_STATE_MAX_BYTES: String(1024 * 1024) });
-    const response = await backend.request({ method: 'POST', path: '/api/users', body: { name: 'x'.repeat(2 * 1024 * 1024), password: 'y' } });
+    const response = await backend.request({
+      method: 'POST',
+      path: '/api/users',
+      body: { name: 'x'.repeat(2 * 1024 * 1024), password: 'y' },
+    });
     expect(response.status).toBe(413);
     expect(response.json).toEqual({ error: 'Request payload too large' });
   }, 30_000);
@@ -102,7 +124,11 @@ describe('backend contract: request limits', () => {
     const backend = await backendWithSite();
     const statuses = [];
     for (let attempt = 0; attempt < 12; attempt += 1) {
-      const response = await backend.request({ method: 'POST', path: '/api/users', body: { name: 'Weak', password: 'short' } });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/users',
+        body: { name: 'Weak', password: 'short' },
+      });
       statuses.push(response.status);
     }
     expect(statuses.slice(0, 10).every((status) => status === 400)).toBe(true);
@@ -113,12 +139,16 @@ describe('backend contract: request limits', () => {
 describe('backend contract: startup refusals', () => {
   it('refuses a non-loopback HOST in local-users mode', async () => {
     const dataRoot = await scratch();
-    await expect(startBackend({ dataRoot, extraEnv: { HOST: '0.0.0.0' } })).rejects.toThrow(/loopback-only host/);
+    await expect(startBackend({ dataRoot, extraEnv: { HOST: '0.0.0.0' } })).rejects.toThrow(
+      /loopback-only host/,
+    );
   }, 30_000);
 
   it('refuses to start with a weak sync token and never listens', async () => {
     const dataRoot = await scratch();
-    await expect(startBackend({ dataRoot, extraEnv: { SSB_SYNC_TOKEN: 'too-short' } })).rejects.toThrow(/SSB_SYNC_TOKEN must be a unique secret/);
+    await expect(
+      startBackend({ dataRoot, extraEnv: { SSB_SYNC_TOKEN: 'too-short' } }),
+    ).rejects.toThrow(/SSB_SYNC_TOKEN must be a unique secret/);
   }, 30_000);
 });
 
@@ -131,12 +161,21 @@ describe('backend contract: network exposure and secret hygiene', () => {
     if (!external) return; // No non-loopback interface (CI sandbox): nothing to probe.
     const error = await new Promise((resolve) => {
       const socket = net.connect({ host: external.address, port: backend.port });
-      socket.setTimeout(3000, () => { socket.destroy(); resolve(new Error('timeout')); });
+      socket.setTimeout(3000, () => {
+        socket.destroy();
+        resolve(new Error('timeout'));
+      });
       socket.once('error', resolve);
-      socket.once('connect', () => { socket.destroy(); resolve(null); });
+      socket.once('connect', () => {
+        socket.destroy();
+        resolve(null);
+      });
     });
     expect(error, 'backend is reachable on a non-loopback address').not.toBeNull();
-    expect(error.code).toBe('ECONNREFUSED');
+    // Refused, unreachable or silently dropped (VPN/firewall interfaces) all mean "not exposed".
+    expect(error.code || error.message).toMatch(
+      /^(ECONNREFUSED|EHOSTUNREACH|ENETUNREACH|timeout)$/,
+    );
   }, 30_000);
 
   it('never writes the sync token or a presented bad token to its log', async () => {
@@ -145,7 +184,11 @@ describe('backend contract: network exposure and secret hygiene', () => {
     await backend.request({ path: '/api/users' });
     await backend.request({ path: '/api/users', headers: { Authorization: `Bearer ${badToken}` } });
     await backend.request({ path: '/api/users', auth: false });
-    await backend.request({ method: 'POST', path: '/api/users', body: { name: 'Weak', password: 'not-logged-password' } });
+    await backend.request({
+      method: 'POST',
+      path: '/api/users',
+      body: { name: 'Weak', password: 'not-logged-password' },
+    });
     const log = backend.output();
     expect(log).not.toContain(backend.token);
     expect(log).not.toContain(badToken);
@@ -158,7 +201,9 @@ describe('backend contract: network exposure and secret hygiene', () => {
       const response = await backend.request({ method: 'POST', path: '/api/users', rawBody });
       expect(response.status, rawBody).toBe(400);
       expect(response.json, rawBody).toEqual({ error: 'Invalid request body' });
-      expect(response.text, rawBody).not.toMatch(/\bat\s+\S+\s+\(|node_modules|\/Users\/|echo-me-not|SyntaxError/);
+      expect(response.text, rawBody).not.toMatch(
+        /\bat\s+\S+\s+\(|node_modules|\/Users\/|echo-me-not|SyntaxError/,
+      );
     }
     expect(backend.output()).not.toContain('echo-me-not');
   }, 30_000);

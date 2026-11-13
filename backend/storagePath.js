@@ -8,14 +8,14 @@ export const DEFAULT_APP_STATE_FILE = path.join(
   repoRoot,
   'private-data',
   'private-sync',
-  'app-state.json'
+  'app-state.json',
 );
 
 export const DEFAULT_VENDOR_OBSERVATIONS_FILE = path.join(
   repoRoot,
   'private-data',
   'private-sync',
-  'vendor-observations.json'
+  'vendor-observations.json',
 );
 
 export function resolveAppStateFile(customPath) {

@@ -1,56 +1,260 @@
-.credit-page { min-width: 0; }
-.card-purchases { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
-.card-purchase { padding: 16px; border: 1px solid var(--border); border-radius: 12px; margin-top: 12px; min-width: 0; }
-.card-purchase progress { width: 100%; height: 8px; accent-color: var(--accent, #5ad5c6); margin-bottom: 16px; }
-.purchase-archive { margin-top: 20px; }
-.purchase-archive summary { cursor: pointer; padding: 10px 0; }
-.card-purchase > .credit-actions { display: inline-flex; margin-right: 10px; margin-top: 8px; }
-.credit-page-heading h2 { margin: 6px 0 10px; font-size: 30px; letter-spacing: -.6px; }
-.credit-page-heading p, .credit-section-heading p { color: var(--muted); line-height: 1.6; margin: 0; font-size: 14px; }
-.credit-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.credit-kpis p { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 12px 0 0; }
-.credit-kpis .val { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.credit-jump-links, .credit-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.credit-jump-links a { text-decoration: none; }
-.credit-section { scroll-margin-top: 24px; min-width: 0; }
-.credit-section-heading { display: flex; justify-content: space-between; align-items: start; gap: 20px; margin-bottom: 20px; }
-.credit-section-title { display: flex; align-items: start; gap: 14px; }
-.credit-section-title h3 { margin: 0 0 6px; font-size: 20px; }
-.credit-section-icon { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; background: var(--surface2); color: var(--accent, #5ad5c6); border: 1px solid var(--border); border-radius: 12px; }
-.credit-section-heading > button { flex-shrink: 0; }
-.credit-empty { color: var(--muted); border: 1px dashed var(--border); border-radius: 12px; padding: 22px; line-height: 1.7; font-size: 14px; }
-.credit-empty a { color: var(--accent, #5ad5c6); }
-.credit-records { display: grid; gap: 14px; }
-.credit-record { min-width: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-.credit-record-heading { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
-.credit-record-heading h4 { margin: 0 0 6px; font-size: 17px; overflow-wrap: anywhere; }
-.credit-record-subtitle { color: var(--muted); font-size: 12px; line-height: 1.6; }
-.credit-date-status { font-size: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 5px 10px; flex-shrink: 0; }
-.credit-date-status.needs-review, .credit-error, .credit-delete { color: var(--red); }
-.credit-record-values { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 22px 0; font-variant-numeric: tabular-nums; }
-.credit-record-values dt { font-size: 12px; color: var(--muted); margin-bottom: 7px; }
-.credit-record-values dd { font-size: 18px; font-weight: 600; margin: 0; overflow-wrap: anywhere; }
-.credit-record-notes { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 1.6; color: var(--muted); }
-.credit-planned .credit-record { border-style: dashed; }
-.credit-editor { border: 1px solid var(--accent, #5ad5c6); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-.credit-editor h3 { margin: 0 0 16px; }
-.credit-form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.credit-form-grid label { display: grid; gap: 8px; font-size: 13px; color: var(--muted); min-width: 0; }
-.credit-form-grid .input { width: 100%; min-width: 0; }
-.credit-form-notes { grid-column: 1 / -1; }
-.credit-form-notes textarea { resize: vertical; }
-.credit-editor .section-note { margin: 16px 0; }
-.credit-delete-confirm { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; font-size: 13px; }
-.credit-delete-confirm .btn { margin: 0 8px 8px 0; }
-.credit-status { padding: 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; }
+.credit-page {
+  min-width: 0;
+}
+.card-purchases {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.card-purchase {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 12px;
+  min-width: 0;
+}
+.card-purchase progress {
+  width: 100%;
+  height: 8px;
+  accent-color: var(--accent, #5ad5c6);
+  margin-bottom: 16px;
+}
+.purchase-archive {
+  margin-top: 20px;
+}
+.purchase-archive summary {
+  cursor: pointer;
+  padding: 10px 0;
+}
+.card-purchase > .credit-actions {
+  display: inline-flex;
+  margin-right: 10px;
+  margin-top: 8px;
+}
+.credit-page-heading h2 {
+  margin: 6px 0 10px;
+  font-size: 30px;
+  letter-spacing: -0.6px;
+}
+.credit-page-heading p,
+.credit-section-heading p {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+  font-size: 14px;
+}
+.credit-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.credit-kpis p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 12px 0 0;
+}
+.credit-kpis .val {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.credit-jump-links,
+.credit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.credit-jump-links a {
+  text-decoration: none;
+}
+.credit-section {
+  scroll-margin-top: 24px;
+  min-width: 0;
+}
+.credit-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.credit-section-title {
+  display: flex;
+  align-items: start;
+  gap: 14px;
+}
+.credit-section-title h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+.credit-section-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  background: var(--surface2);
+  color: var(--accent, #5ad5c6);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.credit-section-heading > button {
+  flex-shrink: 0;
+}
+.credit-empty {
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  line-height: 1.7;
+  font-size: 14px;
+}
+.credit-empty a {
+  color: var(--accent, #5ad5c6);
+}
+.credit-records {
+  display: grid;
+  gap: 14px;
+}
+.credit-record {
+  min-width: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.credit-record-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+.credit-record-heading h4 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+.credit-record-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.credit-date-status {
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 10px;
+  flex-shrink: 0;
+}
+.credit-date-status.needs-review,
+.credit-error,
+.credit-delete {
+  color: var(--red);
+}
+.credit-record-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 22px 0;
+  font-variant-numeric: tabular-nums;
+}
+.credit-record-values dt {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.credit-record-values dd {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.credit-record-notes {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.credit-planned .credit-record {
+  border-style: dashed;
+}
+.credit-editor {
+  border: 1px solid var(--accent, #5ad5c6);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.credit-editor h3 {
+  margin: 0 0 16px;
+}
+.credit-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.credit-form-grid label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  min-width: 0;
+}
+.credit-form-grid .input {
+  width: 100%;
+  min-width: 0;
+}
+.credit-form-notes {
+  grid-column: 1 / -1;
+}
+.credit-form-notes textarea {
+  resize: vertical;
+}
+.credit-editor .section-note {
+  margin: 16px 0;
+}
+.credit-delete-confirm {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  font-size: 13px;
+}
+.credit-delete-confirm .btn {
+  margin: 0 8px 8px 0;
+}
+.credit-status {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+}
 @media (max-width: 1050px) {
-  .credit-section-heading { flex-direction: column; }
-  .credit-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .credit-section-heading {
+    flex-direction: column;
+  }
+  .credit-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 @media (max-width: 600px) {
-  .credit-kpis, .credit-form-grid, .credit-record-values { grid-template-columns: 1fr; }
-  .credit-record-heading { flex-direction: column; }
-  .credit-record, .credit-editor { padding: 16px; }
-  .credit-section-title { gap: 10px; }
-  .credit-page-heading h2 { font-size: 26px; }
+  .credit-kpis,
+  .credit-form-grid,
+  .credit-record-values {
+    grid-template-columns: 1fr;
+  }
+  .credit-record-heading {
+    flex-direction: column;
+  }
+  .credit-record,
+  .credit-editor {
+    padding: 16px;
+  }
+  .credit-section-title {
+    gap: 10px;
+  }
+  .credit-page-heading h2 {
+    font-size: 26px;
+  }
 }

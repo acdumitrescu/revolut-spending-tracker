@@ -42,9 +42,7 @@ export function getSyncAuthorizationHeaders(headers = {}) {
   if (runtimeConfig.localUsers) headers = { ...headers, 'X-SSB-Session': getLocalUserToken() };
   if (runtimeConfig.privateSyncAutoAuth) return { ...headers, 'X-SSB-Client': 'private-ui' };
   const token = getSyncAccessToken();
-  return token
-    ? { ...headers, Authorization: `Bearer ${token}` }
-    : headers;
+  return token ? { ...headers, Authorization: `Bearer ${token}` } : headers;
 }
 
 function parseTimestamp(value) {
@@ -72,18 +70,18 @@ function normalizeSnapshot(body) {
 function hasUserData(state) {
   const data = state?.data?.data || state?.data || state;
   return Boolean(
-    data?.subscriptions?.length
-    || data?.carListings?.length
-    || data?.transactions?.length
-    || data?.accounts?.length
-    || data?.moneyFlow?.incomes?.length
-    || data?.moneyFlow?.transfers?.length
-    || data?.moneyFlow?.brd?.rows?.length
-    || data?.creditRecords?.length
-    || data?.portfolioHoldings?.length
-    || data?.goals?.length
-    || Object.keys(data?.budgets || {}).length
-    || Object.keys(data?.customVendors || {}).length
+    data?.subscriptions?.length ||
+    data?.carListings?.length ||
+    data?.transactions?.length ||
+    data?.accounts?.length ||
+    data?.moneyFlow?.incomes?.length ||
+    data?.moneyFlow?.transfers?.length ||
+    data?.moneyFlow?.brd?.rows?.length ||
+    data?.creditRecords?.length ||
+    data?.portfolioHoldings?.length ||
+    data?.goals?.length ||
+    Object.keys(data?.budgets || {}).length ||
+    Object.keys(data?.customVendors || {}).length,
   );
 }
 
@@ -103,10 +101,10 @@ async function parseJsonResponse(response, fallbackMessage) {
   }
 
   if (!response.ok) {
-    if (response.status === 401 && runtimeConfig.localUsers) window.dispatchEvent(new Event('ssb-user-expired'));
-    const message = typeof body?.error === 'string' && body.error.trim()
-      ? body.error
-      : fallbackMessage;
+    if (response.status === 401 && runtimeConfig.localUsers)
+      window.dispatchEvent(new Event('ssb-user-expired'));
+    const message =
+      typeof body?.error === 'string' && body.error.trim() ? body.error : fallbackMessage;
     const error = new Error(message);
     error.status = response.status;
     error.body = body;
@@ -133,8 +131,16 @@ export async function loadServerSnapshot(signal) {
 
 export async function saveServerSnapshot(data, version, signal) {
   const encrypted = runtimeConfig.encryptedStorage;
-  if (encrypted && !lastServerEnvelope) throw new Error('Encrypted workspace must load before saving');
-  const changes = encrypted ? Object.entries(data.data).filter(([field, value]) => JSON.stringify(value) !== JSON.stringify(lastServerEnvelope.data[field])).map(([field,value]) => ({field,value})) : null;
+  if (encrypted && !lastServerEnvelope)
+    throw new Error('Encrypted workspace must load before saving');
+  const changes = encrypted
+    ? Object.entries(data.data)
+        .filter(
+          ([field, value]) =>
+            JSON.stringify(value) !== JSON.stringify(lastServerEnvelope.data[field]),
+        )
+        .map(([field, value]) => ({ field, value }))
+    : null;
   const response = await fetch(`${runtimeConfig.apiBasePath}/${encrypted ? 'changes' : 'data'}`, {
     method: 'POST',
     headers: getSyncAuthorizationHeaders({ 'Content-Type': 'application/json' }),
@@ -159,10 +165,22 @@ export async function createPrivateBackup(data, reason, importBatchId) {
 }
 
 export async function listEncryptedBackups() {
-  return parseJsonResponse(await fetch(`${runtimeConfig.apiBasePath}/encrypted-backups`, {headers:getSyncAuthorizationHeaders(),credentials:'same-origin'}), 'Unable to list encrypted backups');
+  return parseJsonResponse(
+    await fetch(`${runtimeConfig.apiBasePath}/encrypted-backups`, {
+      headers: getSyncAuthorizationHeaders(),
+      credentials: 'same-origin',
+    }),
+    'Unable to list encrypted backups',
+  );
 }
 export async function loadEncryptedBackup(filename) {
-  return parseJsonResponse(await fetch(`${runtimeConfig.apiBasePath}/encrypted-backups/${encodeURIComponent(filename)}`, {headers:getSyncAuthorizationHeaders(),credentials:'same-origin'}), 'Unable to read encrypted backup');
+  return parseJsonResponse(
+    await fetch(`${runtimeConfig.apiBasePath}/encrypted-backups/${encodeURIComponent(filename)}`, {
+      headers: getSyncAuthorizationHeaders(),
+      credentials: 'same-origin',
+    }),
+    'Unable to read encrypted backup',
+  );
 }
 
 export function isVersionConflict(error) {

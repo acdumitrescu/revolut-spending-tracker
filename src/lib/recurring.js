@@ -22,25 +22,23 @@ function addDays(dateString, days) {
 
 export function detectRecurringTransactions(transactions) {
   const groups = {};
-  transactions
-    .filter(isExpenseTransaction)
-    .forEach((txn) => {
-      const vendor = normalizeVendor(txn.desc);
-      const roundedAmount = Math.round(Math.abs(txn.amt));
-      const currency = txn.currency || 'N/A';
-      const key = `${vendor}|${roundedAmount}|${currency}`;
-      if (!groups[key]) {
-        groups[key] = {
-          vendor,
-          label: txn.desc,
-          amount: roundedAmount,
-          cat: txn.cat,
-          currency,
-          dates: [],
-        };
-      }
-      groups[key].dates.push(txn.date);
-    });
+  transactions.filter(isExpenseTransaction).forEach((txn) => {
+    const vendor = normalizeVendor(txn.desc);
+    const roundedAmount = Math.round(Math.abs(txn.amt));
+    const currency = txn.currency || 'N/A';
+    const key = `${vendor}|${roundedAmount}|${currency}`;
+    if (!groups[key]) {
+      groups[key] = {
+        vendor,
+        label: txn.desc,
+        amount: roundedAmount,
+        cat: txn.cat,
+        currency,
+        dates: [],
+      };
+    }
+    groups[key].dates.push(txn.date);
+  });
 
   return Object.values(groups)
     .map((group) => {

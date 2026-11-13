@@ -40,7 +40,7 @@ describe('Budget page', () => {
     render(
       <ToastProvider>
         <Budget />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
     const monthInput = screen.getByLabelText('Budget Month');
@@ -59,6 +59,8 @@ describe('Budget page', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /copy previous/i }));
     expect(context.copyBudgets).toHaveBeenCalledWith('2026-08', '2026-09');
-    expect(screen.getByRole('alert')).toHaveTextContent('Copied 1 missing category from August 2026. Existing categories were kept.');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Copied 1 missing category from August 2026. Existing categories were kept.',
+    );
   });
 });

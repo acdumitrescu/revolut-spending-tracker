@@ -13,13 +13,25 @@ export function PageHeader({ eyebrow, title, description, actions }) {
   );
 }
 
-export function EmptyState({ icon: Icon, title, description, actionLabel = 'Import transactions', actionTo = '/app/import' }) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  actionLabel = 'Import transactions',
+  actionTo = '/app/import',
+}) {
   return (
     <section className="new-empty-state">
-      {Icon && <span className="new-empty-icon"><Icon size={22} /></span>}
+      {Icon && (
+        <span className="new-empty-icon">
+          <Icon size={22} />
+        </span>
+      )}
       <h2>{title}</h2>
       <p>{description}</p>
-      <Link className="btn btn-primary" to={actionTo}>{actionLabel}</Link>
+      <Link className="btn btn-primary" to={actionTo}>
+        {actionLabel}
+      </Link>
     </section>
   );
 }
@@ -27,7 +39,11 @@ export function EmptyState({ icon: Icon, title, description, actionLabel = 'Impo
 export function ActionCard({ icon: Icon, title, description, action, children, tone = 'default' }) {
   const content = (
     <>
-      {Icon && <span className="action-card-icon"><Icon size={19} /></span>}
+      {Icon && (
+        <span className="action-card-icon">
+          <Icon size={19} />
+        </span>
+      )}
       <span className="action-card-content">
         <strong>{title}</strong>
         <small>{description}</small>
@@ -37,10 +53,18 @@ export function ActionCard({ icon: Icon, title, description, action, children, t
   );
 
   if (typeof action === 'string') {
-    return <Link className={`action-card ${tone}`} to={action}>{content}</Link>;
+    return (
+      <Link className={`action-card ${tone}`} to={action}>
+        {content}
+      </Link>
+    );
   }
 
-  return <button className={`action-card ${tone}`} type="button" onClick={action}>{content}</button>;
+  return (
+    <button className={`action-card ${tone}`} type="button" onClick={action}>
+      {content}
+    </button>
+  );
 }
 
 export function StatusPill({ tone = 'neutral', children }) {

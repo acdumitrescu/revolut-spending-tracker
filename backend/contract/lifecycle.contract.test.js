@@ -32,7 +32,11 @@ describe('backend contract: lifecycle', () => {
   }, 30_000);
 
   it('exits 0 when stdin closes and SSB_EXIT_ON_STDIN_CLOSE=true', async () => {
-    const backend = await startBackend({ dataRoot: await scratch(), stdin: 'pipe', extraEnv: { SSB_EXIT_ON_STDIN_CLOSE: 'true' } });
+    const backend = await startBackend({
+      dataRoot: await scratch(),
+      stdin: 'pipe',
+      extraEnv: { SSB_EXIT_ON_STDIN_CLOSE: 'true' },
+    });
     cleanup.push(() => backend.child.kill('SIGKILL'));
     backend.child.stdin.end();
     const result = await withTimeout(backend.exited, 10_000, 'no exit after stdin closed');

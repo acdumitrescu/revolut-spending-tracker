@@ -48,17 +48,19 @@ describe('persistence', () => {
     };
     const persisted = createPersistedAppState({
       ...createPersistedAppState().data,
-      transactions: [{
-        date: '2026-06-01',
-        desc: 'Synthetic Merchant Location',
-        cat: 'Other',
-        sub: '',
-        amt: -20,
-        flow: 'Debit',
-        type: 'Card Payment',
-        ym: '2026-06',
-        currency: 'RON',
-      }],
+      transactions: [
+        {
+          date: '2026-06-01',
+          desc: 'Synthetic Merchant Location',
+          cat: 'Other',
+          sub: '',
+          amt: -20,
+          flow: 'Debit',
+          type: 'Card Payment',
+          ym: '2026-06',
+          currency: 'RON',
+        },
+      ],
       customVendors: {
         'Synthetic Merchant': ['Shopping', 'General'],
       },
@@ -68,7 +70,7 @@ describe('persistence', () => {
     const reloaded = loadLocalAppState('key', storage).persistedState;
     const [resolved] = resolveTransactionCategories(
       reloaded.data.transactions,
-      reloaded.data.customVendors
+      reloaded.data.customVendors,
     );
 
     expect(reloaded.data.customVendors).toEqual(persisted.data.customVendors);
@@ -77,14 +79,16 @@ describe('persistence', () => {
   });
 
   it('parses legacy raw backups and upgrades them into the versioned contract', () => {
-    const parsed = parseImportedAppState(JSON.stringify({
-      transactions: [],
-      customVendors: {},
-      accounts: [],
-      budgets: {},
-      goals: [],
-      lastUpdated: null,
-    }));
+    const parsed = parseImportedAppState(
+      JSON.stringify({
+        transactions: [],
+        customVendors: {},
+        accounts: [],
+        budgets: {},
+        goals: [],
+        lastUpdated: null,
+      }),
+    );
 
     expect(parsed.schemaVersion).toBe(1);
     expect(parsed.data.displayCurrency).toBe('RON');

@@ -31,10 +31,12 @@ export function validateCsvFile(file) {
 }
 
 function safeBaseName(fileName) {
-  return fileName
-    .replace(/\.csv$/i, '')
-    .replace(/[^a-z0-9_-]+/gi, '-')
-    .replace(/^-+|-+$/g, '') || 'transactions';
+  return (
+    fileName
+      .replace(/\.csv$/i, '')
+      .replace(/[^a-z0-9_-]+/gi, '-')
+      .replace(/^-+|-+$/g, '') || 'transactions'
+  );
 }
 
 export class ImportReview {
@@ -82,15 +84,17 @@ export class ImportReview {
       reason,
     }));
 
-    const duplicateRows = this.analysis.duplicateTransactions.map(({ transaction, duplicateSource }) => ({
-      status: 'Duplicate',
-      row: '',
-      date: transaction.date,
-      description: transaction.desc,
-      amount: transaction.amt,
-      currency: transaction.currency || '',
-      reason: duplicateSource === 'existing' ? 'Already imported' : 'Repeated in file',
-    }));
+    const duplicateRows = this.analysis.duplicateTransactions.map(
+      ({ transaction, duplicateSource }) => ({
+        status: 'Duplicate',
+        row: '',
+        date: transaction.date,
+        description: transaction.desc,
+        amount: transaction.amt,
+        currency: transaction.currency || '',
+        reason: duplicateSource === 'existing' ? 'Already imported' : 'Repeated in file',
+      }),
+    );
 
     return [...invalidRows, ...duplicateRows];
   }

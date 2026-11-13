@@ -34,19 +34,25 @@ export function clearLocalAppState(storageKey, storage = localStorage) {
 }
 
 export function serializeBackupState(persistedState) {
-  return JSON.stringify({
-    ...persistedState,
-    exportedAt: Date.now(),
-  }, null, 2);
+  return JSON.stringify(
+    {
+      ...persistedState,
+      exportedAt: Date.now(),
+    },
+    null,
+    2,
+  );
 }
 
 export function parseImportedAppState(text) {
   const parsed = JSON.parse(text);
   // Only the documented raw legacy shape may omit a version. Never recover
   // arbitrary imports using the permissive local-storage repair path.
-  const result = parsed && Object.hasOwn(parsed, 'schemaVersion')
-    ? PersistedAppStateSchema.safeParse(parsed)
-    : AppDataSchema.safeParse(parsed);
-  if (!result.success) throw new Error('Invalid or unsupported SimpleSafeBanking backup. Nothing was replaced.');
+  const result =
+    parsed && Object.hasOwn(parsed, 'schemaVersion')
+      ? PersistedAppStateSchema.safeParse(parsed)
+      : AppDataSchema.safeParse(parsed);
+  if (!result.success)
+    throw new Error('Invalid or unsupported SimpleSafeBanking backup. Nothing was replaced.');
   return sanitizePersistedAppState(result.data);
 }

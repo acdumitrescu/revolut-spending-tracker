@@ -12,14 +12,21 @@
   --border-strong: rgba(24, 54, 74, 0.2);
   --text: #10212d;
   --text-secondary: #344a59;
-  --muted: #6f8491;
+  /* Darkened from #6f8491 to meet WCAG AA (4.5:1) on the light surfaces. */
+  --muted: #536677;
   --accent: #178a82;
   --accent-hover: #0f746e;
+  /* Filled buttons: background and text that meet WCAG AA (4.5:1) together. */
+  --accent-solid: #0f746e;
+  --accent-solid-hover: #0b5f5a;
+  --on-accent: #ffffff;
   --accent-glow: rgba(23, 138, 130, 0.18);
-  --success: #168564;
+  /* Darkened from #168564 to meet WCAG AA (4.5:1) on tinted badges. */
+  --success: #0f6e52;
   --success-bright: #43cf9b;
   --success-soft: rgba(22, 133, 100, 0.12);
-  --danger: #d05a52;
+  /* Darkened from #d05a52 to meet WCAG AA (4.5:1) as text on white. */
+  --danger: #b8423a;
   --danger-bright: #f46f65;
   --danger-soft: rgba(208, 90, 82, 0.12);
   --warning: #b9732f;
@@ -37,9 +44,9 @@
   --radius: 16px;
   --radius-md: 13px;
   --radius-sm: 10px;
-  --font: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-display: var(--font);
-  --font-numeric: "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  --font-numeric: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -48,7 +55,7 @@
   --space-6: 24px;
   --space-8: 32px;
   --space-10: 40px;
-  --ease: 180ms cubic-bezier(.2, .8, .2, 1);
+  --ease: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 :root[data-theme='dark'] {
@@ -69,6 +76,9 @@
   --muted: #8ba0ae;
   --accent: #61ddce;
   --accent-hover: #7be8dc;
+  --accent-solid: #61ddce;
+  --accent-solid-hover: #7be8dc;
+  --on-accent: #06221e;
   --accent-glow: rgba(97, 221, 206, 0.18);
   --success: #75dfa7;
   --success-bright: #75dfa7;
@@ -101,7 +111,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

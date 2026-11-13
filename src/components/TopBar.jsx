@@ -13,17 +13,24 @@ export default function TopBar() {
   return (
     <header className="new-topbar">
       <Link to="/app" className="topbar-brand" aria-label="SimpleSafeBanking overview">
-        <span className="topbar-brand-mark"><AppLogo size={25} /></span>
+        <span className="topbar-brand-mark">
+          <AppLogo size={25} />
+        </span>
         <strong>SimpleSafeBanking</strong>
       </Link>
       <GlobalSearch />
       <div className="new-topbar-actions">
         <span className={`sync-indicator ${syncStatus.phase}`} title={syncStatus.message}>
-          <span /> {syncStatus.phase === 'auth-required' ? 'Sync locked'
-            : !syncStatus.enabled ? 'Saved locally'
-            : syncStatus.phase === 'synced' ? 'Saved to server'
-            : syncStatus.phase === 'syncing' ? 'Syncing…'
-            : 'Needs attention'}
+          <span />{' '}
+          {syncStatus.phase === 'auth-required'
+            ? 'Sync locked'
+            : !syncStatus.enabled
+              ? 'Saved locally'
+              : syncStatus.phase === 'synced'
+                ? 'Saved to server'
+                : syncStatus.phase === 'syncing'
+                  ? 'Syncing…'
+                  : 'Needs attention'}
         </span>
         <label className="compact-currency">
           <CurrencyBadge currency={data.displayCurrency} />
@@ -33,7 +40,9 @@ export default function TopBar() {
             aria-label="Display currency"
           >
             {SUPPORTED_DISPLAY_CURRENCIES.map((currency) => (
-              <option key={currency} value={currency}>{currency}</option>
+              <option key={currency} value={currency}>
+                {currency}
+              </option>
             ))}
           </select>
         </label>

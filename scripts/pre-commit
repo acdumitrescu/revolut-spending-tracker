@@ -1,0 +1,33 @@
+#!/bin/sh
+# Fast local gate before each commit (well under ten seconds):
+#   1. refuse staged paths that look like private finance data or local notes
+#   2. eslint + prettier on the staged JS/CSS files only
+#   3. the repository privacy scan
+# Installed by scripts/install-git-hooks.sh. The full pipeline is `npm run ci:local`.
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+if printf '%s\n' "$STAGED_FILES" | grep -E '(^|/)(private-data|personal-data|backups|exports|imports|tmp-data)/|(^|/)PRIVATE_NOTES\.md$|revolut.*\.csv$|transactions.*\.(csv|xlsx)$|statement.*\.(csv|xlsx)$|banking.*\.(csv|xlsx)$|simple_safe_banking_backup_.*\.(json|xlsx|xls)$' >/dev/null 2>&1; then
+  echo "Blocked commit: staged files look like private finance data or local-only notes." >&2
+  echo "Move them into ignored folders or unstage them before committing." >&2
+  exit 1
+fi
+
+if [ -x node_modules/.bin/eslint ]; then
+  lint_files="$(printf '%s\n' "$STAGED_FILES" | grep -E '\.(js|jsx|mjs)$' || true)"
+  if [ -n "$lint_files" ]; then
+    printf '%s\n' "$lint_files" | tr '\n' '\0' | xargs -0 node_modules/.bin/eslint --max-warnings=0 --
+  fi
+  format_files="$(printf '%s\n' "$STAGED_FILES" | grep -E '\.(js|jsx|mjs|css|json|md|ya?ml)$' || true)"
+  if [ -n "$format_files" ]; then
+    printf '%s\n' "$format_files" | tr '\n' '\0' | xargs -0 node_modules/.bin/prettier --check --ignore-unknown --
+  fi
+fi
+
+if [ -x scripts/privacy-scan.sh ]; then
+  scripts/privacy-scan.sh >/dev/null
+fi

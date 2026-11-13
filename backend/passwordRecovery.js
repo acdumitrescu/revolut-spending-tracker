@@ -23,22 +23,48 @@ export async function protectRecoveryKey(key, password, { allowShortPassword = f
     const cipher = createCipheriv('aes-256-gcm', wrappingKey, nonce);
     cipher.setAAD(aad);
     const ciphertext = Buffer.concat([cipher.update(key), cipher.final()]);
-    return { format, kdf: 'scrypt-N131072-r8-p1', cipher: 'aes-256-gcm', salt: salt.toString('hex'), nonce: nonce.toString('hex'), ciphertext: ciphertext.toString('hex'), tag: cipher.getAuthTag().toString('hex') };
-  } finally { wrappingKey.fill(0); }
+    return {
+      format,
+      kdf: 'scrypt-N131072-r8-p1',
+      cipher: 'aes-256-gcm',
+      salt: salt.toString('hex'),
+      nonce: nonce.toString('hex'),
+      ciphertext: ciphertext.toString('hex'),
+      tag: cipher.getAuthTag().toString('hex'),
+    };
+  } finally {
+    wrappingKey.fill(0);
+  }
 }
 export async function unlockRecoveryKey(envelope, password, { allowShortPassword = false } = {}) {
   checkPassword(password, allowShortPassword);
-  if (!envelope || envelope.format !== format || envelope.kdf !== 'scrypt-N131072-r8-p1' || envelope.cipher !== 'aes-256-gcm' ||
-      !/^[a-f0-9]{64}$/.test(envelope.salt) || !/^[a-f0-9]{24}$/.test(envelope.nonce) ||
-      !/^[a-f0-9]{64}$/.test(envelope.ciphertext) || !/^[a-f0-9]{32}$/.test(envelope.tag)) throw new Error('Invalid recovery file');
+  if (
+    !envelope ||
+    envelope.format !== format ||
+    envelope.kdf !== 'scrypt-N131072-r8-p1' ||
+    envelope.cipher !== 'aes-256-gcm' ||
+    !/^[a-f0-9]{64}$/.test(envelope.salt) ||
+    !/^[a-f0-9]{24}$/.test(envelope.nonce) ||
+    !/^[a-f0-9]{64}$/.test(envelope.ciphertext) ||
+    !/^[a-f0-9]{32}$/.test(envelope.tag)
+  )
+    throw new Error('Invalid recovery file');
   const wrappingKey = await derive(password, Buffer.from(envelope.salt, 'hex'), 32, options);
   let partial;
   try {
-    const decipher = createDecipheriv('aes-256-gcm', wrappingKey, Buffer.from(envelope.nonce, 'hex'));
+    const decipher = createDecipheriv(
+      'aes-256-gcm',
+      wrappingKey,
+      Buffer.from(envelope.nonce, 'hex'),
+    );
     decipher.setAAD(aad);
     decipher.setAuthTag(Buffer.from(envelope.tag, 'hex'));
     partial = decipher.update(Buffer.from(envelope.ciphertext, 'hex'));
     return Buffer.concat([partial, decipher.final()]);
-  } catch { throw new Error('Wrong recovery password or damaged recovery file'); }
-  finally { wrappingKey.fill(0); partial?.fill(0); }
+  } catch {
+    throw new Error('Wrong recovery password or damaged recovery file');
+  } finally {
+    wrappingKey.fill(0);
+    partial?.fill(0);
+  }
 }

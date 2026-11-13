@@ -42,10 +42,13 @@ describe('serverSync', () => {
   it('keeps the access token in session storage and sends it as a bearer token', async () => {
     setSyncAccessToken('synthetic-session-token');
 
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ data: null, version: 0, updatedAt: null }),
-    }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ data: null, version: 0, updatedAt: null }),
+      }),
+    );
 
     await loadServerSnapshot();
 
@@ -53,22 +56,28 @@ describe('serverSync', () => {
     expect(window.sessionStorage.setItem).toHaveBeenCalled();
     expect(window.localStorage.setItem).not.toHaveBeenCalledWith(
       expect.stringContaining('sync'),
-      expect.anything()
+      expect.anything(),
     );
-    expect(fetch).toHaveBeenCalledWith('/api/data', expect.objectContaining({
-      headers: { Authorization: 'Bearer synthetic-session-token' },
-    }));
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/data',
+      expect.objectContaining({
+        headers: { Authorization: 'Bearer synthetic-session-token' },
+      }),
+    );
 
     clearSyncAccessToken();
     expect(getSyncAccessToken()).toBe('');
   });
 
   it('surfaces unauthorized responses without retrying or hiding the status', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => ({ error: 'Private sync authentication required' }),
-    }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        json: async () => ({ error: 'Private sync authentication required' }),
+      }),
+    );
 
     await expect(loadServerSnapshot()).rejects.toMatchObject({
       status: 401,
@@ -77,14 +86,17 @@ describe('serverSync', () => {
   });
 
   it('normalizes snapshot metadata from a successful load', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: { lastUpdated: 1700000000000, transactions: [] },
-        version: 3,
-        updatedAt: '2026-06-18T12:00:00.000Z',
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          data: { lastUpdated: 1700000000000, transactions: [] },
+          version: 3,
+          updatedAt: '2026-06-18T12:00:00.000Z',
+        }),
       }),
-    }));
+    );
 
     const snapshot = await loadServerSnapshot();
     expect(snapshot.version).toBe(3);
@@ -107,10 +119,13 @@ describe('serverSync', () => {
     const snapshot = await saveServerSnapshot(payload, 3);
 
     expect(snapshot.version).toBe(4);
-    expect(fetchMock).toHaveBeenCalledWith('/api/data', expect.objectContaining({
-      method: 'POST',
-      body: JSON.stringify({ data: payload, version: 3 }),
-    }));
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/data',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ data: payload, version: 3 }),
+      }),
+    );
   });
 
   it('sends a versioned app state and import metadata when creating a backup', async () => {
@@ -130,23 +145,29 @@ describe('serverSync', () => {
       filename: 'backup.json',
       reason: 'import',
     });
-    expect(fetchMock).toHaveBeenCalledWith('/api/backups', expect.objectContaining({
-      method: 'POST',
-      body: JSON.stringify({ data: payload, reason: 'import', importBatchId: 'batch-123' }),
-    }));
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backups',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ data: payload, reason: 'import', importBatchId: 'batch-123' }),
+      }),
+    );
   });
 
   it('surfaces version conflicts with the latest snapshot body', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: false,
-      status: 409,
-      json: async () => ({
-        error: 'Version conflict',
-        data: { lastUpdated: 1700000005000, transactions: [] },
-        version: 8,
-        updatedAt: '2026-06-18T12:02:00.000Z',
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 409,
+        json: async () => ({
+          error: 'Version conflict',
+          data: { lastUpdated: 1700000005000, transactions: [] },
+          version: 8,
+          updatedAt: '2026-06-18T12:02:00.000Z',
+        }),
       }),
-    }));
+    );
 
     await expect(saveServerSnapshot({ lastUpdated: 1700000000000 }, 7)).rejects.toMatchObject({
       status: 409,

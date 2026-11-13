@@ -12,13 +12,18 @@ function getCurrencyLocale(currency) {
   return CURRENCY_LOCALES[currency] || 'en-US';
 }
 
-export const formatCurrency = (value, currency = 'RON') => {
+// Precision: pass { decimals: 2 } for single transactions and balances, { decimals: 0 } for
+// chart axes. By default large aggregates (100 or more) are whole units and smaller amounts
+// keep cents, so a non-zero amount never shows as 0.
+export const formatCurrency = (value, currency = 'RON', { decimals } = {}) => {
+  const amount = Number(value) || 0;
+  const digits = decimals ?? (amount !== 0 && Math.abs(amount) < 100 ? 2 : 0);
   return new Intl.NumberFormat(getCurrencyLocale(currency), {
     style: 'currency',
     currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(amount);
 };
 
 export const formatCurrencyK = (value, currency = 'RON') => {
@@ -30,8 +35,12 @@ export const formatDisplayAmount = (
   value,
   fromCurrency = 'RON',
   displayCurrency = 'RON',
-  fxRates = DEFAULT_FX_RATES
-) => formatCurrency(convertAmountToDisplay(value, fromCurrency, displayCurrency, fxRates), displayCurrency);
+  fxRates = DEFAULT_FX_RATES,
+) =>
+  formatCurrency(
+    convertAmountToDisplay(value, fromCurrency, displayCurrency, fxRates),
+    displayCurrency,
+  );
 
 export const formatPercentage = (value, total) => {
   if (!total) return '0%';
@@ -39,33 +48,48 @@ export const formatPercentage = (value, total) => {
 };
 
 export const CAT_COLORS = {
-  'Shopping': '#4f8cc9',
-  'Groceries': '#2ea86b',
-  'Health': '#d76659',
-  'Transport': '#8f72c8',
+  Shopping: '#4f8cc9',
+  Groceries: '#2ea86b',
+  Health: '#d76659',
+  Transport: '#8f72c8',
   'Food & Dining': '#d88c37',
-  'Telecom': '#53a8bb',
-  'Subscriptions': '#4aa67d',
+  Telecom: '#53a8bb',
+  Subscriptions: '#4aa67d',
   'Tech & Cloud': '#70829d',
   'Sports & Fitness': '#63b06e',
-  'Entertainment': '#cc697f',
+  Entertainment: '#cc697f',
   'Personal Care': '#b27ec5',
-  'Education': '#5d92df',
-  'Utilities': '#7b7f89',
-  'Gambling': '#cb5b56',
-  'Cash': '#9ba3ae',
-  'Travel': '#467cb8',
-  'Fees': '#b9b4ac',
-  'Other': '#8794a4',
-  'Income': '#1f9d5a',
-  'Transfers': '#6c7480',
-  'Savings': '#3b7bc7'
+  Education: '#5d92df',
+  Utilities: '#7b7f89',
+  Gambling: '#cb5b56',
+  Cash: '#9ba3ae',
+  Travel: '#467cb8',
+  Fees: '#b9b4ac',
+  Other: '#8794a4',
+  Income: '#1f9d5a',
+  Transfers: '#6c7480',
+  Savings: '#3b7bc7',
 };
 
 export const EXPENSE_CATS = new Set([
-  'Groceries', 'Food & Dining', 'Transport', 'Telecom',
-  'Entertainment', 'Gambling', 'Health', 'Personal Care', 'Sports & Fitness', 'Shopping',
-  'Subscriptions', 'Tech & Cloud', 'Education', 'Utilities', 'Travel', 'Cash', 'Fees', 'Other'
+  'Groceries',
+  'Food & Dining',
+  'Transport',
+  'Telecom',
+  'Entertainment',
+  'Gambling',
+  'Health',
+  'Personal Care',
+  'Sports & Fitness',
+  'Shopping',
+  'Subscriptions',
+  'Tech & Cloud',
+  'Education',
+  'Utilities',
+  'Travel',
+  'Cash',
+  'Fees',
+  'Other',
 ]);
 
 export const getColorForCategory = (cat) => {

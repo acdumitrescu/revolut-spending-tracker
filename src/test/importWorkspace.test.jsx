@@ -19,30 +19,36 @@ describe('ImportWorkspace', () => {
             <ImportWorkspace />
           </MemoryRouter>
         </ToastProvider>
-      </AppProvider>
+      </AppProvider>,
     );
 
-    expect(screen.getByRole('heading', { name: /bring your financial history into focus/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /bring your financial history into focus/i }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /choose csv file/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /try synthetic demo data/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /restore private backup/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /download csv template/i })).toBeInTheDocument();
     expect(screen.getByText(/no bank connection or public upload required/i)).toBeInTheDocument();
-    expect(screen.getByText(/uploaded csvs stay in this browser on this device/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/uploaded csvs stay in this browser on this device/i),
+    ).toBeInTheDocument();
   });
 
   it('reviews a non-demo CSV before adding it and then shows the backup reminder', async () => {
     vi.spyOn(csvParser, 'parseCSV').mockResolvedValue({
-      transactions: [{
-        date: '2026-06-01',
-        desc: 'Demo Coffee Shop',
-        cat: 'Food & Dining',
-        sub: 'Coffee',
-        amt: 24,
-        flow: 'Debit',
-        type: 'Card payment',
-        ym: '2026-06',
-      }],
+      transactions: [
+        {
+          date: '2026-06-01',
+          desc: 'Demo Coffee Shop',
+          cat: 'Food & Dining',
+          sub: 'Coffee',
+          amt: 24,
+          flow: 'Debit',
+          type: 'Card payment',
+          ym: '2026-06',
+        },
+      ],
       summary: {
         detectedProfileId: 'revolut-personal-raw',
         detectedProfileLabel: 'Revolut Personal CSV',
@@ -65,11 +71,13 @@ describe('ImportWorkspace', () => {
             <ImportWorkspace />
           </MemoryRouter>
         </ToastProvider>
-      </AppProvider>
+      </AppProvider>,
     );
 
     const fileInput = document.querySelector('input[type="file"][accept=".csv"]');
-    const file = new File(['date,description,amount\n'], 'my-private-upload.csv', { type: 'text/csv' });
+    const file = new File(['date,description,amount\n'], 'my-private-upload.csv', {
+      type: 'text/csv',
+    });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
     await waitFor(() => {
@@ -88,18 +96,20 @@ describe('ImportWorkspace', () => {
 
   it('shows an already imported transaction as a duplicate before a second import', async () => {
     const parsedResult = {
-      transactions: [{
-        date: '2026-06-01',
-        desc: 'Synthetic Coffee Shop',
-        cat: 'Food & Dining',
-        sub: 'Coffee',
-        amt: -24,
-        flow: 'Debit',
-        type: 'Card Payment',
-        ym: '2026-06',
-        currency: 'RON',
-        ref: 'synthetic-1',
-      }],
+      transactions: [
+        {
+          date: '2026-06-01',
+          desc: 'Synthetic Coffee Shop',
+          cat: 'Food & Dining',
+          sub: 'Coffee',
+          amt: -24,
+          flow: 'Debit',
+          type: 'Card Payment',
+          ym: '2026-06',
+          currency: 'RON',
+          ref: 'synthetic-1',
+        },
+      ],
       summary: {
         detectedProfileId: 'revolut-personal-raw',
         detectedProfileLabel: 'Revolut Personal CSV',
@@ -123,7 +133,7 @@ describe('ImportWorkspace', () => {
             <ImportWorkspace />
           </MemoryRouter>
         </ToastProvider>
-      </AppProvider>
+      </AppProvider>,
     );
 
     const fileInput = document.querySelector('input[type="file"][accept=".csv"]');
@@ -142,14 +152,30 @@ describe('ImportWorkspace', () => {
 
   it('cancels a pending review without adding transactions', async () => {
     vi.spyOn(csvParser, 'parseCSV').mockResolvedValue({
-      transactions: [{
-        date: '2026-06-01', desc: 'Synthetic Market', cat: 'Groceries', sub: 'Market',
-        amt: -20, flow: 'Debit', type: 'Card Payment', ym: '2026-06', currency: 'RON',
-      }],
+      transactions: [
+        {
+          date: '2026-06-01',
+          desc: 'Synthetic Market',
+          cat: 'Groceries',
+          sub: 'Market',
+          amt: -20,
+          flow: 'Debit',
+          type: 'Card Payment',
+          ym: '2026-06',
+          currency: 'RON',
+        },
+      ],
       summary: {
-        detectedProfileId: 'revolut-personal-raw', detectedProfileLabel: 'Revolut Personal CSV',
-        totalRows: 1, processedRows: 1, skippedRows: 0, warnings: [], skippedReasonCounts: {},
-        skippedDetails: [], validationCategories: {}, unknownVendorCount: 0,
+        detectedProfileId: 'revolut-personal-raw',
+        detectedProfileLabel: 'Revolut Personal CSV',
+        totalRows: 1,
+        processedRows: 1,
+        skippedRows: 0,
+        warnings: [],
+        skippedReasonCounts: {},
+        skippedDetails: [],
+        validationCategories: {},
+        unknownVendorCount: 0,
       },
       vendorObservations: [],
     });
@@ -157,9 +183,11 @@ describe('ImportWorkspace', () => {
     render(
       <AppProvider>
         <ToastProvider>
-          <MemoryRouter><ImportWorkspace /></MemoryRouter>
+          <MemoryRouter>
+            <ImportWorkspace />
+          </MemoryRouter>
         </ToastProvider>
-      </AppProvider>
+      </AppProvider>,
     );
 
     const fileInput = document.querySelector('input[type="file"][accept=".csv"]');
@@ -179,10 +207,16 @@ describe('ImportWorkspace', () => {
       transactions: [],
       rejectedRows: [{ rowNumber: 2, reason: 'invalid amount' }],
       summary: {
-        detectedProfileId: 'normalized-csv', detectedProfileLabel: 'Normalized CSV',
-        totalRows: 1, processedRows: 0, skippedRows: 1, warnings: [],
-        skippedReasonCounts: { 'invalid amount': 1 }, skippedDetails: ['Row 2: invalid amount'],
-        validationCategories: { 'suspicious-amount': 1 }, unknownVendorCount: 0,
+        detectedProfileId: 'normalized-csv',
+        detectedProfileLabel: 'Normalized CSV',
+        totalRows: 1,
+        processedRows: 0,
+        skippedRows: 1,
+        warnings: [],
+        skippedReasonCounts: { 'invalid amount': 1 },
+        skippedDetails: ['Row 2: invalid amount'],
+        validationCategories: { 'suspicious-amount': 1 },
+        unknownVendorCount: 0,
       },
       vendorObservations: [],
     });
@@ -190,9 +224,11 @@ describe('ImportWorkspace', () => {
     render(
       <AppProvider>
         <ToastProvider>
-          <MemoryRouter><ImportWorkspace /></MemoryRouter>
+          <MemoryRouter>
+            <ImportWorkspace />
+          </MemoryRouter>
         </ToastProvider>
-      </AppProvider>
+      </AppProvider>,
     );
 
     const fileInput = document.querySelector('input[type="file"][accept=".csv"]');
@@ -209,14 +245,30 @@ describe('ImportWorkspace', () => {
 
   it('keeps an audit record when a confirmed import is undone', async () => {
     vi.spyOn(csvParser, 'parseCSV').mockResolvedValue({
-      transactions: [{
-        date: '2026-06-01', desc: 'Synthetic Market', cat: 'Groceries', sub: 'Market',
-        amt: -20, flow: 'Debit', type: 'Card Payment', ym: '2026-06', currency: 'RON',
-      }],
+      transactions: [
+        {
+          date: '2026-06-01',
+          desc: 'Synthetic Market',
+          cat: 'Groceries',
+          sub: 'Market',
+          amt: -20,
+          flow: 'Debit',
+          type: 'Card Payment',
+          ym: '2026-06',
+          currency: 'RON',
+        },
+      ],
       summary: {
-        detectedProfileId: 'revolut-personal-raw', detectedProfileLabel: 'Revolut Personal CSV',
-        totalRows: 1, processedRows: 1, skippedRows: 0, warnings: [], skippedReasonCounts: {},
-        skippedDetails: [], validationCategories: {}, unknownVendorCount: 0,
+        detectedProfileId: 'revolut-personal-raw',
+        detectedProfileLabel: 'Revolut Personal CSV',
+        totalRows: 1,
+        processedRows: 1,
+        skippedRows: 0,
+        warnings: [],
+        skippedReasonCounts: {},
+        skippedDetails: [],
+        validationCategories: {},
+        unknownVendorCount: 0,
       },
       vendorObservations: [],
     });
@@ -224,9 +276,11 @@ describe('ImportWorkspace', () => {
     render(
       <AppProvider>
         <ToastProvider>
-          <MemoryRouter><ImportWorkspace /></MemoryRouter>
+          <MemoryRouter>
+            <ImportWorkspace />
+          </MemoryRouter>
         </ToastProvider>
-      </AppProvider>
+      </AppProvider>,
     );
 
     const fileInput = document.querySelector('input[type="file"][accept=".csv"]');

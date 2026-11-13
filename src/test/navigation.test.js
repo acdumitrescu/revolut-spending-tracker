@@ -33,10 +33,24 @@ describe('application navigation model', () => {
 
   it('keeps every development feature directly discoverable', () => {
     const childLabels = APP_HUBS.flatMap((hub) => hub.children || []).map((child) => child.label);
-    expect(childLabels).toEqual(expect.arrayContaining([
-      'Transactions', 'Monthly', 'Subscriptions', 'Budget', 'Goals', 'Forecast',
-      'Rent calculator', 'Car lease',
-      'Categories', 'Vendors', 'Mappings', 'Heatmap', 'Balances', 'Credit', 'Portfolio',
-    ]));
+    expect(childLabels).toEqual(
+      expect.arrayContaining([
+        'Transactions',
+        'Monthly',
+        'Subscriptions',
+        'Budget',
+        'Goals',
+        'Forecast',
+        'Rent calculator',
+        'Car lease',
+        'Categories',
+        'Vendors',
+        'Mappings',
+        'Heatmap',
+        'Balances',
+        'Credit',
+        'Portfolio',
+      ]),
+    );
   });
 });

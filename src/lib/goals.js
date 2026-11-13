@@ -46,17 +46,27 @@ export function assignGoalAccounts(goals, accounts) {
 
 function savedAtMonth(goal, linkedAccounts, month, fxRates) {
   const currency = goalCurrency(goal);
-  const snapshot = getAccountBalanceSnapshot(linkedAccounts, { month, displayCurrency: currency, fxRates });
+  const snapshot = getAccountBalanceSnapshot(linkedAccounts, {
+    month,
+    displayCurrency: currency,
+    fxRates,
+  });
   const contributed = (goal.contributions || [])
     .filter((entry) => entry.date.slice(0, 7) <= month)
     .reduce((sum, entry) => sum + entry.amount, 0);
-  return { linked: snapshot.total, contributed, total: snapshot.total + contributed, missing: snapshot.missing };
+  return {
+    linked: snapshot.total,
+    contributed,
+    total: snapshot.total + contributed,
+    missing: snapshot.missing,
+  };
 }
 
 // Months where we really know something: an explicit balance entry on a linked account or a contribution.
 function dataMonths(goal, linkedAccounts) {
   const months = new Set((goal.contributions || []).map((entry) => entry.date.slice(0, 7)));
-  for (const account of linkedAccounts) Object.keys(account.balances || {}).forEach((month) => months.add(month));
+  for (const account of linkedAccounts)
+    Object.keys(account.balances || {}).forEach((month) => months.add(month));
   return [...months].sort();
 }
 
@@ -72,7 +82,8 @@ export function computeGoal(goal, linkedAccounts, { fxRates, now }) {
 
   const monthsLeft = goal.targetMonth ? monthsBetween(current, goal.targetMonth) : null;
   const overdue = !complete && monthsLeft !== null && monthsLeft < 0;
-  const requiredMonthly = complete || monthsLeft === null || overdue ? null : remaining / Math.max(monthsLeft, 1);
+  const requiredMonthly =
+    complete || monthsLeft === null || overdue ? null : remaining / Math.max(monthsLeft, 1);
 
   // Pace: net change per month across the real data points of the last six months. Needs two distinct months.
   const windowStart = addMonths(current, -(HISTORY_MONTHS - 1));
@@ -84,7 +95,11 @@ export function computeGoal(goal, linkedAccounts, { fxRates, now }) {
     const first = points[0];
     const last = points.at(-1);
     const span = monthsBetween(first, last);
-    if (span > 0) pace = (savedAtMonth(goal, linkedAccounts, last, fxRates).total - savedAtMonth(goal, linkedAccounts, first, fxRates).total) / span;
+    if (span > 0)
+      pace =
+        (savedAtMonth(goal, linkedAccounts, last, fxRates).total -
+          savedAtMonth(goal, linkedAccounts, first, fxRates).total) /
+        span;
   }
 
   const monthsToFinish = !complete && pace && pace > 0 ? Math.ceil(remaining / pace) : null;
@@ -121,20 +136,28 @@ export function computeGoal(goal, linkedAccounts, { fxRates, now }) {
 
 export function computeGoals(goals, accounts, { fxRates, now }) {
   const assigned = assignGoalAccounts(goals, accounts);
-  return goals.map((goal) => ({ goal, linkedAccounts: assigned.get(goal.id) || [], ...computeGoal(goal, assigned.get(goal.id) || [], { fxRates, now }) }));
+  return goals.map((goal) => ({
+    goal,
+    linkedAccounts: assigned.get(goal.id) || [],
+    ...computeGoal(goal, assigned.get(goal.id) || [], { fxRates, now }),
+  }));
 }
 
 // Series for the projection chart: what you saved, where today's pace lands, and the path the target date needs.
 export function getGoalChart(goal, linkedAccounts, result, { fxRates }) {
   const { current, monthsLeft, pace, requiredMonthly, saved, target } = result;
-  const past = Array.from({ length: HISTORY_MONTHS }, (_, index) => addMonths(current, index - (HISTORY_MONTHS - 1)));
+  const past = Array.from({ length: HISTORY_MONTHS }, (_, index) =>
+    addMonths(current, index - (HISTORY_MONTHS - 1)),
+  );
   const ahead = Math.min(MAX_HORIZON, Math.max(monthsLeft || 0, result.monthsToFinish || 0, 6));
   const future = Array.from({ length: ahead }, (_, index) => addMonths(current, index + 1));
   const months = [...past, ...future];
   const firstKnown = dataMonths(goal, linkedAccounts)[0];
-  const actual = months.map((month) => (month <= current && firstKnown && month >= firstKnown
-    ? Math.max(savedAtMonth(goal, linkedAccounts, month, fxRates).total, 0)
-    : null));
+  const actual = months.map((month) =>
+    month <= current && firstKnown && month >= firstKnown
+      ? Math.max(savedAtMonth(goal, linkedAccounts, month, fxRates).total, 0)
+      : null,
+  );
   const projected = months.map((month, index) => {
     if (month < current || pace === null || pace <= 0) return null;
     return Math.min(saved + pace * (index - (HISTORY_MONTHS - 1)), target);
@@ -158,5 +181,9 @@ export const STATUS_LABELS = {
 };
 
 export function totalSavedInCurrency(results, displayCurrency, fxRates) {
-  return results.reduce((sum, item) => sum + convertAmountToDisplay(item.saved, item.currency, displayCurrency, fxRates), 0);
+  return results.reduce(
+    (sum, item) =>
+      sum + convertAmountToDisplay(item.saved, item.currency, displayCurrency, fxRates),
+    0,
+  );
 }
