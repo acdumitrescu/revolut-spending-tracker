@@ -205,124 +205,132 @@ it('fails closed for damaged registry and limits expensive password attempts', a
   await expect(createLocalUsers({ root })).rejects.toThrow();
 });
 
-it('requires a user session on every financial API and never lets a supplied user ID change its database', async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'ssb-users-api-'));
-  const key = randomBytes(32);
-  const filename = path.join(root, 'legacy.ssbdb');
-  const helper = path.join(root, 'synthetic-helper');
-  await fs.writeFile(
-    helper,
-    `#!${process.execPath}\nprocess.stdout.write(Buffer.from('${key.toString('hex')}', 'hex'));\n`,
-    { mode: 0o700 },
-  );
-  const db = await openEncryptedStore({ filename, key, create: true });
-  await db.write(state(), 0);
-  await db.putDocument('vendor-observations', {
-    schemaVersion: 1,
-    observations: { legacy: { normalizedDescription: 'legacy', count: 1 } },
-  });
-  await db.close();
-  const originalBytes = stateDigest((await fs.readFile(filename)).toString('base64'));
-  const token = 'synthetic-only-user-api-test-token-123456789';
-  for (const [name, value] of Object.entries({
-    SSB_STORAGE: 'sqlcipher',
-    SSB_LOCAL_USERS: 'true',
-    SSB_DATABASE_FILE: filename,
-    SSB_USERS_DIR: path.join(root, 'users'),
-    SSB_KEYCHAIN_HELPER: helper,
-    SSB_BACKUP_DIR: path.join(root, 'legacy-backups'),
-    SSB_SYNC_TOKEN: token,
-    ALLOWED_ORIGINS: 'http://127.0.0.1:5189',
-  }))
-    vi.stubEnv(name, value);
-  vi.resetModules();
-  const { app, closePrivateStorage } = await import('./server.js');
-  const server = app.listen(0, '127.0.0.1');
-  await once(server, 'listening');
-  const base = `http://127.0.0.1:${server.address().port}`;
-  const send = (url, body, session = '', extra = {}) =>
-    fetch(base + url, {
-      method: body === undefined ? 'GET' : 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Origin: 'http://127.0.0.1:5189',
-        'Content-Type': 'application/json',
-        'X-SSB-Session': session,
-        ...extra,
-      },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    });
-  try {
-    for (const [url, body] of [
-      ['/api/data'],
-      ['/api/changes', {}],
-      ['/api/backups', {}],
-      ['/api/encrypted-backups'],
-      ['/api/vendor-observations'],
-      ['/api/vendor-observations/collect', {}],
-      ['/api/vendor-observations/resolve', {}],
-      ['/api/quotes'],
-      ['/api/instruments/search'],
-      ['/api/users/recovery', {}],
-    ])
-      expect((await send(url, body)).status, url).toBe(401);
-    const response = await send('/api/users', { name: 'Original', password, migrate: true });
-    expect(response.status).toBe(200);
-    const one = await response.json();
-    expect(stateDigest((await fs.readFile(filename)).toString('base64'))).toBe(originalBytes);
-    expect(
-      (await fs.readdir(path.join(root, 'legacy-backups'))).some((name) => name.endsWith('.ssbdb')),
-    ).toBe(true);
-    const two = await (await send('/api/users', { name: 'Empty', password })).json();
-    const currentOne = await (await send('/api/data', undefined, one.token)).json();
-    expect(currentOne.data.data.accounts[0].id).toBe('legacy');
-    const currentTwo = await (
-      await send('/api/data?userId=' + one.user.id, undefined, two.token, {
-        'X-SSB-User': one.user.id,
-      })
-    ).json();
-    expect(currentTwo.data.data.accounts).toEqual([]);
-    expect(
-      (await (await send('/api/vendor-observations', undefined, two.token)).json()).observations,
-    ).toEqual([]);
-    const receipt = await (
-      await send('/api/backups', { data: currentOne.data, reason: 'manual' }, one.token)
-    ).json();
-    expect(
-      (await send('/api/encrypted-backups/' + receipt.filename, undefined, two.token)).status,
-    ).toBe(400);
-    const changed = await send(
-      '/api/changes',
-      {
-        version: currentTwo.version,
-        changes: [
-          {
-            field: 'accounts',
-            value: [{ id: 'two', name: 'Only two', currency: 'EUR', balances: {}, notes: {} }],
-          },
-        ],
-      },
-      two.token,
+// Needs the macOS Keychain helper (readDatabaseKey refuses other platforms by design);
+// runs on the Mac (npm run ci:local), skipped on Linux CI.
+it.skipIf(process.platform !== 'darwin')(
+  'requires a user session on every financial API and never lets a supplied user ID change its database',
+  async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'ssb-users-api-'));
+    const key = randomBytes(32);
+    const filename = path.join(root, 'legacy.ssbdb');
+    const helper = path.join(root, 'synthetic-helper');
+    await fs.writeFile(
+      helper,
+      `#!${process.execPath}\nprocess.stdout.write(Buffer.from('${key.toString('hex')}', 'hex'));\n`,
+      { mode: 0o700 },
     );
-    expect(changed.status).toBe(200);
-    expect(
-      (await (await send('/api/data', undefined, one.token)).json()).data.data.accounts[0].id,
-    ).toBe('legacy');
-    expect((await send('/api/users/lock', {}, one.token)).status).toBe(200);
-    expect((await send('/api/data', undefined, one.token)).status).toBe(401);
-    expect((await send('/api/data', undefined, two.token)).status).toBe(200);
-    expect(
-      (await send('/api/users/unlock', { userId: two.user.id, password: 'incorrect password' }))
-        .status,
-    ).toBe(401);
-  } finally {
-    server.close();
-    await once(server, 'close');
-    await closePrivateStorage();
-    vi.unstubAllEnvs();
-    key.fill(0);
-  }
-}, 30000);
+    const db = await openEncryptedStore({ filename, key, create: true });
+    await db.write(state(), 0);
+    await db.putDocument('vendor-observations', {
+      schemaVersion: 1,
+      observations: { legacy: { normalizedDescription: 'legacy', count: 1 } },
+    });
+    await db.close();
+    const originalBytes = stateDigest((await fs.readFile(filename)).toString('base64'));
+    const token = 'synthetic-only-user-api-test-token-123456789';
+    for (const [name, value] of Object.entries({
+      SSB_STORAGE: 'sqlcipher',
+      SSB_LOCAL_USERS: 'true',
+      SSB_DATABASE_FILE: filename,
+      SSB_USERS_DIR: path.join(root, 'users'),
+      SSB_KEYCHAIN_HELPER: helper,
+      SSB_BACKUP_DIR: path.join(root, 'legacy-backups'),
+      SSB_SYNC_TOKEN: token,
+      ALLOWED_ORIGINS: 'http://127.0.0.1:5189',
+    }))
+      vi.stubEnv(name, value);
+    vi.resetModules();
+    const { app, closePrivateStorage } = await import('./server.js');
+    const server = app.listen(0, '127.0.0.1');
+    await once(server, 'listening');
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const send = (url, body, session = '', extra = {}) =>
+      fetch(base + url, {
+        method: body === undefined ? 'GET' : 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Origin: 'http://127.0.0.1:5189',
+          'Content-Type': 'application/json',
+          'X-SSB-Session': session,
+          ...extra,
+        },
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      });
+    try {
+      for (const [url, body] of [
+        ['/api/data'],
+        ['/api/changes', {}],
+        ['/api/backups', {}],
+        ['/api/encrypted-backups'],
+        ['/api/vendor-observations'],
+        ['/api/vendor-observations/collect', {}],
+        ['/api/vendor-observations/resolve', {}],
+        ['/api/quotes'],
+        ['/api/instruments/search'],
+        ['/api/users/recovery', {}],
+      ])
+        expect((await send(url, body)).status, url).toBe(401);
+      const response = await send('/api/users', { name: 'Original', password, migrate: true });
+      expect(response.status).toBe(200);
+      const one = await response.json();
+      expect(stateDigest((await fs.readFile(filename)).toString('base64'))).toBe(originalBytes);
+      expect(
+        (await fs.readdir(path.join(root, 'legacy-backups'))).some((name) =>
+          name.endsWith('.ssbdb'),
+        ),
+      ).toBe(true);
+      const two = await (await send('/api/users', { name: 'Empty', password })).json();
+      const currentOne = await (await send('/api/data', undefined, one.token)).json();
+      expect(currentOne.data.data.accounts[0].id).toBe('legacy');
+      const currentTwo = await (
+        await send('/api/data?userId=' + one.user.id, undefined, two.token, {
+          'X-SSB-User': one.user.id,
+        })
+      ).json();
+      expect(currentTwo.data.data.accounts).toEqual([]);
+      expect(
+        (await (await send('/api/vendor-observations', undefined, two.token)).json()).observations,
+      ).toEqual([]);
+      const receipt = await (
+        await send('/api/backups', { data: currentOne.data, reason: 'manual' }, one.token)
+      ).json();
+      expect(
+        (await send('/api/encrypted-backups/' + receipt.filename, undefined, two.token)).status,
+      ).toBe(400);
+      const changed = await send(
+        '/api/changes',
+        {
+          version: currentTwo.version,
+          changes: [
+            {
+              field: 'accounts',
+              value: [{ id: 'two', name: 'Only two', currency: 'EUR', balances: {}, notes: {} }],
+            },
+          ],
+        },
+        two.token,
+      );
+      expect(changed.status).toBe(200);
+      expect(
+        (await (await send('/api/data', undefined, one.token)).json()).data.data.accounts[0].id,
+      ).toBe('legacy');
+      expect((await send('/api/users/lock', {}, one.token)).status).toBe(200);
+      expect((await send('/api/data', undefined, one.token)).status).toBe(401);
+      expect((await send('/api/data', undefined, two.token)).status).toBe(200);
+      expect(
+        (await send('/api/users/unlock', { userId: two.user.id, password: 'incorrect password' }))
+          .status,
+      ).toBe(401);
+    } finally {
+      server.close();
+      await once(server, 'close');
+      await closePrivateStorage();
+      vi.unstubAllEnvs();
+      key.fill(0);
+    }
+  },
+  30000,
+);
 
 it('allows short test passwords only when enabled and keeps existing test users unlockable after disabling it', async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'ssb-weak-test-'));

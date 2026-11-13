@@ -43,7 +43,8 @@ export async function go(page, path) {
     window.history.pushState({}, '', target);
     window.dispatchEvent(new PopStateEvent('popstate'));
   }, path);
-  await expect(page).toHaveURL(new RegExp(`${path.replace(/[/]/g, '\\/')}$`));
+  const escaped = path.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+  await expect(page).toHaveURL(new RegExp(`${escaped}$`));
 }
 
 /** Resolves when the next workspace save reaches the server. Call before the edit. */

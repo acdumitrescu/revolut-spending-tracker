@@ -146,11 +146,13 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Build and start the stack (images are not pushed)
+      - name: Generate a throwaway sync token
         run: |
-          SSB_SYNC_TOKEN="$(openssl rand -hex 32)"
-          export SSB_SYNC_TOKEN
-          docker compose up --build --detach --wait --wait-timeout 180
+          token="$(openssl rand -hex 32)"
+          echo "::add-mask::$token"
+          echo "SSB_SYNC_TOKEN=$token" >> "$GITHUB_ENV"
+      - name: Build and start the stack (images are not pushed)
+        run: docker compose up --build --detach --wait --wait-timeout 180
       - name: Smoke test
         run: |
           curl --fail --silent --show-error http://127.0.0.1:3176/ > /dev/null

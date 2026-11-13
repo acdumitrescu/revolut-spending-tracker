@@ -118,3 +118,15 @@ describe('private portable backups', () => {
     ).rejects.toMatchObject({ status: 400 });
   });
 });
+
+describe('backupPath', () => {
+  it('keeps backup files inside the backup folder', async () => {
+    const { backupPath } = await import('./encryptedBackups.js');
+    expect(backupPath('/tmp/ssb-backups', 'manual-1-a.ssbdb')).toBe(
+      '/tmp/ssb-backups/manual-1-a.ssbdb',
+    );
+    for (const name of ['../escape.ssbdb', 'nested/file.ssbdb', '..', '']) {
+      expect(() => backupPath('/tmp/ssb-backups', name)).toThrow(/Invalid backup filename/);
+    }
+  });
+});
