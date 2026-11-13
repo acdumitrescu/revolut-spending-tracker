@@ -15,6 +15,15 @@ function canonical(value) {
     );
   return value;
 }
+/** Joins a validated file name to the backup folder and refuses anything that escapes it. */
+export function backupPath(backupDir, filename) {
+  const root = path.resolve(backupDir);
+  const resolved = path.resolve(root, filename);
+  if (!resolved.startsWith(root + path.sep) || path.basename(resolved) !== filename)
+    throw Object.assign(new Error('Invalid backup filename'), { status: 400 });
+  return resolved;
+}
+
 export const stateDigest = (value) =>
   createHash('sha256')
     .update(JSON.stringify(canonical(value)))
@@ -39,7 +48,7 @@ export async function createEncryptedBackup({
       ? `import-${importBatchId}.ssbdb`
       : `${reason}-${Date.now()}-${randomUUID()}.ssbdb`;
   await fs.mkdir(backupDir, { recursive: true, mode: 0o700 });
-  const destination = path.join(backupDir, filename);
+  const destination = backupPath(backupDir, filename);
   try {
     await fs.lstat(destination);
     const existing = await openEncryptedStore({ filename: destination, key });
@@ -58,7 +67,7 @@ export async function createEncryptedBackup({
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
   }
-  const temporary = path.join(backupDir, `.${randomUUID()}.pending.ssbdb`);
+  const temporary = backupPath(backupDir, `.${randomUUID()}.pending.ssbdb`);
   const receipt = {
     filename,
     createdAt: new Date().toISOString(),

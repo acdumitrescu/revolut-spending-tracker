@@ -14,7 +14,7 @@ import { validateState } from './validateState.js';
 import { hostGuard, requestBoundary, securityHeaders } from './requestBoundary.js';
 import { readDatabaseKey } from './keychain.js';
 import { openEncryptedStore } from './encryptedStore.js';
-import { createEncryptedBackup } from './encryptedBackups.js';
+import { createEncryptedBackup, backupPath } from './encryptedBackups.js';
 import { applyWorkspaceChanges } from './workspaceChanges.js';
 
 const PORT = Number.parseInt(process.env.PORT || '3177', 10);
@@ -633,7 +633,7 @@ app.get('/api/encrypted-backups/:filename', async (req, res) => {
   let backup;
   try {
     backup = await openEncryptedStore({
-      filename: path.join(getBackupDir(), req.params.filename),
+      filename: backupPath(getBackupDir(), req.params.filename),
       key: getKey(),
     });
     await backup.integrity();
