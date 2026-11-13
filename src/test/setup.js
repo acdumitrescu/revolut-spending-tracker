@@ -37,15 +37,18 @@ beforeEach(() => {
   }
 
   if (typeof window !== 'undefined') {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        rates: {
-          EUR: 5,
-          USD: 4.6,
-        },
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          rates: {
+            EUR: 5,
+            USD: 4.6,
+          },
+        }),
       }),
-    }));
+    );
   }
 });
 

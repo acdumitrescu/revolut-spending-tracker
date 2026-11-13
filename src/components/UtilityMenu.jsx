@@ -44,9 +44,15 @@ export default function UtilityMenu() {
       </button>
       {open && (
         <div className="utility-menu-popover" role="menu" aria-label="Workspace menu">
-          <Link ref={firstItemRef} role="menuitem" to="/app/import" onClick={() => setOpen(false)}><FileUp size={16} /> Import &amp; backup</Link>
-          <Link role="menuitem" to="/app/settings" onClick={() => setOpen(false)}><Settings size={16} /> Settings</Link>
-          <Link role="menuitem" to="/" onClick={() => setOpen(false)}><Home size={16} /> Product home</Link>
+          <Link ref={firstItemRef} role="menuitem" to="/app/import" onClick={() => setOpen(false)}>
+            <FileUp size={16} /> Import &amp; backup
+          </Link>
+          <Link role="menuitem" to="/app/settings" onClick={() => setOpen(false)}>
+            <Settings size={16} /> Settings
+          </Link>
+          <Link role="menuitem" to="/" onClick={() => setOpen(false)}>
+            <Home size={16} /> Product home
+          </Link>
         </div>
       )}
     </div>

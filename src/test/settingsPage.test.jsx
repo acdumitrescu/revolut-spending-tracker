@@ -47,14 +47,18 @@ describe('Settings private sync access', () => {
     render(
       <ToastProvider>
         <SettingsPage />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
     const tokenInput = screen.getByLabelText('Private sync token');
-    fireEvent.change(tokenInput, { target: { value: 'synthetic-settings-token-32-characters-minimum' } });
+    fireEvent.change(tokenInput, {
+      target: { value: 'synthetic-settings-token-32-characters-minimum' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Unlock' }));
 
-    expect(unlockPrivateSync).toHaveBeenCalledWith('synthetic-settings-token-32-characters-minimum');
+    expect(unlockPrivateSync).toHaveBeenCalledWith(
+      'synthetic-settings-token-32-characters-minimum',
+    );
     expect(tokenInput).toHaveValue('');
     expect(screen.getByText(/never included in app data or backups/i)).toBeInTheDocument();
 
@@ -67,7 +71,7 @@ describe('Settings private sync access', () => {
     render(
       <ToastProvider>
         <SettingsPage />
-      </ToastProvider>
+      </ToastProvider>,
     );
 
     expect(screen.getByText('Automatic local sync')).toBeInTheDocument();

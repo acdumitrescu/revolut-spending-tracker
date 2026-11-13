@@ -10,7 +10,7 @@ const outputFile = path.join(
   repoRoot,
   'private-data',
   'vendor-knowledge',
-  'overpass-ro-discovery.json'
+  'overpass-ro-discovery.json',
 );
 
 const OVERPASS_ENDPOINT = process.env.OVERPASS_URL || 'https://overpass-api.de/api/interpreter';
@@ -25,7 +25,7 @@ out tags;
 `;
 
 const knownAliases = new Set(
-  compiledKnowledge.records.flatMap((record) => record.searchKeys || [])
+  compiledKnowledge.records.flatMap((record) => record.searchKeys || []),
 );
 
 function summarizeElements(elements) {
@@ -46,9 +46,7 @@ function summarizeElements(elements) {
     counts.set(normalized, existing);
   }
 
-  return [...counts.values()]
-    .sort((a, b) => b.hits - a.hits)
-    .slice(0, 200);
+  return [...counts.values()].sort((a, b) => b.hits - a.hits).slice(0, 200);
 }
 
 async function main() {

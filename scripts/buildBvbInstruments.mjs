@@ -19,7 +19,8 @@ function decodeHtml(value) {
 }
 
 function parseInstruments(html, market) {
-  const pattern = /FinancialInstrumentsDetails\.aspx\?s=([^"]+)"><b>([^<]+)<\/b><\/a><p[^>]*>([^<]*)<\/p>\s*<\/td><td>([\s\S]*?)<\/td>/g;
+  const pattern =
+    /FinancialInstrumentsDetails\.aspx\?s=([^"]+)"><b>([^<]+)<\/b><\/a><p[^>]*>([^<]*)<\/p>\s*<\/td><td>([\s\S]*?)<\/td>/g;
   const seen = new Set();
   const instruments = [];
 
@@ -54,7 +55,9 @@ function getFormFields(html) {
 
 async function loadAeroShares(mainHtml) {
   const form = getFormFields(mainHtml);
-  const aeroButton = [...mainHtml.matchAll(/<input[^>]+type="submit"[^>]+value="AeRO"[^>]*>/g)][0]?.[0];
+  const aeroButton = [
+    ...mainHtml.matchAll(/<input[^>]+type="submit"[^>]+value="AeRO"[^>]*>/g),
+  ][0]?.[0];
   const buttonName = aeroButton?.match(/name="([^"]+)/)?.[1];
   if (!buttonName) throw new Error('BVB AeRO selector was not found');
   form.set(buttonName, 'AeRO');
@@ -77,10 +80,19 @@ const instruments = [
   ...parseInstruments(aeroHtml, 'AeRO'),
 ].sort((left, right) => left.ticker.localeCompare(right.ticker));
 
-await fs.writeFile(outputFile, `${JSON.stringify({
-  source: 'Bucharest Stock Exchange shares market pages',
-  generatedAt: new Date().toISOString(),
-  instruments,
-}, null, 2)}\n`);
+await fs.writeFile(
+  outputFile,
+  `${JSON.stringify(
+    {
+      source: 'Bucharest Stock Exchange shares market pages',
+      generatedAt: new Date().toISOString(),
+      instruments,
+    },
+    null,
+    2,
+  )}\n`,
+);
 
-console.log(`Wrote ${instruments.length} BVB share instruments to ${path.relative(repoRoot, outputFile)}`);
+console.log(
+  `Wrote ${instruments.length} BVB share instruments to ${path.relative(repoRoot, outputFile)}`,
+);

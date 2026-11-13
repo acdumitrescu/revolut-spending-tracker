@@ -15,8 +15,18 @@ export function getPortfolioInsightRows(holdings = [], fxRates) {
     const reportingCurrency = getPortfolioReportingCurrency(holding);
     const nativeCost = holding.quantity * holding.avgCost;
     const nativeValue = holding.quantity * holding.currentPrice;
-    const costBasis = convertAmountToDisplay(nativeCost, holding.currency, reportingCurrency, fxRates);
-    const marketValue = convertAmountToDisplay(nativeValue, holding.currency, reportingCurrency, fxRates);
+    const costBasis = convertAmountToDisplay(
+      nativeCost,
+      holding.currency,
+      reportingCurrency,
+      fxRates,
+    );
+    const marketValue = convertAmountToDisplay(
+      nativeValue,
+      holding.currency,
+      reportingCurrency,
+      fxRates,
+    );
 
     return {
       ...holding,
@@ -37,14 +47,22 @@ export function getPortfolioCurrencySummary(rows, currency) {
   const visibleRows = rows.filter((row) => row.reportingCurrency === currency);
   const totalMarketValue = visibleRows.reduce((sum, row) => sum + row.marketValue, 0);
   const totalCostBasis = visibleRows.reduce((sum, row) => sum + row.costBasis, 0);
-  const accountTotals = Object.values(visibleRows.reduce((accounts, row) => {
-    const key = `${row.broker}:${row.account}`;
-    const current = accounts[key] || { key, broker: row.broker, account: row.account, marketValue: 0, costBasis: 0 };
-    current.marketValue += row.marketValue;
-    current.costBasis += row.costBasis;
-    accounts[key] = current;
-    return accounts;
-  }, {}));
+  const accountTotals = Object.values(
+    visibleRows.reduce((accounts, row) => {
+      const key = `${row.broker}:${row.account}`;
+      const current = accounts[key] || {
+        key,
+        broker: row.broker,
+        account: row.account,
+        marketValue: 0,
+        costBasis: 0,
+      };
+      current.marketValue += row.marketValue;
+      current.costBasis += row.costBasis;
+      accounts[key] = current;
+      return accounts;
+    }, {}),
+  );
 
   return {
     rows: visibleRows,
@@ -57,15 +75,21 @@ export function getPortfolioCurrencySummary(rows, currency) {
 }
 
 export function applyPortfolioQuotes(holdings = [], quotes = []) {
-  const quotesBySymbol = new Map(quotes.map((quote) => [
-    String(quote?.symbol || '').trim().toUpperCase(),
-    quote,
-  ]));
+  const quotesBySymbol = new Map(
+    quotes.map((quote) => [
+      String(quote?.symbol || '')
+        .trim()
+        .toUpperCase(),
+      quote,
+    ]),
+  );
   const updates = [];
   const currencyMismatches = [];
 
   for (const holding of holdings) {
-    const symbol = String(holding?.quoteSymbol || holding?.ticker || '').trim().toUpperCase();
+    const symbol = String(holding?.quoteSymbol || holding?.ticker || '')
+      .trim()
+      .toUpperCase();
     const quote = quotesBySymbol.get(symbol);
     if (!quote) continue;
 

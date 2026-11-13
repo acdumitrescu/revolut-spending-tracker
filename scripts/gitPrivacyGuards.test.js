@@ -38,16 +38,31 @@ function runHook(lines) {
 }
 
 function containsPrivateHistory(commitOid) {
-  return spawnSync('sh', ['-c', '. "$1"; ssb_commit_contains_private_history "$2" origin', 'sh', path.join(fixture, 'scripts/git-privacy-guards.sh'), commitOid], {
-    cwd: fixture,
-    encoding: 'utf8',
-  });
+  return spawnSync(
+    'sh',
+    [
+      '-c',
+      '. "$1"; ssb_commit_contains_private_history "$2" origin',
+      'sh',
+      path.join(fixture, 'scripts/git-privacy-guards.sh'),
+      commitOid,
+    ],
+    {
+      cwd: fixture,
+      encoding: 'utf8',
+    },
+  );
 }
 
 beforeAll(() => {
   fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'ssb-git-privacy-'));
   fs.mkdirSync(path.join(fixture, 'scripts'), { recursive: true });
-  for (const file of ['git-privacy-guards.sh', 'install-git-hooks.sh', 'pre-push', 'privacy-scan.sh']) {
+  for (const file of [
+    'git-privacy-guards.sh',
+    'install-git-hooks.sh',
+    'pre-push',
+    'privacy-scan.sh',
+  ]) {
     fs.copyFileSync(path.join(repoRoot, 'scripts', file), path.join(fixture, 'scripts', file));
   }
   fs.chmodSync(path.join(fixture, 'scripts/install-git-hooks.sh'), 0o755);
@@ -77,9 +92,7 @@ beforeAll(() => {
 describe('Git privacy guards', () => {
   it('recognizes earlier personal-only history after the branch is renamed', () => {
     expect(containsPrivateHistory(earlierPersonal).status).toBe(0);
-    const result = runHook([
-      `refs/heads/alias ${earlierPersonal} refs/heads/alias ${zeroOid}`,
-    ]);
+    const result = runHook([`refs/heads/alias ${earlierPersonal} refs/heads/alias ${zeroOid}`]);
     expect(result.status).toBe(1);
     expect(result.stderr).toMatch(/local-only personal history/i);
   });
@@ -95,9 +108,7 @@ describe('Git privacy guards', () => {
     git('update-ref', 'refs/ssb/public/main', git('rev-parse', 'main'));
     git('update-ref', 'refs/heads/main', personalTip);
 
-    const result = runHook([
-      `refs/heads/main ${personalTip} refs/heads/main ${zeroOid}`,
-    ]);
+    const result = runHook([`refs/heads/main ${personalTip} refs/heads/main ${zeroOid}`]);
     expect(result.status).toBe(1);
     expect(result.stderr).toMatch(/local-only personal history/i);
 
@@ -134,23 +145,17 @@ describe('Git privacy guards', () => {
     }).trim();
     git('tag', '-a', 'blob-tag', blobOid, '-m', 'blob tag');
     const tagOid = git('rev-parse', 'refs/tags/blob-tag');
-    const tagResult = runHook([
-      `refs/tags/blob-tag ${tagOid} refs/tags/blob-tag ${zeroOid}`,
-    ]);
+    const tagResult = runHook([`refs/tags/blob-tag ${tagOid} refs/tags/blob-tag ${zeroOid}`]);
     expect(tagResult.status).toBe(1);
     expect(tagResult.stderr).toMatch(/non-commit object/i);
 
-    const deleteResult = runHook([
-      `(delete) ${zeroOid} refs/heads/personal ${personalTip}`,
-    ]);
+    const deleteResult = runHook([`(delete) ${zeroOid} refs/heads/personal ${personalTip}`]);
     expect(deleteResult.status).toBe(0);
   });
 
   it('recognizes SHA-256-style deletion object IDs', () => {
     const sha256ZeroOid = '0'.repeat(64);
-    const deleteResult = runHook([
-      `(delete) ${sha256ZeroOid} refs/heads/personal ${personalTip}`,
-    ]);
+    const deleteResult = runHook([`(delete) ${sha256ZeroOid} refs/heads/personal ${personalTip}`]);
     expect(deleteResult.status).toBe(0);
   });
 
@@ -162,7 +167,8 @@ describe('Git privacy guards', () => {
     }
     fs.chmodSync(path.join(isolated, 'scripts/install-git-hooks.sh'), 0o755);
 
-    const isolatedGit = (...args) => execFileSync('git', args, { cwd: isolated, encoding: 'utf8' }).trim();
+    const isolatedGit = (...args) =>
+      execFileSync('git', args, { cwd: isolated, encoding: 'utf8' }).trim();
     isolatedGit('init', '-b', 'main', '--quiet');
     isolatedGit('config', 'user.name', 'Synthetic Test');
     isolatedGit('config', 'user.email', 'synthetic@example.invalid');

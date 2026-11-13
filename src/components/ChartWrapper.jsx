@@ -52,7 +52,14 @@ const DOUGHNUT_OPTIONS = {
   plugins: {
     legend: {
       position: 'right',
-      labels: { color: '#333333', font: { size: 11, weight: '600' }, padding: 12, usePointStyle: true, boxWidth: 8, boxHeight: 8 },
+      labels: {
+        color: '#333333',
+        font: { size: 11, weight: '600' },
+        padding: 12,
+        usePointStyle: true,
+        boxWidth: 8,
+        boxHeight: 8,
+      },
     },
   },
   cutout: '68%',
@@ -79,10 +86,24 @@ export default function ChartWrapper({
   const mutedColor = getThemeValue('--muted', '#6f7d93');
   const borderColor = getThemeValue('--border', 'rgba(72, 50, 24, 0.09)');
   const surfaceColor = getThemeValue('--surface-elevated', '#ffffff');
-  const hasRenderableData = labels.length > 0 && datasets.some((dataset) => Array.isArray(dataset?.data) && dataset.data.length > 0);
+  const hasRenderableData =
+    labels.length > 0 &&
+    datasets.some((dataset) => Array.isArray(dataset?.data) && dataset.data.length > 0);
   if (!hasRenderableData) {
     return (
-      <div style={{ height: `${height}px`, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: '13px', border: '1px dashed var(--border)', borderRadius: '12px' }}>
+      <div
+        style={{
+          height: `${height}px`,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--muted)',
+          fontSize: '13px',
+          border: '1px dashed var(--border)',
+          borderRadius: '12px',
+        }}
+      >
         No chart data available for this view yet.
       </div>
     );
@@ -193,7 +214,8 @@ export default function ChartWrapper({
           borderColor,
           borderWidth: 1,
           callbacks: {
-            label: (context) => `${context.dataset.label || 'Value'}: ${formatCurrency(context.parsed?.[isHorizontal ? 'x' : 'y'] ?? context.raw, currency)}`,
+            label: (context) =>
+              `${context.dataset.label || 'Value'}: ${formatCurrency(context.parsed?.[isHorizontal ? 'x' : 'y'] ?? context.raw, currency)}`,
           },
           ...(options.plugins?.tooltip || {}),
         },

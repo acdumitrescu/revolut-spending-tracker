@@ -17,7 +17,7 @@ describe('ImportSummaryModal', () => {
           skippedReasonCounts: { 'invalid amount': 1, 'missing description': 1 },
           skippedDetails: ['Row 4: invalid amount', 'Row 6: missing description'],
         }}
-      />
+      />,
     );
 
     expect(screen.getByText('Import Summary')).toBeInTheDocument();

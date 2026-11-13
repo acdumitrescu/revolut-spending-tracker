@@ -31,12 +31,30 @@ function BrdHarness() {
   const { data, commitBrdStatement } = useAppContext();
   const run = async () => {
     try {
-      const statement = await parseBrdStatement('Date of Transaction,Merchant/Beneficiary Name,Transaction details,Amount,Currency,Transaction type,Status\n2026-10-01,Synthetic shop,POS,10,RON,DBIT,PROCESSED');
-      await commitBrdStatement({ statement, accountId:'brd', ownRecipients:[], fileName:'synthetic-brd.csv', importedAt:1, balanceConfirmation:{date:'2026-10-06',amountMinor:123456} });
-    } catch { /* Inspect state after the expected backup failure. */ }
-    finally { setDone(true); }
+      const statement = await parseBrdStatement(
+        'Date of Transaction,Merchant/Beneficiary Name,Transaction details,Amount,Currency,Transaction type,Status\n2026-10-01,Synthetic shop,POS,10,RON,DBIT,PROCESSED',
+      );
+      await commitBrdStatement({
+        statement,
+        accountId: 'brd',
+        ownRecipients: [],
+        fileName: 'synthetic-brd.csv',
+        importedAt: 1,
+        balanceConfirmation: { date: '2026-10-06', amountMinor: 123456 },
+      });
+    } catch {
+      /* Inspect state after the expected backup failure. */
+    } finally {
+      setDone(true);
+    }
   };
-  return <><button onClick={run}>BRD import</button>{done && <span>BRD finished</span>}<output data-testid="brd-state">{JSON.stringify(data)}</output></>;
+  return (
+    <>
+      <button onClick={run}>BRD import</button>
+      {done && <span>BRD finished</span>}
+      <output data-testid="brd-state">{JSON.stringify(data)}</output>
+    </>
+  );
 }
 
 const transaction = {
@@ -79,9 +97,15 @@ function ImportHarness() {
 
   return (
     <div>
-      <button type="button" onClick={() => run('real.csv')}>Real import</button>
-      <button type="button" onClick={() => run('demo-revolut.csv', true)}>Demo import</button>
-      <button type="button" onClick={() => run('demo-revolut.csv')}>Real file with demo name</button>
+      <button type="button" onClick={() => run('real.csv')}>
+        Real import
+      </button>
+      <button type="button" onClick={() => run('demo-revolut.csv', true)}>
+        Demo import
+      </button>
+      <button type="button" onClick={() => run('demo-revolut.csv')}>
+        Real file with demo name
+      </button>
       <span data-testid="transaction-count">{data.transactions.length}</span>
     </div>
   );
@@ -93,39 +117,74 @@ afterEach(() => {
 });
 
 describe('AppContext import backups', () => {
-  it.each([1, 2])('leaves BRD balances and activity unchanged if backup %s fails', async (failedCall) => {
-    const state=createPersistedAppState();state.data.accounts=[{id:'brd',name:'BRD',currency:'RON',balances:{'2026-09':99},notes:{}}];
-    window.localStorage.getItem.mockReturnValue(JSON.stringify(state));
-    if (failedCall === 2) createPrivateBackupMock.mockResolvedValueOnce({filename:'recovery.ssbdb'});
-    createPrivateBackupMock.mockRejectedValue(new Error('disk full'));
-    render(<AppProvider><BrdHarness /></AppProvider>);
-    await act(async()=>{fireEvent.click(screen.getByText('BRD import'));});
-    await screen.findByText('BRD finished');
-    const result=JSON.parse(screen.getByTestId('brd-state').textContent);
-    expect(result.moneyFlow.brd).toBeUndefined();expect(result.accounts[0].balances).toEqual({'2026-09':99});
-  });
+  it.each([1, 2])(
+    'leaves BRD balances and activity unchanged if backup %s fails',
+    async (failedCall) => {
+      const state = createPersistedAppState();
+      state.data.accounts = [
+        { id: 'brd', name: 'BRD', currency: 'RON', balances: { '2026-09': 99 }, notes: {} },
+      ];
+      window.localStorage.getItem.mockReturnValue(JSON.stringify(state));
+      if (failedCall === 2)
+        createPrivateBackupMock.mockResolvedValueOnce({ filename: 'recovery.ssbdb' });
+      createPrivateBackupMock.mockRejectedValue(new Error('disk full'));
+      render(
+        <AppProvider>
+          <BrdHarness />
+        </AppProvider>,
+      );
+      await act(async () => {
+        fireEvent.click(screen.getByText('BRD import'));
+      });
+      await screen.findByText('BRD finished');
+      const result = JSON.parse(screen.getByTestId('brd-state').textContent);
+      expect(result.moneyFlow.brd).toBeUndefined();
+      expect(result.accounts[0].balances).toEqual({ '2026-09': 99 });
+    },
+  );
   it('backs up old and next BRD states before atomically committing the ledger and confirmed balance', async () => {
-    const state=createPersistedAppState();state.data.accounts=[{id:'brd',name:'BRD',currency:'RON',balances:{},notes:{}}];
+    const state = createPersistedAppState();
+    state.data.accounts = [{ id: 'brd', name: 'BRD', currency: 'RON', balances: {}, notes: {} }];
     window.localStorage.getItem.mockReturnValue(JSON.stringify(state));
-    createPrivateBackupMock.mockResolvedValue({filename:'synthetic.ssbdb'});
-    render(<AppProvider><BrdHarness /></AppProvider>);
-    await act(async()=>{fireEvent.click(screen.getByText('BRD import'));});
+    createPrivateBackupMock.mockResolvedValue({ filename: 'synthetic.ssbdb' });
+    render(
+      <AppProvider>
+        <BrdHarness />
+      </AppProvider>,
+    );
+    await act(async () => {
+      fireEvent.click(screen.getByText('BRD import'));
+    });
     await screen.findByText('BRD finished');
-    expect(createPrivateBackupMock.mock.calls.map(call=>call[1])).toEqual(['recovery','import']);
+    expect(createPrivateBackupMock.mock.calls.map((call) => call[1])).toEqual([
+      'recovery',
+      'import',
+    ]);
     expect(createPrivateBackupMock.mock.calls[0][0].data.moneyFlow.brd).toBeUndefined();
     expect(createPrivateBackupMock.mock.calls[1][0].data.moneyFlow.brd.rows).toHaveLength(1);
-    const result=JSON.parse(screen.getByTestId('brd-state').textContent);
-    expect(result.accounts[0].balances['2026-10']).toBe(1234.56);expect(result.moneyFlow.brd.rows).toHaveLength(1);
+    const result = JSON.parse(screen.getByTestId('brd-state').textContent);
+    expect(result.accounts[0].balances['2026-10']).toBe(1234.56);
+    expect(result.moneyFlow.brd.rows).toHaveLength(1);
   });
   it('does not trust an uploaded filename to bypass backups', async () => {
     createPrivateBackupMock.mockResolvedValue({ filename: 'backup.json', reason: 'import' });
-    render(<AppProvider><ImportHarness /></AppProvider>);
-    await act(async () => { fireEvent.click(screen.getByText('Real file with demo name')); });
+    render(
+      <AppProvider>
+        <ImportHarness />
+      </AppProvider>,
+    );
+    await act(async () => {
+      fireEvent.click(screen.getByText('Real file with demo name'));
+    });
     expect(createPrivateBackupMock).toHaveBeenCalledTimes(1);
   });
   it('backs up the complete next state before committing a real import', async () => {
     createPrivateBackupMock.mockResolvedValue({ filename: 'backup.json', reason: 'import' });
-    render(<AppProvider><ImportHarness /></AppProvider>);
+    render(
+      <AppProvider>
+        <ImportHarness />
+      </AppProvider>,
+    );
 
     await act(async () => {
       fireEvent.click(screen.getByText('Real import'));
@@ -143,7 +202,11 @@ describe('AppContext import backups', () => {
 
   it('does not commit when the required backup fails', async () => {
     createPrivateBackupMock.mockRejectedValue(new Error('disk full'));
-    render(<AppProvider><ImportHarness /></AppProvider>);
+    render(
+      <AppProvider>
+        <ImportHarness />
+      </AppProvider>,
+    );
 
     await act(async () => {
       fireEvent.click(screen.getByText('Real import'));
@@ -153,7 +216,11 @@ describe('AppContext import backups', () => {
   });
 
   it('does not create an automatic backup for synthetic demo imports', async () => {
-    render(<AppProvider><ImportHarness /></AppProvider>);
+    render(
+      <AppProvider>
+        <ImportHarness />
+      </AppProvider>,
+    );
 
     await act(async () => {
       fireEvent.click(screen.getByText('Demo import'));

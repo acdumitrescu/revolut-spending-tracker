@@ -24,7 +24,8 @@ if (encrypted && !process.argv.includes('--no-auto-unlock')) devAutoLogin = read
 if (encrypted && !devAutoLogin && existsSync(autoLoginFile)) {
   try {
     const parsed = JSON.parse(readFileSync(autoLoginFile, 'utf8'));
-    if (parsed?.name && parsed?.password) devAutoLogin = { name: String(parsed.name), password: String(parsed.password) };
+    if (parsed?.name && parsed?.password)
+      devAutoLogin = { name: String(parsed.name), password: String(parsed.password) };
   } catch {
     console.error(`Ignoring unreadable ${autoLoginFile}.`);
   }
@@ -42,7 +43,9 @@ if (useSavedToken) {
 }
 
 if (!isSafeSyncToken(syncToken)) {
-  console.error('SSB_SYNC_TOKEN must be a unique secret of at least 32 characters before starting personal development.');
+  console.error(
+    'SSB_SYNC_TOKEN must be a unique secret of at least 32 characters before starting personal development.',
+  );
   process.exit(1);
 }
 
@@ -57,8 +60,17 @@ const apiEnvironment = {
   SSB_SYNC_TOKEN: syncToken,
   SSB_TRUSTED_DEV_PROXY: 'true',
   SSB_DEV_DISABLE_AUTO_LOCK: 'true',
-  SSB_ALLOW_WEAK_TEST_PASSWORDS: String(existsSync(path.join(privateDataDir, 'weak-passwords.testing'))),
-  ...(encrypted ? { SSB_LOCAL_USERS: 'true', SSB_STORAGE: 'sqlcipher', SSB_DATABASE_FILE: databaseFile, SSB_KEYCHAIN_HELPER: path.join(repoRoot, 'private-data', 'runtime', 'ssb-keychain') } : {}),
+  SSB_ALLOW_WEAK_TEST_PASSWORDS: String(
+    existsSync(path.join(privateDataDir, 'weak-passwords.testing')),
+  ),
+  ...(encrypted
+    ? {
+        SSB_LOCAL_USERS: 'true',
+        SSB_STORAGE: 'sqlcipher',
+        SSB_DATABASE_FILE: databaseFile,
+        SSB_KEYCHAIN_HELPER: path.join(repoRoot, 'private-data', 'runtime', 'ssb-keychain'),
+      }
+    : {}),
 };
 
 const viteEnvironment = {
@@ -72,7 +84,12 @@ const viteEnvironment = {
   VITE_API_BASE_PATH: '/api',
   SSB_TRUSTED_DEV_PROXY: 'true',
   SSB_SYNC_TOKEN: syncToken,
-  ...(devAutoLogin ? { VITE_DEV_AUTO_LOGIN_USER: devAutoLogin.name, VITE_DEV_AUTO_LOGIN_PASSWORD: devAutoLogin.password } : {}),
+  ...(devAutoLogin
+    ? {
+        VITE_DEV_AUTO_LOGIN_USER: devAutoLogin.name,
+        VITE_DEV_AUTO_LOGIN_PASSWORD: devAutoLogin.password,
+      }
+    : {}),
 };
 
 let apiProcess;
@@ -139,16 +156,15 @@ try {
   process.exit();
 }
 
-viteProcess = spawn(process.execPath, [
-  viteEntry,
-  '--host', '127.0.0.1',
-  '--port', '5173',
-  '--strictPort',
-], {
-  cwd: repoRoot,
-  env: viteEnvironment,
-  stdio: 'inherit',
-});
+viteProcess = spawn(
+  process.execPath,
+  [viteEntry, '--host', '127.0.0.1', '--port', '5173', '--strictPort'],
+  {
+    cwd: repoRoot,
+    env: viteEnvironment,
+    stdio: 'inherit',
+  },
+);
 
 viteProcess.on('exit', (code, signal) => {
   if (!stopping) {

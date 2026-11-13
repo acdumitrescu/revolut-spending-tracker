@@ -8,14 +8,16 @@ import SideNavigation from '../components/SideNavigation';
 vi.mock('../lib/AppContext', () => ({
   useAppContext: () => ({
     data: {
-      transactions: [{
-        id: 'one',
-        date: '2026-05-10',
-        desc: 'Synthetic Market',
-        matchedVendor: 'Synthetic Market',
-        cat: 'Groceries',
-        sub: 'Supermarket',
-      }],
+      transactions: [
+        {
+          id: 'one',
+          date: '2026-05-10',
+          desc: 'Synthetic Market',
+          matchedVendor: 'Synthetic Market',
+          cat: 'Groceries',
+          sub: 'Supermarket',
+        },
+      ],
     },
   }),
 }));
@@ -28,7 +30,7 @@ describe('navigation accessibility', () => {
         <Routes>
           <Route path="/app/activity/transactions" element={<h1>Transaction results</h1>} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const search = screen.getByRole('combobox', { name: /search transactions/i });
@@ -39,7 +41,11 @@ describe('navigation accessibility', () => {
   });
 
   it('closes the utility menu with Escape and restores trigger focus', () => {
-    render(<MemoryRouter><UtilityMenu /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <UtilityMenu />
+      </MemoryRouter>,
+    );
     const trigger = screen.getByRole('button', { name: /open workspace menu/i });
     fireEvent.click(trigger);
     expect(screen.getByRole('menu')).toBeInTheDocument();
@@ -49,10 +55,20 @@ describe('navigation accessibility', () => {
   });
 
   it('exposes Portfolio and Mappings from the expanded desktop navigation', () => {
-    render(<MemoryRouter initialEntries={['/app']}><SideNavigation /></MemoryRouter>);
+    render(
+      <MemoryRouter initialEntries={['/app']}>
+        <SideNavigation />
+      </MemoryRouter>,
+    );
 
-    expect(screen.getByRole('link', { name: 'Portfolio' })).toHaveAttribute('href', '/app/accounts/portfolio');
-    expect(screen.getByRole('link', { name: 'Mappings' })).toHaveAttribute('href', '/app/insights/vendors#mappings');
+    expect(screen.getByRole('link', { name: 'Portfolio' })).toHaveAttribute(
+      'href',
+      '/app/accounts/portfolio',
+    );
+    expect(screen.getByRole('link', { name: 'Mappings' })).toHaveAttribute(
+      'href',
+      '/app/insights/vendors#mappings',
+    );
     expect(screen.getByRole('button', { name: 'Collapse navigation' })).toBeInTheDocument();
   });
 });

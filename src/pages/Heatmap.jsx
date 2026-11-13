@@ -66,7 +66,11 @@ export default function Heatmap() {
     return (
       <div>
         <h2 style={{ marginBottom: '20px' }}>Spending Heatmap</h2>
-        <EmptyState icon={CalendarRange} title="No spending rhythm yet" description="Import transactions to explore daily intensity and unusual spending days." />
+        <EmptyState
+          icon={CalendarRange}
+          title="No spending rhythm yet"
+          description="Import transactions to explore daily intensity and unusual spending days."
+        />
       </div>
     );
   }
@@ -75,17 +79,43 @@ export default function Heatmap() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+        }}
+      >
         <div>
           <h2 style={{ marginBottom: '6px' }}>Spending Heatmap</h2>
-          <div style={{ color: 'var(--muted)', fontSize: '12px' }}>GitHub-style monthly view with daily drilldown</div>
+          <div style={{ color: 'var(--muted)', fontSize: '12px' }}>
+            GitHub-style monthly view with daily drilldown
+          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button className="btn" onClick={() => setWindowIndex((idx) => Math.max(0, idx - 1))} disabled={safeWindowIndex === 0}>
+          <button
+            className="btn"
+            onClick={() => setWindowIndex((idx) => Math.max(0, idx - 1))}
+            disabled={safeWindowIndex === 0}
+          >
             <ChevronLeft size={14} />
           </button>
-          <div style={{ minWidth: '150px', textAlign: 'center', fontSize: '12px', color: 'var(--muted)' }}>{visibleMonthLabel}</div>
-          <button className="btn" onClick={() => setWindowIndex((idx) => Math.min(monthWindows.length - 1, idx + 1))} disabled={safeWindowIndex >= monthWindows.length - 1}>
+          <div
+            style={{
+              minWidth: '150px',
+              textAlign: 'center',
+              fontSize: '12px',
+              color: 'var(--muted)',
+            }}
+          >
+            {visibleMonthLabel}
+          </div>
+          <button
+            className="btn"
+            onClick={() => setWindowIndex((idx) => Math.min(monthWindows.length - 1, idx + 1))}
+            disabled={safeWindowIndex >= monthWindows.length - 1}
+          >
             <ChevronRight size={14} />
           </button>
         </div>
@@ -94,7 +124,12 @@ export default function Heatmap() {
       <div className="kpi-grid" style={{ marginBottom: '20px' }}>
         <div className="kpi red">
           <div className="lbl">Visible Spend</div>
-          <div className="val">{formatCurrency(monthCards.reduce((sum, card) => sum + card.totalSpend, 0), displayCurrency)}</div>
+          <div className="val">
+            {formatCurrency(
+              monthCards.reduce((sum, card) => sum + card.totalSpend, 0),
+              displayCurrency,
+            )}
+          </div>
         </div>
         <div className="kpi amber">
           <div className="lbl">Active Days</div>
@@ -108,18 +143,44 @@ export default function Heatmap() {
 
       <div className="grid3">
         {monthCards.map((card) => {
-          const label = new Date(`${card.month}-01`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+          const label = new Date(`${card.month}-01`).toLocaleDateString('en-US', {
+            month: 'long',
+            year: 'numeric',
+          });
           return (
             <div key={card.month} className="card">
               <div className="card-title">{label}</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)',
+                  gap: '4px',
+                  marginBottom: '8px',
+                }}
+              >
                 {weekDays.map((day) => (
-                  <div key={day} style={{ fontSize: '10px', color: 'var(--muted)', textAlign: 'center', fontWeight: 600 }}>{day}</div>
+                  <div
+                    key={day}
+                    style={{
+                      fontSize: '10px',
+                      color: 'var(--muted)',
+                      textAlign: 'center',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {day}
+                  </div>
                 ))}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
                 {card.grid.map((cell, index) => {
-                  if (!cell) return <div key={`${card.month}-blank-${index}`} style={{ aspectRatio: '1', borderRadius: '4px' }} />;
+                  if (!cell)
+                    return (
+                      <div
+                        key={`${card.month}-blank-${index}`}
+                        style={{ aspectRatio: '1', borderRadius: '4px' }}
+                      />
+                    );
                   const intensity = card.maxSpend > 0 ? cell.spendNet / card.maxSpend : 0;
                   return (
                     <button
@@ -134,7 +195,10 @@ export default function Heatmap() {
                         color: intensity > 0.5 ? '#fff' : 'var(--muted)',
                         fontSize: '10px',
                         fontWeight: cell.spendNet > 0 ? 700 : 400,
-                        border: cell.date === selectedDate ? '2px solid var(--blue)' : '1px solid var(--border)',
+                        border:
+                          cell.date === selectedDate
+                            ? '2px solid var(--blue)'
+                            : '1px solid var(--border)',
                         cursor: 'pointer',
                       }}
                     >
@@ -149,26 +213,69 @@ export default function Heatmap() {
       </div>
 
       <div className="card" style={{ marginTop: '14px' }}>
-        <div className="card-title">{selectedDate ? `Transactions on ${selectedDate}` : 'Pick a day to inspect activity'}</div>
+        <div className="card-title">
+          {selectedDate ? `Transactions on ${selectedDate}` : 'Pick a day to inspect activity'}
+        </div>
         {selectedDayDetails ? (
           <>
-            <div style={{ display: 'flex', gap: '24px', marginBottom: '14px', color: 'var(--muted)', fontSize: '12px' }}>
-              <span>Net spend: <strong style={{ color: 'var(--red)' }}>{formatCurrency(selectedDayDetails.spendNet, displayCurrency)}</strong></span>
-              <span>Income: <strong style={{ color: 'var(--green)' }}>{formatCurrency(selectedDayDetails.income, displayCurrency)}</strong></span>
-              <span>Refunds: <strong>{formatCurrency(selectedDayDetails.refunds, displayCurrency)}</strong></span>
+            <div
+              style={{
+                display: 'flex',
+                gap: '24px',
+                marginBottom: '14px',
+                color: 'var(--muted)',
+                fontSize: '12px',
+              }}
+            >
+              <span>
+                Net spend:{' '}
+                <strong style={{ color: 'var(--red)' }}>
+                  {formatCurrency(selectedDayDetails.spendNet, displayCurrency)}
+                </strong>
+              </span>
+              <span>
+                Income:{' '}
+                <strong style={{ color: 'var(--green)' }}>
+                  {formatCurrency(selectedDayDetails.income, displayCurrency)}
+                </strong>
+              </span>
+              <span>
+                Refunds:{' '}
+                <strong>{formatCurrency(selectedDayDetails.refunds, displayCurrency)}</strong>
+              </span>
             </div>
             <div className="tbl-wrap">
               <table>
                 <thead>
-                  <tr><th>Description</th><th>Category</th><th style={{ textAlign: 'right' }}>Amount</th></tr>
+                  <tr>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th style={{ textAlign: 'right' }}>Amount</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {selectedDayTxns.map((txn) => (
                     <tr key={`${txn.date}-${txn.desc}-${txn.amt}-${txn.ref || txn.type}`}>
                       <td>{txn.desc}</td>
                       <td>{txn.cat}</td>
-                      <td style={{ textAlign: 'right', color: txn.flow === 'Credit' ? 'var(--green)' : 'var(--red)' }}>
-                        {txn.flow === 'Credit' ? '+' : '-'}{formatCurrency(Math.abs(convertAmountToDisplay(txn.amt, txn.currency || 'RON', displayCurrency, data.fxRates)), displayCurrency)}
+                      <td
+                        style={{
+                          textAlign: 'right',
+                          color: txn.flow === 'Credit' ? 'var(--green)' : 'var(--red)',
+                        }}
+                      >
+                        {txn.flow === 'Credit' ? '+' : '-'}
+                        {formatCurrency(
+                          Math.abs(
+                            convertAmountToDisplay(
+                              txn.amt,
+                              txn.currency || 'RON',
+                              displayCurrency,
+                              data.fxRates,
+                            ),
+                          ),
+                          displayCurrency,
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -177,7 +284,9 @@ export default function Heatmap() {
             </div>
           </>
         ) : (
-          <div style={{ color: 'var(--muted)', fontSize: '13px' }}>Click any day square to inspect the underlying transactions.</div>
+          <div style={{ color: 'var(--muted)', fontSize: '13px' }}>
+            Click any day square to inspect the underlying transactions.
+          </div>
         )}
       </div>
     </div>

@@ -21,10 +21,15 @@ const PORT = Number.parseInt(process.env.PORT || '3177', 10);
 // Loopback by default. The Docker image sets HOST=0.0.0.0 explicitly (backend/Dockerfile).
 const HOST = process.env.HOST || '127.0.0.1';
 const APP_STATE_FILE = resolveAppStateFile(process.env.APP_STATE_FILE);
-const VENDOR_OBSERVATIONS_FILE = resolveVendorObservationsFile(process.env.VENDOR_OBSERVATIONS_FILE);
+const VENDOR_OBSERVATIONS_FILE = resolveVendorObservationsFile(
+  process.env.VENDOR_OBSERVATIONS_FILE,
+);
 const APP_STATE_BACKUP_FILE = `${APP_STATE_FILE}.bak`;
 const VENDOR_OBSERVATIONS_BACKUP_FILE = `${VENDOR_OBSERVATIONS_FILE}.bak`;
-const MAX_PAYLOAD_BYTES = Number.parseInt(process.env.APP_STATE_MAX_BYTES || String(5 * 1024 * 1024), 10);
+const MAX_PAYLOAD_BYTES = Number.parseInt(
+  process.env.APP_STATE_MAX_BYTES || String(5 * 1024 * 1024),
+  10,
+);
 const ALLOWED_ORIGINS = String(process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((origin) => origin.trim())
@@ -38,10 +43,15 @@ const userContext = new AsyncLocalStorage();
 let databaseKey;
 let encryptedStore;
 if (encryptedMode && !usersMode) {
-  if (!process.env.SSB_DATABASE_FILE || !process.env.SSB_KEYCHAIN_HELPER) throw new Error('Encrypted storage configuration missing');
+  if (!process.env.SSB_DATABASE_FILE || !process.env.SSB_KEYCHAIN_HELPER)
+    throw new Error('Encrypted storage configuration missing');
   databaseKey = await readDatabaseKey(process.env.SSB_KEYCHAIN_HELPER);
-  encryptedStore = await openEncryptedStore({ filename: process.env.SSB_DATABASE_FILE, key: databaseKey });
-  if (!(await encryptedStore.read()).data) throw new Error('Encrypted store not initialized; refusing empty fallback');
+  encryptedStore = await openEncryptedStore({
+    filename: process.env.SSB_DATABASE_FILE,
+    key: databaseKey,
+  });
+  if (!(await encryptedStore.read()).data)
+    throw new Error('Encrypted store not initialized; refusing empty fallback');
 }
 
 let writeQueue = Promise.resolve();
@@ -83,54 +93,109 @@ function authenticatePrivateApi(req, res, next) {
   return next();
 }
 
-const ALLOWED_HOSTS = String(process.env.SSB_ALLOWED_HOSTS || '').split(',').map((item) => item.trim()).filter(Boolean);
+const ALLOWED_HOSTS = String(process.env.SSB_ALLOWED_HOSTS || '')
+  .split(',')
+  .map((item) => item.trim())
+  .filter(Boolean);
 app.use(securityHeaders());
 app.use(hostGuard({ allowedHosts: ALLOWED_HOSTS }));
 app.use('/api', authenticatePrivateApi);
-app.use('/api', (req, res, next) => requestBoundary({
-  allowedHosts: ALLOWED_HOSTS,
-  allowedOrigins: ALLOWED_ORIGINS.length ? ALLOWED_ORIGINS : ['http://127.0.0.1:3176', 'http://localhost:3176'],
-})(req, res, next));
+app.use('/api', (req, res, next) =>
+  requestBoundary({
+    allowedHosts: ALLOWED_HOSTS,
+    allowedOrigins: ALLOWED_ORIGINS.length
+      ? ALLOWED_ORIGINS
+      : ['http://127.0.0.1:3176', 'http://localhost:3176'],
+  })(req, res, next),
+);
 app.use('/api/users/restore', express.json({ limit: '30mb' }));
 app.use(express.json({ limit: `${Math.ceil(MAX_PAYLOAD_BYTES / (1024 * 1024))}mb` }));
 
-const users = usersMode ? await createLocalUsers({
-  autoLockDisabled: process.env.SSB_TRUSTED_DEV_PROXY === 'true' && process.env.SSB_DEV_DISABLE_AUTO_LOCK === 'true' && HOST === '127.0.0.1',
-  allowWeakTestPasswords: process.env.SSB_ALLOW_WEAK_TEST_PASSWORDS === 'true',
-  root: process.env.SSB_USERS_DIR || path.join(path.dirname(process.env.SSB_DATABASE_FILE), 'users'),
-  readLegacy: await fs.stat(process.env.SSB_DATABASE_FILE).then(() => true).catch(error => { if (error.code === 'ENOENT') return false; throw error; }) ? async () => {
-    // Existing database is only unlocked during first-user migration.
-    const key = await readDatabaseKey(process.env.SSB_KEYCHAIN_HELPER);
-    let store;
-    try {
-      store = await openEncryptedStore({ filename: process.env.SSB_DATABASE_FILE, key });
-      await store.integrity();
-      const data = (await store.read()).data;
-      if (!data) throw new Error('Existing workspace is empty; refusing migration');
-      const observations = await store.getDocument('vendor-observations');
-      await createEncryptedBackup({ backupDir: process.env.SSB_BACKUP_DIR, key, data, reason: 'recovery', observations });
-      return { data, observations };
-    } finally { if (store) await store.close(); key.fill(0); }
-  } : null,
-}) : null;
-const getStore = () => usersMode ? userContext.getStore()?.store : encryptedStore;
-const getKey = () => usersMode ? userContext.getStore()?.key : databaseKey;
-const getBackupDir = () => usersMode ? userContext.getStore()?.backupDir : process.env.SSB_BACKUP_DIR;
+const users = usersMode
+  ? await createLocalUsers({
+      autoLockDisabled:
+        process.env.SSB_TRUSTED_DEV_PROXY === 'true' &&
+        process.env.SSB_DEV_DISABLE_AUTO_LOCK === 'true' &&
+        HOST === '127.0.0.1',
+      allowWeakTestPasswords: process.env.SSB_ALLOW_WEAK_TEST_PASSWORDS === 'true',
+      root:
+        process.env.SSB_USERS_DIR ||
+        path.join(path.dirname(process.env.SSB_DATABASE_FILE), 'users'),
+      readLegacy: (await fs
+        .stat(process.env.SSB_DATABASE_FILE)
+        .then(() => true)
+        .catch((error) => {
+          if (error.code === 'ENOENT') return false;
+          throw error;
+        }))
+        ? async () => {
+            // Existing database is only unlocked during first-user migration.
+            const key = await readDatabaseKey(process.env.SSB_KEYCHAIN_HELPER);
+            let store;
+            try {
+              store = await openEncryptedStore({ filename: process.env.SSB_DATABASE_FILE, key });
+              await store.integrity();
+              const data = (await store.read()).data;
+              if (!data) throw new Error('Existing workspace is empty; refusing migration');
+              const observations = await store.getDocument('vendor-observations');
+              await createEncryptedBackup({
+                backupDir: process.env.SSB_BACKUP_DIR,
+                key,
+                data,
+                reason: 'recovery',
+                observations,
+              });
+              return { data, observations };
+            } finally {
+              if (store) await store.close();
+              key.fill(0);
+            }
+          }
+        : null,
+    })
+  : null;
+const getStore = () => (usersMode ? userContext.getStore()?.store : encryptedStore);
+const getKey = () => (usersMode ? userContext.getStore()?.key : databaseKey);
+const getBackupDir = () =>
+  usersMode ? userContext.getStore()?.backupDir : process.env.SSB_BACKUP_DIR;
 
 if (users) {
-  const userAction = work => async (req, res) => {
-    try { res.json(await work(req)); }
-    catch (error) { res.status(error.status || 500).json({ error: error.status ? error.message : 'Local user operation failed. Your existing data has not been replaced.' }); }
-    finally { if (req.body?.password) req.body.password = ''; }
+  const userAction = (work) => async (req, res) => {
+    try {
+      res.json(await work(req));
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.status
+          ? error.message
+          : 'Local user operation failed. Your existing data has not been replaced.',
+      });
+    } finally {
+      if (req.body?.password) req.body.password = '';
+    }
   };
-  app.get('/api/users', userAction(() => users.list()));
-  app.post('/api/users', userAction(req => users.create(req.body)));
-  app.post('/api/users/unlock', userAction(req => users.unlock(req.body)));
-  app.post('/api/users/restore', userAction(req => users.restore(req.body)));
-  app.post('/api/users/lock', userAction(async req => {
-    await users.revoke(String(req.headers['x-ssb-session'] || ''));
-    return { locked: true };
-  }));
+  app.get(
+    '/api/users',
+    userAction(() => users.list()),
+  );
+  app.post(
+    '/api/users',
+    userAction((req) => users.create(req.body)),
+  );
+  app.post(
+    '/api/users/unlock',
+    userAction((req) => users.unlock(req.body)),
+  );
+  app.post(
+    '/api/users/restore',
+    userAction((req) => users.restore(req.body)),
+  );
+  app.post(
+    '/api/users/lock',
+    userAction(async (req) => {
+      await users.revoke(String(req.headers['x-ssb-session'] || ''));
+      return { locked: true };
+    }),
+  );
 
   // Bind each handler for its entire async lifetime, including an aborted client.
   // A user ID in a URL, header, or payload can never switch the database.
@@ -138,15 +203,23 @@ if (users) {
     const register = app[method].bind(app);
     app[method] = (route, ...handlers) => {
       if (!route.startsWith('/api/')) return register(route, ...handlers);
-      return register(route, ...handlers.map(handler => async (req, res, next) => {
-        let lease;
-        try {
-          lease = await users.acquire(String(req.headers['x-ssb-session'] || ''));
-          await userContext.run(lease.session, () => handler(req, res, next));
-        } catch (error) {
-          if (!res.headersSent) res.status(error.status || 500).json({ error: error.status === 401 ? error.message : 'User request failed' });
-        } finally { if (lease) await lease.release(); }
-      }));
+      return register(
+        route,
+        ...handlers.map((handler) => async (req, res, next) => {
+          let lease;
+          try {
+            lease = await users.acquire(String(req.headers['x-ssb-session'] || ''));
+            await userContext.run(lease.session, () => handler(req, res, next));
+          } catch (error) {
+            if (!res.headersSent)
+              res
+                .status(error.status || 500)
+                .json({ error: error.status === 401 ? error.message : 'User request failed' });
+          } finally {
+            if (lease) await lease.release();
+          }
+        }),
+      );
     };
   }
   app.get('/api/users/session', async (_req, res) => {
@@ -210,7 +283,7 @@ async function readStateFile() {
       APP_STATE_FILE,
       APP_STATE_BACKUP_FILE,
       readStateFileAt,
-      'Private app state'
+      'Private app state',
     );
     if (recovered) return recovered;
     throw error;
@@ -227,7 +300,10 @@ async function writeStateFile(nextState) {
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
   }
-  await fs.writeFile(tempFile, `${JSON.stringify(nextState, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 });
+  await fs.writeFile(tempFile, `${JSON.stringify(nextState, null, 2)}\n`, {
+    encoding: 'utf8',
+    mode: 0o600,
+  });
   await fs.rename(tempFile, APP_STATE_FILE);
   await fs.chmod(APP_STATE_FILE, 0o600);
 }
@@ -238,12 +314,14 @@ async function readVendorObservationsFileAt(filePath) {
   return {
     schemaVersion: 1,
     updatedAt: typeof parsed?.updatedAt === 'string' ? parsed.updatedAt : null,
-    observations: parsed?.observations && typeof parsed.observations === 'object' ? parsed.observations : {},
+    observations:
+      parsed?.observations && typeof parsed.observations === 'object' ? parsed.observations : {},
   };
 }
 
 async function readVendorObservationsFile() {
-  if (getStore()) return (await getStore().getDocument('vendor-observations')) || getEmptyObservations();
+  if (getStore())
+    return (await getStore().getDocument('vendor-observations')) || getEmptyObservations();
   try {
     return await readVendorObservationsFileAt(VENDOR_OBSERVATIONS_FILE);
   } catch (error) {
@@ -252,7 +330,7 @@ async function readVendorObservationsFile() {
       VENDOR_OBSERVATIONS_FILE,
       VENDOR_OBSERVATIONS_BACKUP_FILE,
       readVendorObservationsFileAt,
-      'Private vendor observations'
+      'Private vendor observations',
     );
     if (recovered) return recovered;
     throw error;
@@ -269,7 +347,10 @@ async function writeVendorObservationsFile(nextState) {
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
   }
-  await fs.writeFile(tempFile, `${JSON.stringify(nextState, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 });
+  await fs.writeFile(tempFile, `${JSON.stringify(nextState, null, 2)}\n`, {
+    encoding: 'utf8',
+    mode: 0o600,
+  });
   await fs.rename(tempFile, VENDOR_OBSERVATIONS_FILE);
   await fs.chmod(VENDOR_OBSERVATIONS_FILE, 0o600);
 }
@@ -312,7 +393,11 @@ function normalizeCandidate(candidate) {
     alias: String(candidate?.alias || '').trim(),
     score: Number.isFinite(candidate?.score) ? candidate.score : 1,
     sourceEvidence: Array.isArray(candidate?.sourceEvidence)
-      ? [...new Set(candidate.sourceEvidence.map((value) => String(value || '').trim()).filter(Boolean))]
+      ? [
+          ...new Set(
+            candidate.sourceEvidence.map((value) => String(value || '').trim()).filter(Boolean),
+          ),
+        ]
       : [],
   };
 }
@@ -327,22 +412,35 @@ function mergeSuggestedCandidates(existing = [], incoming = []) {
       merged.set(key, candidate);
     }
   }
-  return [...merged.values()]
-    .sort((a, b) => a.score - b.score)
-    .slice(0, 5);
+  return [...merged.values()].sort((a, b) => a.score - b.score).slice(0, 5);
 }
 
 function mergeObservation(existing, incoming) {
-  const rawSamples = [...new Set([...(existing?.rawSamples || []), String(incoming.rawDescription || '').trim()].filter(Boolean))].slice(0, 6);
+  const rawSamples = [
+    ...new Set(
+      [...(existing?.rawSamples || []), String(incoming.rawDescription || '').trim()].filter(
+        Boolean,
+      ),
+    ),
+  ].slice(0, 6);
   return {
     normalizedDescription: incoming.normalizedDescription,
     rawSamples,
     count: Number(existing?.count || 0) + Number(incoming.count || 0),
     totalAmountAbs: Number(existing?.totalAmountAbs || 0) + Number(incoming.amountAbs || 0),
-    firstSeenAt: existing?.firstSeenAt && existing.firstSeenAt < incoming.firstSeenAt ? existing.firstSeenAt : incoming.firstSeenAt,
-    lastSeenAt: existing?.lastSeenAt && existing.lastSeenAt > incoming.lastSeenAt ? existing.lastSeenAt : incoming.lastSeenAt,
+    firstSeenAt:
+      existing?.firstSeenAt && existing.firstSeenAt < incoming.firstSeenAt
+        ? existing.firstSeenAt
+        : incoming.firstSeenAt,
+    lastSeenAt:
+      existing?.lastSeenAt && existing.lastSeenAt > incoming.lastSeenAt
+        ? existing.lastSeenAt
+        : incoming.lastSeenAt,
     status: existing?.status || 'pending',
-    suggestedCandidates: mergeSuggestedCandidates(existing?.suggestedCandidates, incoming.suggestedCandidates),
+    suggestedCandidates: mergeSuggestedCandidates(
+      existing?.suggestedCandidates,
+      incoming.suggestedCandidates,
+    ),
     resolution: existing?.resolution || null,
   };
 }
@@ -411,12 +509,14 @@ app.get('/api/instruments/search', async (req, res) => {
 });
 
 app.post('/api/data', async (req, res) => {
-  if (encryptedMode) return res.status(405).json({ error: 'Encrypted workspaces require validated change commands' });
+  if (encryptedMode)
+    return res
+      .status(405)
+      .json({ error: 'Encrypted workspaces require validated change commands' });
   try {
     validateIncomingState(req.body?.data);
-    const requestedVersion = Number.isInteger(req.body?.version) && req.body.version >= 0
-      ? req.body.version
-      : 0;
+    const requestedVersion =
+      Number.isInteger(req.body?.version) && req.body.version >= 0 ? req.body.version : 0;
 
     const savedState = await withSerializedWrite(async () => {
       const current = await readStateFile();
@@ -459,16 +559,27 @@ app.post('/api/data', async (req, res) => {
 app.post('/api/backups', async (req, res) => {
   try {
     if (getStore()) {
-      const receipt = await withSerializedWrite(async () => createEncryptedBackup({ backupDir: getBackupDir(), key: getKey(), data: req.body?.data, reason: req.body?.reason, importBatchId: req.body?.importBatchId, observations: await readVendorObservationsFile() }));
+      const receipt = await withSerializedWrite(async () =>
+        createEncryptedBackup({
+          backupDir: getBackupDir(),
+          key: getKey(),
+          data: req.body?.data,
+          reason: req.body?.reason,
+          importBatchId: req.body?.importBatchId,
+          observations: await readVendorObservationsFile(),
+        }),
+      );
       return res.json(receipt);
     }
-    const backup = await withSerializedWrite(() => writePortableBackup({
-      backupDir: getBackupDir(),
-      data: req.body?.data,
-      reason: req.body?.reason,
-      importBatchId: req.body?.importBatchId,
-      maxPayloadBytes: MAX_PAYLOAD_BYTES,
-    }));
+    const backup = await withSerializedWrite(() =>
+      writePortableBackup({
+        backupDir: getBackupDir(),
+        data: req.body?.data,
+        reason: req.body?.reason,
+        importBatchId: req.body?.importBatchId,
+        maxPayloadBytes: MAX_PAYLOAD_BYTES,
+      }),
+    );
     res.json(backup);
   } catch (error) {
     const status = Number.isInteger(error.status) ? error.status : 500;
@@ -489,8 +600,14 @@ app.post('/api/changes', async (req, res) => {
     });
     res.json(saved);
   } catch (error) {
-    if (error.status === 409) return res.status(409).json({ error: 'Version conflict', ...(error.body || await getStore().read()) });
-    res.status(error.status === 400 ? 400 : 500).json({ error: error.status === 400 ? 'Invalid workspace changes' : 'Unable to commit encrypted workspace' });
+    if (error.status === 409)
+      return res
+        .status(409)
+        .json({ error: 'Version conflict', ...(error.body || (await getStore().read())) });
+    res.status(error.status === 400 ? 400 : 500).json({
+      error:
+        error.status === 400 ? 'Invalid workspace changes' : 'Unable to commit encrypted workspace',
+    });
   }
 });
 
@@ -498,20 +615,34 @@ app.get('/api/encrypted-backups', async (_req, res) => {
   if (!getStore()) return res.status(404).json({ error: 'Encrypted storage is not active' });
   try {
     const names = await fs.readdir(getBackupDir());
-    res.json({ filenames: names.filter((name) => /^(manual|import|recovery)-[A-Za-z0-9_-]+\.ssbdb$/.test(name)).sort().reverse() });
-  } catch { res.status(500).json({ error: 'Unable to list encrypted backups' }); }
+    res.json({
+      filenames: names
+        .filter((name) => /^(manual|import|recovery)-[A-Za-z0-9_-]+\.ssbdb$/.test(name))
+        .sort()
+        .reverse(),
+    });
+  } catch {
+    res.status(500).json({ error: 'Unable to list encrypted backups' });
+  }
 });
 
 app.get('/api/encrypted-backups/:filename', async (req, res) => {
   if (!getStore()) return res.status(404).json({ error: 'Encrypted storage is not active' });
-  if (!/^(manual|import|recovery)-[A-Za-z0-9_-]+\.ssbdb$/.test(req.params.filename)) return res.status(400).json({error:'Invalid backup filename'});
+  if (!/^(manual|import|recovery)-[A-Za-z0-9_-]+\.ssbdb$/.test(req.params.filename))
+    return res.status(400).json({ error: 'Invalid backup filename' });
   let backup;
   try {
-    backup = await openEncryptedStore({filename:path.join(getBackupDir(),req.params.filename),key:getKey()});
+    backup = await openEncryptedStore({
+      filename: path.join(getBackupDir(), req.params.filename),
+      key: getKey(),
+    });
     await backup.integrity();
     res.json({ data: validateState((await backup.read()).data) });
-  } catch { res.status(400).json({error:'Backup could not be authenticated or validated'}); }
-  finally { if(backup) await backup.close(); }
+  } catch {
+    res.status(400).json({ error: 'Backup could not be authenticated or validated' });
+  } finally {
+    if (backup) await backup.close();
+  }
 });
 
 app.post('/api/vendor-observations/collect', async (req, res) => {
@@ -525,7 +656,10 @@ app.post('/api/vendor-observations/collect', async (req, res) => {
       for (const incoming of req.body.observations) {
         const normalizedDescription = String(incoming?.normalizedDescription || '').trim();
         if (!normalizedDescription) continue;
-        observations[normalizedDescription] = mergeObservation(observations[normalizedDescription], incoming);
+        observations[normalizedDescription] = mergeObservation(
+          observations[normalizedDescription],
+          incoming,
+        );
       }
 
       const nextState = {
@@ -581,9 +715,10 @@ app.post('/api/vendor-observations/resolve', async (req, res) => {
           [normalizedDescription]: {
             ...existing,
             status,
-            resolution: req.body?.resolution && typeof req.body.resolution === 'object'
-              ? req.body.resolution
-              : existing.resolution || null,
+            resolution:
+              req.body?.resolution && typeof req.body.resolution === 'object'
+                ? req.body.resolution
+                : existing.resolution || null,
           },
         },
       };
@@ -612,17 +747,27 @@ app.post('/api/vendor-observations/resolve', async (req, res) => {
 // /api paths and the Host/Origin boundary work unchanged. Unset in Docker/dev.
 const STATIC_DIR = process.env.SSB_STATIC_DIR ? path.resolve(process.env.SSB_STATIC_DIR) : '';
 if (STATIC_DIR) {
-  app.use(express.static(STATIC_DIR, {
-    index: 'index.html',
-    fallthrough: true,
-    setHeaders(res, filePath) {
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      // Hashed assets are immutable; the entry document must always revalidate.
-      res.setHeader('Cache-Control', filePath.endsWith('.html') ? 'no-cache' : 'public, max-age=31536000, immutable');
-    },
-  }));
+  app.use(
+    express.static(STATIC_DIR, {
+      index: 'index.html',
+      fallthrough: true,
+      setHeaders(res, filePath) {
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        // Hashed assets are immutable; the entry document must always revalidate.
+        res.setHeader(
+          'Cache-Control',
+          filePath.endsWith('.html') ? 'no-cache' : 'public, max-age=31536000, immutable',
+        );
+      },
+    }),
+  );
   app.use((req, res, next) => {
-    if ((req.method !== 'GET' && req.method !== 'HEAD') || req.path === '/api' || req.path.startsWith('/api/')) return next();
+    if (
+      (req.method !== 'GET' && req.method !== 'HEAD') ||
+      req.path === '/api' ||
+      req.path.startsWith('/api/')
+    )
+      return next();
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     return res.sendFile(path.join(STATIC_DIR, 'index.html'));
@@ -633,7 +778,9 @@ if (STATIC_DIR) {
 app.use((error, _req, res, _next) => {
   void _next; // Four arguments are required for Express error middleware.
   const tooLarge = error.type === 'entity.too.large';
-  res.status(tooLarge ? 413 : 400).json({ error: tooLarge ? 'Request payload too large' : 'Invalid request body' });
+  res
+    .status(tooLarge ? 413 : 400)
+    .json({ error: tooLarge ? 'Request payload too large' : 'Invalid request body' });
 });
 
 export async function closePrivateStorage() {
@@ -643,13 +790,16 @@ export async function closePrivateStorage() {
 }
 export { app };
 
-const isMainModule = process.argv[1]
-  && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+const isMainModule =
+  process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
 
 if (isMainModule) {
-  if (usersMode && HOST !== '127.0.0.1' && HOST !== 'localhost') throw new Error('Local users require a loopback-only host');
+  if (usersMode && HOST !== '127.0.0.1' && HOST !== 'localhost')
+    throw new Error('Local users require a loopback-only host');
   if (!hasValidConfiguredSyncToken()) {
-    console.error('SSB_SYNC_TOKEN must be a unique secret of at least 32 characters for private sync.');
+    console.error(
+      'SSB_SYNC_TOKEN must be a unique secret of at least 32 characters for private sync.',
+    );
     process.exitCode = 1;
   } else {
     const server = app.listen(PORT, HOST, () => {

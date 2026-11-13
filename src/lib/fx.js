@@ -1,4 +1,8 @@
-import { BASE_CURRENCY, SUPPORTED_DISPLAY_CURRENCIES, DEFAULT_FX_RATES } from '../../backend/stateConstants.js';
+import {
+  BASE_CURRENCY,
+  SUPPORTED_DISPLAY_CURRENCIES,
+  DEFAULT_FX_RATES,
+} from '../../backend/stateConstants.js';
 export { BASE_CURRENCY, SUPPORTED_DISPLAY_CURRENCIES, DEFAULT_FX_RATES };
 
 export function normalizeCurrencyCode(currency) {
@@ -38,7 +42,12 @@ export function getRateForCurrency(currency, fxRates = DEFAULT_FX_RATES) {
   return normalizeFxRates(fxRates)[normalized] || null;
 }
 
-export function convertAmount(amount, fromCurrency = BASE_CURRENCY, toCurrency = BASE_CURRENCY, fxRates = DEFAULT_FX_RATES) {
+export function convertAmount(
+  amount,
+  fromCurrency = BASE_CURRENCY,
+  toCurrency = BASE_CURRENCY,
+  fxRates = DEFAULT_FX_RATES,
+) {
   const numericAmount = Number(amount);
   if (!Number.isFinite(numericAmount)) return 0;
 
@@ -57,6 +66,11 @@ export function convertAmount(amount, fromCurrency = BASE_CURRENCY, toCurrency =
   return target === BASE_CURRENCY ? amountInRon : amountInRon / targetRate;
 }
 
-export function convertAmountToDisplay(amount, fromCurrency, displayCurrency, fxRates = DEFAULT_FX_RATES) {
+export function convertAmountToDisplay(
+  amount,
+  fromCurrency,
+  displayCurrency,
+  fxRates = DEFAULT_FX_RATES,
+) {
   return convertAmount(amount, fromCurrency, displayCurrency, fxRates);
 }

@@ -1,6 +1,6 @@
-const HEALTHY_HOUSING_SHARE = 0.30;
+const HEALTHY_HOUSING_SHARE = 0.3;
 const OUTER_HOUSING_SHARE = 0.35;
-const FRAGILE_HOUSING_SHARE = 0.40;
+const FRAGILE_HOUSING_SHARE = 0.4;
 
 function nonNegativeNumber(value) {
   const numeric = Number(value);

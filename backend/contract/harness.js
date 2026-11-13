@@ -18,7 +18,11 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const liveChildren = new Set();
 process.once('exit', () => {
   for (const child of liveChildren) {
-    try { child.kill('SIGKILL'); } catch { /* already gone */ }
+    try {
+      child.kill('SIGKILL');
+    } catch {
+      /* already gone */
+    }
   }
 });
 
@@ -81,9 +85,15 @@ export async function startBackend({ dataRoot, extraEnv = {}, stdin = 'ignore' }
   liveChildren.add(child);
   child.on('exit', () => liveChildren.delete(child));
   let output = '';
-  child.stdout.on('data', (chunk) => { output += chunk; });
-  child.stderr.on('data', (chunk) => { output += chunk; });
-  const exited = new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal })));
+  child.stdout.on('data', (chunk) => {
+    output += chunk;
+  });
+  child.stderr.on('data', (chunk) => {
+    output += chunk;
+  });
+  const exited = new Promise((resolve) =>
+    child.on('exit', (code, signal) => resolve({ code, signal })),
+  );
 
   const backend = {
     port,
@@ -102,11 +112,14 @@ export async function startBackend({ dataRoot, extraEnv = {}, stdin = 'ignore' }
 
   const deadline = Date.now() + 15_000;
   while (Date.now() < deadline) {
-    if (child.exitCode !== null) throw new Error(`backend exited during startup (${child.exitCode}):\n${output}`);
+    if (child.exitCode !== null)
+      throw new Error(`backend exited during startup (${child.exitCode}):\n${output}`);
     try {
       const response = await request({ port, path: '/healthz', auth: false });
       if (response.status === 200) return backend;
-    } catch { /* still starting */ }
+    } catch {
+      /* still starting */
+    }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   child.kill('SIGKILL');
@@ -117,11 +130,25 @@ export async function startBackend({ dataRoot, extraEnv = {}, stdin = 'ignore' }
  * Minimal HTTP client with full header control (fetch forbids overriding Host).
  * Defaults model the real UI: bearer token, same-origin Origin on writes.
  */
-export function request({ port, token, origin, method = 'GET', path: urlPath, body, rawBody, session, auth = true, headers = {} }) {
+export function request({
+  port,
+  token,
+  origin,
+  method = 'GET',
+  path: urlPath,
+  body,
+  rawBody,
+  session,
+  auth = true,
+  headers = {},
+}) {
   // `rawBody` sends bytes as-is (declared as JSON), so tests can send malformed JSON.
-  const payload = rawBody !== undefined
-    ? Buffer.from(rawBody)
-    : body === undefined ? undefined : Buffer.from(JSON.stringify(body));
+  const payload =
+    rawBody !== undefined
+      ? Buffer.from(rawBody)
+      : body === undefined
+        ? undefined
+        : Buffer.from(JSON.stringify(body));
   const finalHeaders = {
     Host: `127.0.0.1:${port}`,
     ...(auth && token ? { Authorization: `Bearer ${token}` } : {}),
@@ -130,18 +157,26 @@ export function request({ port, token, origin, method = 'GET', path: urlPath, bo
     ...(session ? { 'x-ssb-session': session } : {}),
     ...headers,
   };
-  for (const [name, value] of Object.entries(finalHeaders)) if (value === undefined) delete finalHeaders[name];
+  for (const [name, value] of Object.entries(finalHeaders))
+    if (value === undefined) delete finalHeaders[name];
   return new Promise((resolve, reject) => {
-    const req = http.request({ host: '127.0.0.1', port, method, path: urlPath, headers: finalHeaders }, (res) => {
-      const chunks = [];
-      res.on('data', (chunk) => chunks.push(chunk));
-      res.on('end', () => {
-        const text = Buffer.concat(chunks).toString('utf8');
-        let json;
-        try { json = JSON.parse(text); } catch { json = undefined; }
-        resolve({ status: res.statusCode, headers: res.headers, text, json });
-      });
-    });
+    const req = http.request(
+      { host: '127.0.0.1', port, method, path: urlPath, headers: finalHeaders },
+      (res) => {
+        const chunks = [];
+        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('end', () => {
+          const text = Buffer.concat(chunks).toString('utf8');
+          let json;
+          try {
+            json = JSON.parse(text);
+          } catch {
+            json = undefined;
+          }
+          resolve({ status: res.statusCode, headers: res.headers, text, json });
+        });
+      },
+    );
     req.on('error', reject);
     req.setTimeout(30_000, () => req.destroy(new Error('request timed out')));
     if (payload) req.write(payload);
@@ -153,6 +188,8 @@ export function withTimeout(promise, ms, message) {
   let timer;
   return Promise.race([
     promise.finally(() => clearTimeout(timer)),
-    new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(message)), ms); }),
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(message)), ms);
+    }),
   ]);
 }

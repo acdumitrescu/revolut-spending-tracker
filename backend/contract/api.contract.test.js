@@ -35,27 +35,44 @@ describe('backend contract: HTTP API (local-users profile)', () => {
     });
 
     it('rejects a wrong bearer token with 401', async () => {
-      const response = await backend.request({ path: '/api/users', headers: { Authorization: `Bearer ${'0'.repeat(64)}` } });
+      const response = await backend.request({
+        path: '/api/users',
+        headers: { Authorization: `Bearer ${'0'.repeat(64)}` },
+      });
       expect(response.status).toBe(401);
     });
 
     it('rejects a foreign Host header with 403', async () => {
-      const response = await backend.request({ path: '/api/users', headers: { Host: 'evil.example:80' } });
+      const response = await backend.request({
+        path: '/api/users',
+        headers: { Host: 'evil.example:80' },
+      });
       expect(response.status).toBe(403);
     });
 
     it('rejects a foreign Origin with 403', async () => {
-      const response = await backend.request({ path: '/api/users', headers: { Origin: 'http://evil.example' } });
+      const response = await backend.request({
+        path: '/api/users',
+        headers: { Origin: 'http://evil.example' },
+      });
       expect(response.status).toBe(403);
     });
 
     it('rejects writes without an Origin header', async () => {
-      const response = await backend.request({ method: 'POST', path: '/api/users/unlock', body: {}, headers: { Origin: undefined } });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/users/unlock',
+        body: {},
+        headers: { Origin: undefined },
+      });
       expect(response.status).toBe(403);
     });
 
     it('rejects cross-site fetch metadata', async () => {
-      const response = await backend.request({ path: '/api/users', headers: { 'Sec-Fetch-Site': 'cross-site' } });
+      const response = await backend.request({
+        path: '/api/users',
+        headers: { 'Sec-Fetch-Site': 'cross-site' },
+      });
       expect(response.status).toBe(403);
     });
 
@@ -70,17 +87,29 @@ describe('backend contract: HTTP API (local-users profile)', () => {
     it('reports setup required on an empty data root', async () => {
       const response = await backend.request({ path: '/api/users' });
       expect(response.status).toBe(200);
-      expect(response.json).toMatchObject({ users: [], setupRequired: true, migrationRequired: false });
+      expect(response.json).toMatchObject({
+        users: [],
+        setupRequired: true,
+        migrationRequired: false,
+      });
       expect(response.json.passwordMinimum).toBe(16);
     });
 
     it('rejects a weak password with 400', async () => {
-      const response = await backend.request({ method: 'POST', path: '/api/users', body: { name: 'Weak', password: 'short' } });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/users',
+        body: { name: 'Weak', password: 'short' },
+      });
       expect(response.status).toBe(400);
     });
 
     it('creates the first user and returns a session', async () => {
-      const response = await backend.request({ method: 'POST', path: '/api/users', body: { name: 'Contract', password: STRONG_PASSWORD } });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/users',
+        body: { name: 'Contract', password: STRONG_PASSWORD },
+      });
       expect(response.status).toBe(200);
       expect(response.json.user).toMatchObject({ name: 'Contract' });
       expect(response.json.token).toMatch(/^[a-f0-9]{64}$/);
@@ -109,15 +138,25 @@ describe('backend contract: HTTP API (local-users profile)', () => {
     });
 
     it('refuses whole-state writes in encrypted mode with 405', async () => {
-      const response = await backend.request({ method: 'POST', path: '/api/data', session, body: { data: {}, version: 0 } });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/data',
+        session,
+        body: { data: {}, version: 0 },
+      });
       expect(response.status).toBe(405);
     });
 
     it('applies a validated change and bumps the version', async () => {
       const before = (await backend.request({ path: '/api/data', session })).json;
       const response = await backend.request({
-        method: 'POST', path: '/api/changes', session,
-        body: { version: before.version, changes: [{ field: 'lastUpdated', value: 1_700_000_000_000 }] },
+        method: 'POST',
+        path: '/api/changes',
+        session,
+        body: {
+          version: before.version,
+          changes: [{ field: 'lastUpdated', value: 1_700_000_000_000 }],
+        },
       });
       expect(response.status).toBe(200);
       expect(response.json.version).toBe(before.version + 1);
@@ -126,7 +165,9 @@ describe('backend contract: HTTP API (local-users profile)', () => {
 
     it('answers a stale version with 409 and the current state', async () => {
       const response = await backend.request({
-        method: 'POST', path: '/api/changes', session,
+        method: 'POST',
+        path: '/api/changes',
+        session,
         body: { version: 0, changes: [{ field: 'lastUpdated', value: 1 }] },
       });
       expect(response.status).toBe(409);
@@ -135,7 +176,12 @@ describe('backend contract: HTTP API (local-users profile)', () => {
     });
 
     it('rejects malformed changes with 400', async () => {
-      const response = await backend.request({ method: 'POST', path: '/api/changes', session, body: { version: 1, changes: [{ field: 'nope', value: 1 }] } });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/changes',
+        session,
+        body: { version: 1, changes: [{ field: 'nope', value: 1 }] },
+      });
       expect(response.status).toBe(400);
     });
 
@@ -146,26 +192,42 @@ describe('backend contract: HTTP API (local-users profile)', () => {
     });
 
     it('rejects a path-traversal backup name with 400', async () => {
-      const response = await backend.request({ path: '/api/encrypted-backups/..%2Fusers.json', session });
+      const response = await backend.request({
+        path: '/api/encrypted-backups/..%2Fusers.json',
+        session,
+      });
       expect(response.status).toBe(400);
     });
   });
 
   describe('lock and unlock', () => {
     it('locks the session', async () => {
-      const response = await backend.request({ method: 'POST', path: '/api/users/lock', session, body: {} });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/users/lock',
+        session,
+        body: {},
+      });
       expect(response.status).toBe(200);
       expect(response.json).toEqual({ locked: true });
       expect((await backend.request({ path: '/api/data', session })).status).toBe(401);
     });
 
     it('rejects a wrong password with 401', async () => {
-      const response = await backend.request({ method: 'POST', path: '/api/users/unlock', body: { userId, password: 'wrong-password-wrong-password' } });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/users/unlock',
+        body: { userId, password: 'wrong-password-wrong-password' },
+      });
       expect(response.status).toBe(401);
     }, 30_000);
 
     it('unlocks with the right password', async () => {
-      const response = await backend.request({ method: 'POST', path: '/api/users/unlock', body: { userId, password: STRONG_PASSWORD } });
+      const response = await backend.request({
+        method: 'POST',
+        path: '/api/users/unlock',
+        body: { userId, password: STRONG_PASSWORD },
+      });
       expect(response.status).toBe(200);
       session = response.json.token;
       expect((await backend.request({ path: '/api/data', session })).status).toBe(200);
@@ -178,7 +240,11 @@ describe('backend contract: HTTP API (local-users profile)', () => {
       backend = await startBackend({ dataRoot });
       const list = await backend.request({ path: '/api/users' });
       expect(list.json.users).toEqual([{ id: userId, name: 'Contract' }]);
-      const unlock = await backend.request({ method: 'POST', path: '/api/users/unlock', body: { userId, password: STRONG_PASSWORD } });
+      const unlock = await backend.request({
+        method: 'POST',
+        path: '/api/users/unlock',
+        body: { userId, password: STRONG_PASSWORD },
+      });
       const data = await backend.request({ path: '/api/data', session: unlock.json.token });
       expect(data.json.data.data.lastUpdated).toBe(1_700_000_000_000);
     }, 30_000);

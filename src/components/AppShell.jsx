@@ -12,7 +12,9 @@ export default function AppShell() {
 
   return (
     <div className={`new-app-shell${navigationCollapsed ? ' nav-collapsed' : ''}`}>
-      <a className="skip-link" href="#main-content">Skip to main content</a>
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <TopBar />
       <SideNavigation
         collapsed={navigationCollapsed}

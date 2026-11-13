@@ -8,15 +8,26 @@ describe('LandingPage', () => {
     render(
       <MemoryRouter>
         <LandingPage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(screen.getByRole('heading', { name: /know where your money goes/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /import your csv/i })).toHaveAttribute('href', '/app/import');
+    expect(
+      screen.getByRole('heading', { name: /know where your money goes/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /import your csv/i })).toHaveAttribute(
+      'href',
+      '/app/import',
+    );
     expect(screen.getByText(/no account required/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /useful dashboard in three quiet steps/i })).toBeInTheDocument();
-    expect(screen.getByText(/optional private sync is designed for self-hosted deployments/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /useful dashboard in three quiet steps/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/optional private sync is designed for self-hosted deployments/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/upload your own csv locally in-browser/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /safe to explore, local by default/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /safe to explore, local by default/i }),
+    ).toBeInTheDocument();
   });
 });

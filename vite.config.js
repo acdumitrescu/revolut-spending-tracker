@@ -1,31 +1,55 @@
 /* global process */
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { isSafeSyncToken } from './backend/syncToken.js'
-import { requestBoundary } from './backend/requestBoundary.js'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { isSafeSyncToken } from './backend/syncToken.js';
+import { requestBoundary } from './backend/requestBoundary.js';
 
 export default defineConfig(() => {
-  const localPort = Number(process.env.SSB_DEV_PORT || 5173)
-  const trustedDevProxy = process.env.SSB_TRUSTED_DEV_PROXY === 'true'
-  const syncToken = String(process.env.SSB_SYNC_TOKEN || '').trim()
+  const localPort = Number(process.env.SSB_DEV_PORT || 5173);
+  const trustedDevProxy = process.env.SSB_TRUSTED_DEV_PROXY === 'true';
+  const syncToken = String(process.env.SSB_SYNC_TOKEN || '').trim();
 
   if (trustedDevProxy && !isSafeSyncToken(syncToken)) {
-    throw new Error('Trusted development proxy requires a safe SSB_SYNC_TOKEN.')
+    throw new Error('Trusted development proxy requires a safe SSB_SYNC_TOKEN.');
   }
 
   return {
-    plugins: [react(), ...(trustedDevProxy ? [{
-      name: 'trusted-local-api-boundary',
-      configureServer(server) {
-        const guard = requestBoundary({ allowedHosts: [`127.0.0.1:${localPort}`, `localhost:${localPort}`], allowedOrigins: [`http://127.0.0.1:${localPort}`, `http://localhost:${localPort}`], trustedProxy: true });
-        // Vite Connect responses do not implement Express status/json helpers.
-        server.middlewares.use((req, res, next) => {
-          if (!req.url?.startsWith('/api')) return next();
-          const response = { status(code) { res.statusCode = code; return this; }, json(body) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(body)); }, setHeader: (...args) => res.setHeader(...args) };
-          return guard(req, response, next);
-        });
-      },
-    }] : [])],
+    plugins: [
+      react(),
+      ...(trustedDevProxy
+        ? [
+            {
+              name: 'trusted-local-api-boundary',
+              configureServer(server) {
+                const guard = requestBoundary({
+                  allowedHosts: [`127.0.0.1:${localPort}`, `localhost:${localPort}`],
+                  allowedOrigins: [
+                    `http://127.0.0.1:${localPort}`,
+                    `http://localhost:${localPort}`,
+                  ],
+                  trustedProxy: true,
+                });
+                // Vite Connect responses do not implement Express status/json helpers.
+                server.middlewares.use((req, res, next) => {
+                  if (!req.url?.startsWith('/api')) return next();
+                  const response = {
+                    status(code) {
+                      res.statusCode = code;
+                      return this;
+                    },
+                    json(body) {
+                      res.setHeader('Content-Type', 'application/json');
+                      res.end(JSON.stringify(body));
+                    },
+                    setHeader: (...args) => res.setHeader(...args),
+                  };
+                  return guard(req, response, next);
+                });
+              },
+            },
+          ]
+        : []),
+    ],
     server: {
       proxy: {
         '/api': {
@@ -57,5 +81,5 @@ export default defineConfig(() => {
       environment: 'jsdom',
       setupFiles: './src/test/setup.js',
     },
-  }
-})
+  };
+});

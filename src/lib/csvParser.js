@@ -20,8 +20,17 @@ const PROFILE_REGISTRY = [
     id: 'revolut-personal-raw',
     label: 'Revolut Personal CSV',
     source: 'revolut-personal',
-    requiredGroups: [['description'], ['amount', 'amount_payment'], ['date_completed', 'date_started', 'date']],
-    optionalGroups: [['type'], ['currency', 'currency_payment', 'currency_original'], ['reference'], ['state']],
+    requiredGroups: [
+      ['description'],
+      ['amount', 'amount_payment'],
+      ['date_completed', 'date_started', 'date'],
+    ],
+    optionalGroups: [
+      ['type'],
+      ['currency', 'currency_payment', 'currency_original'],
+      ['reference'],
+      ['state'],
+    ],
     datePriority: ['date_completed', 'date_started', 'date'],
     amountPriority: ['amount', 'amount_payment'],
     currencyPriority: ['currency', 'currency_payment', 'currency_original'],
@@ -33,9 +42,32 @@ const PROFILE_REGISTRY = [
     id: 'revolut-business-transaction',
     label: 'Revolut Business Transaction Statement CSV',
     source: 'revolut-business-transaction',
-    requiredGroups: [['description'], ['type'], ['amount', 'amount_payment', 'amount_original'], ['date_completed_local', 'date_completed_utc', 'date_completed', 'date_started_local', 'date_started_utc', 'date_started']],
-    optionalGroups: [['currency_payment', 'currency_original', 'currency'], ['reference'], ['account']],
-    datePriority: ['date_completed_local', 'date_completed_utc', 'date_completed', 'date_started_local', 'date_started_utc', 'date_started'],
+    requiredGroups: [
+      ['description'],
+      ['type'],
+      ['amount', 'amount_payment', 'amount_original'],
+      [
+        'date_completed_local',
+        'date_completed_utc',
+        'date_completed',
+        'date_started_local',
+        'date_started_utc',
+        'date_started',
+      ],
+    ],
+    optionalGroups: [
+      ['currency_payment', 'currency_original', 'currency'],
+      ['reference'],
+      ['account'],
+    ],
+    datePriority: [
+      'date_completed_local',
+      'date_completed_utc',
+      'date_completed',
+      'date_started_local',
+      'date_started_utc',
+      'date_started',
+    ],
     amountPriority: ['amount_payment', 'amount', 'amount_original'],
     currencyPriority: ['currency_payment', 'currency', 'currency_original'],
     descriptionPriority: ['description'],
@@ -46,9 +78,29 @@ const PROFILE_REGISTRY = [
     id: 'revolut-business-expense',
     label: 'Revolut Business Expense CSV',
     source: 'revolut-business-expense',
-    requiredGroups: [['description'], ['amount_payment'], ['currency_payment'], ['type'], ['date_completed_local', 'date_completed_utc', 'date_completed', 'date_started_local', 'date_started_utc', 'date_started']],
+    requiredGroups: [
+      ['description'],
+      ['amount_payment'],
+      ['currency_payment'],
+      ['type'],
+      [
+        'date_completed_local',
+        'date_completed_utc',
+        'date_completed',
+        'date_started_local',
+        'date_started_utc',
+        'date_started',
+      ],
+    ],
     optionalGroups: [['amount_original'], ['currency_original'], ['reference'], ['category']],
-    datePriority: ['date_completed_local', 'date_completed_utc', 'date_completed', 'date_started_local', 'date_started_utc', 'date_started'],
+    datePriority: [
+      'date_completed_local',
+      'date_completed_utc',
+      'date_completed',
+      'date_started_local',
+      'date_started_utc',
+      'date_started',
+    ],
     amountPriority: ['amount_payment', 'amount_original'],
     currencyPriority: ['currency_payment', 'currency_original'],
     descriptionPriority: ['description'],
@@ -61,33 +113,98 @@ const HEADER_ALIASES = {
   date: ['date'],
   date_started: ['started date'],
   date_completed: ['completed date'],
-  date_started_utc: ['transaction started utc', 'started date utc', 'tranzactie initiata utc', 'transaccion iniciada utc', 'zacatek transakce utc'],
-  date_completed_utc: ['transaction completed utc', 'completed date utc', 'tranzactie finalizata utc', 'transaccion completada utc', 'transakce byla dokoncena utc'],
+  date_started_utc: [
+    'transaction started utc',
+    'started date utc',
+    'tranzactie initiata utc',
+    'transaccion iniciada utc',
+    'zacatek transakce utc',
+  ],
+  date_completed_utc: [
+    'transaction completed utc',
+    'completed date utc',
+    'tranzactie finalizata utc',
+    'transaccion completada utc',
+    'transakce byla dokoncena utc',
+  ],
   date_started_local: [
     'transaction started timezone set in your appearance settings',
     'transaction started local time',
     'tranzactie initiata fuse orar setat in setarile tale de aspect',
     'se ha iniciado la transaccion segun la zona horaria configurada en apariencia',
-    'zacatek transakce casove pasmo je nastaveno v nastaveni vzhled'
+    'zacatek transakce casove pasmo je nastaveno v nastaveni vzhled',
   ],
   date_completed_local: [
     'transaction completed local time',
     'transaction completed timezone set in your appearance settings',
     'tranzactie finalizata se afiseaza ora setata in aspect din setarile tale',
     'transaccion completada zona horaria configurada en apariencia',
-    'transakce byla dokoncena casove pasmo je nastaveno ve vasem nastaveni vzhled'
+    'transakce byla dokoncena casove pasmo je nastaveno ve vasem nastaveni vzhled',
   ],
-  description: ['description', 'transaction description', 'expense description', 'merchant', 'reference', 'descriere tranzactie', 'descriere cheltuiala', 'descripcion de la transaccion', 'descripcion de gasto', 'popis transakce', 'popis vydaju'],
+  description: [
+    'description',
+    'transaction description',
+    'expense description',
+    'merchant',
+    'reference',
+    'descriere tranzactie',
+    'descriere cheltuiala',
+    'descripcion de la transaccion',
+    'descripcion de gasto',
+    'popis transakce',
+    'popis vydaju',
+  ],
   amount: ['amount'],
-  amount_payment: ['amount payment currency', 'importe divisa de pago', 'suma moneda plata', 'castka mena platby'],
-  amount_original: ['orig amount orig currency', 'original amount original currency', 'importe orig divisa orig', 'suma initiala moneda initiala', 'puv castka puv mena'],
+  amount_payment: [
+    'amount payment currency',
+    'importe divisa de pago',
+    'suma moneda plata',
+    'castka mena platby',
+  ],
+  amount_original: [
+    'orig amount orig currency',
+    'original amount original currency',
+    'importe orig divisa orig',
+    'suma initiala moneda initiala',
+    'puv castka puv mena',
+  ],
   currency: ['currency'],
-  currency_payment: ['payment currency', 'moneda de pago', 'moneda de plata', 'moneda plata', 'mena platby'],
-  currency_original: ['base currency', 'original currency', 'moneda origen', 'moneda origine', 'moneda initiala', 'puvodni mena'],
+  currency_payment: [
+    'payment currency',
+    'moneda de pago',
+    'moneda de plata',
+    'moneda plata',
+    'mena platby',
+  ],
+  currency_original: [
+    'base currency',
+    'original currency',
+    'moneda origen',
+    'moneda origine',
+    'moneda initiala',
+    'puvodni mena',
+  ],
   type: ['type', 'transaction type', 'tipul tranzactiei', 'tipo de transaccion', 'typ transakce'],
-  reference: ['reference', 'id', 'transaction id', 'expense id', 'id tranzactie', 'id cheltuiala', 'identificador de transaccion', 'id de gasto', 'id transakce', 'id vydaje'],
+  reference: [
+    'reference',
+    'id',
+    'transaction id',
+    'expense id',
+    'id tranzactie',
+    'id cheltuiala',
+    'identificador de transaccion',
+    'id de gasto',
+    'id transakce',
+    'id vydaje',
+  ],
   flow: ['flow'],
-  category: ['category', 'expense category name', 'nume categorie de cheltuieli', 'nombre de la categoria de gasto', 'nazev kategorie vydaju'],
+  category: [
+    'category',
+    'expense category name',
+    'nume categorie de cheltuieli',
+    'nombre de la categoria de gasto',
+    'nazev kategorie vydaju',
+  ],
   subcategory: ['subcategory'],
   account: ['account'],
   state: ['state', 'status'],
@@ -133,7 +250,8 @@ function normalizeType(type, desc) {
   if (rawType.includes('exchange')) return 'Exchange';
   if (rawType.includes('card')) return 'Card Payment';
   if (rawType.includes('top up') || rawDesc.includes('top up')) return 'Top Up';
-  if (rawType.includes('refund') || rawDesc.includes('refund') || rawDesc.includes('reversal')) return 'Refund';
+  if (rawType.includes('refund') || rawDesc.includes('refund') || rawDesc.includes('reversal'))
+    return 'Refund';
   if (rawType.includes('chargeback')) return 'Chargeback';
   return String(type || '').trim();
 }
@@ -177,19 +295,36 @@ function detectProfile(columns) {
   const headerLookup = buildHeaderLookup(columns);
   const normalizedProfile = PROFILE_REGISTRY.find((profile) => profile.id === 'normalized-csv');
   const personalProfile = PROFILE_REGISTRY.find((profile) => profile.id === 'revolut-personal-raw');
-  const businessTransactionProfile = PROFILE_REGISTRY.find((profile) => profile.id === 'revolut-business-transaction');
-  const businessExpenseProfile = PROFILE_REGISTRY.find((profile) => profile.id === 'revolut-business-expense');
+  const businessTransactionProfile = PROFILE_REGISTRY.find(
+    (profile) => profile.id === 'revolut-business-transaction',
+  );
+  const businessExpenseProfile = PROFILE_REGISTRY.find(
+    (profile) => profile.id === 'revolut-business-expense',
+  );
 
-  const normalizedMatched = normalizedProfile.requiredGroups.every((group) => hasAnyHeaderGroup(headerLookup, group));
-  const personalMatched = personalProfile.requiredGroups.every((group) => hasAnyHeaderGroup(headerLookup, group));
-  const businessTransactionMatched = businessTransactionProfile.requiredGroups.every((group) => hasAnyHeaderGroup(headerLookup, group));
-  const businessExpenseMatched = businessExpenseProfile.requiredGroups.every((group) => hasAnyHeaderGroup(headerLookup, group));
+  const normalizedMatched = normalizedProfile.requiredGroups.every((group) =>
+    hasAnyHeaderGroup(headerLookup, group),
+  );
+  const personalMatched = personalProfile.requiredGroups.every((group) =>
+    hasAnyHeaderGroup(headerLookup, group),
+  );
+  const businessTransactionMatched = businessTransactionProfile.requiredGroups.every((group) =>
+    hasAnyHeaderGroup(headerLookup, group),
+  );
+  const businessExpenseMatched = businessExpenseProfile.requiredGroups.every((group) =>
+    hasAnyHeaderGroup(headerLookup, group),
+  );
 
   const hasExpandedBusinessColumns =
     hasAnyHeaderGroup(headerLookup, ['account']) ||
     hasAnyHeaderGroup(headerLookup, ['amount_payment']) ||
     hasAnyHeaderGroup(headerLookup, ['currency_payment']) ||
-    hasAnyHeaderGroup(headerLookup, ['date_started_utc', 'date_started_local', 'date_completed_utc', 'date_completed_local']);
+    hasAnyHeaderGroup(headerLookup, [
+      'date_started_utc',
+      'date_started_local',
+      'date_completed_utc',
+      'date_completed_local',
+    ]);
 
   const hasExpenseSpecificColumns =
     hasAnyHeaderGroup(headerLookup, ['amount_original']) ||
@@ -302,7 +437,7 @@ export function categorizeTransactionRecord(transaction, customVendors = {}) {
     transaction?.desc,
     Number(transaction?.amt) || 0,
     transaction?.type,
-    customVendors
+    customVendors,
   );
 }
 
@@ -323,12 +458,16 @@ function buildWarnings(profile, headerLookup) {
   }
 
   if (headerLookup.unrecognizedHeaders.length > 0) {
-    pushWarning(`Unrecognized columns ignored: ${headerLookup.unrecognizedHeaders.slice(0, 5).join(', ')}${headerLookup.unrecognizedHeaders.length > 5 ? ', ...' : ''}`);
+    pushWarning(
+      `Unrecognized columns ignored: ${headerLookup.unrecognizedHeaders.slice(0, 5).join(', ')}${headerLookup.unrecognizedHeaders.length > 5 ? ', ...' : ''}`,
+    );
     tagValidation('unrecognized-columns');
   }
 
   if (headerLookup.unrecognizedHeaders.length > 0 && headerLookup.recognizedHeaders.size > 0) {
-    pushWarning('Partially recognized header set detected. Parsed using the closest supported profile.');
+    pushWarning(
+      'Partially recognized header set detected. Parsed using the closest supported profile.',
+    );
     tagValidation('partial-header-match');
   }
 
@@ -336,7 +475,9 @@ function buildWarnings(profile, headerLookup) {
     hasAnyHeaderGroup(headerLookup, ['date_started_utc']) &&
     hasAnyHeaderGroup(headerLookup, ['date_started_local'])
   ) {
-    pushWarning('Both UTC and local started-date columns detected. Local/completed dates are preferred when available.');
+    pushWarning(
+      'Both UTC and local started-date columns detected. Local/completed dates are preferred when available.',
+    );
     tagValidation('multiple-date-sources');
   }
 
@@ -344,7 +485,9 @@ function buildWarnings(profile, headerLookup) {
     hasAnyHeaderGroup(headerLookup, ['date_completed_utc']) &&
     hasAnyHeaderGroup(headerLookup, ['date_completed_local'])
   ) {
-    pushWarning('Both UTC and local completed-date columns detected. Local completed dates are preferred when available.');
+    pushWarning(
+      'Both UTC and local completed-date columns detected. Local completed dates are preferred when available.',
+    );
     tagValidation('multiple-date-sources');
   }
 
@@ -352,7 +495,9 @@ function buildWarnings(profile, headerLookup) {
     hasAnyHeaderGroup(headerLookup, ['amount_payment']) &&
     hasAnyHeaderGroup(headerLookup, ['amount_original'])
   ) {
-    pushWarning('Both payment and original amount columns detected. Payment amount is used for analytics.');
+    pushWarning(
+      'Both payment and original amount columns detected. Payment amount is used for analytics.',
+    );
     tagValidation('multiple-amount-sources');
   }
 
@@ -360,12 +505,16 @@ function buildWarnings(profile, headerLookup) {
     hasAnyHeaderGroup(headerLookup, ['currency_payment']) &&
     hasAnyHeaderGroup(headerLookup, ['currency_original'])
   ) {
-    pushWarning('Both payment and original currency columns detected. Payment currency is preferred when available.');
+    pushWarning(
+      'Both payment and original currency columns detected. Payment currency is preferred when available.',
+    );
     tagValidation('multiple-currency-sources');
   }
 
   if (profile.id === 'normalized-csv' && !hasAnyHeaderGroup(headerLookup, ['flow'])) {
-    pushWarning('Normalized CSV is missing an explicit Flow column. Flow will fall back to amount sign.');
+    pushWarning(
+      'Normalized CSV is missing an explicit Flow column. Flow will fall back to amount sign.',
+    );
     tagValidation('flow-derived-from-sign');
   }
 
@@ -401,11 +550,13 @@ function mergeVendorObservations(observations) {
       continue;
     }
 
-    const sampleSet = new Set([existing.rawDescription, observation.rawDescription].filter(Boolean));
+    const sampleSet = new Set(
+      [existing.rawDescription, observation.rawDescription].filter(Boolean),
+    );
     const preferredSuggestionMap = new Map(
       [...existing.suggestedCandidates, ...observation.suggestedCandidates]
         .sort((a, b) => a.score - b.score)
-        .map((candidate) => [`${candidate.canonicalName}:${candidate.alias}`, candidate])
+        .map((candidate) => [`${candidate.canonicalName}:${candidate.alias}`, candidate]),
     );
 
     merged.set(observation.normalizedDescription, {
@@ -413,8 +564,12 @@ function mergeVendorObservations(observations) {
       rawDescription: [...sampleSet][0],
       amountAbs: existing.amountAbs + observation.amountAbs,
       count: existing.count + observation.count,
-      firstSeenAt: existing.firstSeenAt < observation.firstSeenAt ? existing.firstSeenAt : observation.firstSeenAt,
-      lastSeenAt: existing.lastSeenAt > observation.lastSeenAt ? existing.lastSeenAt : observation.lastSeenAt,
+      firstSeenAt:
+        existing.firstSeenAt < observation.firstSeenAt
+          ? existing.firstSeenAt
+          : observation.firstSeenAt,
+      lastSeenAt:
+        existing.lastSeenAt > observation.lastSeenAt ? existing.lastSeenAt : observation.lastSeenAt,
       suggestedCandidates: [...preferredSuggestionMap.values()].slice(0, 3),
     });
   }
@@ -430,19 +585,27 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
 
   const rawDate = getFirstMappedValue(row, headerLookup, profile.datePriority);
   const date = normalizeDate(rawDate);
-  const desc = String(getFirstMappedValue(row, headerLookup, profile.descriptionPriority) || '').trim();
+  const desc = String(
+    getFirstMappedValue(row, headerLookup, profile.descriptionPriority) || '',
+  ).trim();
   const amount = parseAmount(getFirstMappedValue(row, headerLookup, profile.amountPriority));
   const rawType = getFirstMappedValue(row, headerLookup, profile.typePriority);
   const type = normalizeType(rawType, desc);
-  const currency = String(getFirstMappedValue(row, headerLookup, profile.currencyPriority) || '').trim().toUpperCase();
-  const importedRef = String(getFirstMappedValue(row, headerLookup, profile.referencePriority) || '').trim();
+  const currency = String(getFirstMappedValue(row, headerLookup, profile.currencyPriority) || '')
+    .trim()
+    .toUpperCase();
+  const importedRef = String(
+    getFirstMappedValue(row, headerLookup, profile.referencePriority) || '',
+  ).trim();
   const startedAt = String(getFirstMappedValue(row, headerLookup, ['date_started']) || '').trim();
-  const completedAt = String(getFirstMappedValue(row, headerLookup, ['date_completed']) || '').trim();
-  const ref = importedRef || (
-    profile.id === 'revolut-personal-raw' && (completedAt || startedAt)
+  const completedAt = String(
+    getFirstMappedValue(row, headerLookup, ['date_completed']) || '',
+  ).trim();
+  const ref =
+    importedRef ||
+    (profile.id === 'revolut-personal-raw' && (completedAt || startedAt)
       ? `revolut:${completedAt || startedAt}|${startedAt}`
-      : ''
-  );
+      : '');
 
   if (!date) {
     return { error: { rowNumber: rowIndex, reason: 'missing or invalid date' } };
@@ -514,11 +677,14 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
       matchStrategy: classification.matchStrategy,
       confidence: classification.confidence,
     },
-    vendorObservation: buildVendorObservation({
-      date,
-      desc,
-      amt: amount,
-    }, classification),
+    vendorObservation: buildVendorObservation(
+      {
+        date,
+        desc,
+        amt: amount,
+      },
+      classification,
+    ),
   };
 }
 
@@ -551,15 +717,23 @@ export function parseCSV(file, customVendors = {}) {
         const { profile, headerLookup } = detectProfile(columns);
 
         if (!profile) {
-          reject(new Error(`Unknown CSV format. Validation category: unsupported-file-shape. Columns: ${columns.join(', ')}`));
+          reject(
+            new Error(
+              `Unknown CSV format. Validation category: unsupported-file-shape. Columns: ${columns.join(', ')}`,
+            ),
+          );
           return;
         }
 
         const { warnings, validationCategories } = buildWarnings(profile, headerLookup);
-        const parserWarnings = [...new Set((results.errors || []).map((error) => {
-          const row = Number.isInteger(error.row) ? ` (data row ${error.row + 1})` : '';
-          return `CSV parser: ${error.message}${row}`;
-        }))];
+        const parserWarnings = [
+          ...new Set(
+            (results.errors || []).map((error) => {
+              const row = Number.isInteger(error.row) ? ` (data row ${error.row + 1})` : '';
+              return `CSV parser: ${error.message}${row}`;
+            }),
+          ),
+        ];
         warnings.push(...parserWarnings);
         if (parserWarnings.length > 0) {
           validationCategories['parser-warning'] = parserWarnings.length;
@@ -578,15 +752,20 @@ export function parseCSV(file, customVendors = {}) {
             const reason = result.error.reason;
             skippedReasonCounts[reason] = (skippedReasonCounts[reason] || 0) + 1;
             if (reason.includes('invalid amount')) {
-              validationCategories['suspicious-amount'] = (validationCategories['suspicious-amount'] || 0) + 1;
+              validationCategories['suspicious-amount'] =
+                (validationCategories['suspicious-amount'] || 0) + 1;
             } else if (reason.includes('invalid date')) {
-              validationCategories['suspicious-date'] = (validationCategories['suspicious-date'] || 0) + 1;
+              validationCategories['suspicious-date'] =
+                (validationCategories['suspicious-date'] || 0) + 1;
             } else if (reason.includes('missing description')) {
-              validationCategories['missing-description'] = (validationCategories['missing-description'] || 0) + 1;
+              validationCategories['missing-description'] =
+                (validationCategories['missing-description'] || 0) + 1;
             } else if (reason.includes('zero-value')) {
-              validationCategories['zero-value-row'] = (validationCategories['zero-value-row'] || 0) + 1;
+              validationCategories['zero-value-row'] =
+                (validationCategories['zero-value-row'] || 0) + 1;
             } else if (reason.includes('non-completed')) {
-              validationCategories['non-completed-transaction'] = (validationCategories['non-completed-transaction'] || 0) + 1;
+              validationCategories['non-completed-transaction'] =
+                (validationCategories['non-completed-transaction'] || 0) + 1;
             }
             continue;
           }
@@ -642,7 +821,9 @@ function legacyTxKey(t) {
 }
 
 export function analyzeTransactionImport(existing, incoming) {
-  const existingReferenceKeys = new Set(existing.filter((transaction) => transaction.ref).map(txKey));
+  const existingReferenceKeys = new Set(
+    existing.filter((transaction) => transaction.ref).map(txKey),
+  );
   const remainingLegacyCounts = new Map();
   for (const transaction of existing.filter((candidate) => !candidate.ref)) {
     const key = legacyTxKey(transaction);

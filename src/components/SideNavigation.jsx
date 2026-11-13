@@ -39,10 +39,12 @@ export default function SideNavigation({ collapsed = false, onToggle }) {
           </nav>
           <div className="sidebar-utilities">
             <NavLink to="/app/import" className="utility-nav-item" title="Import and backup">
-              <FileUp size={20} aria-hidden="true" /><span>Import</span>
+              <FileUp size={20} aria-hidden="true" />
+              <span>Import</span>
             </NavLink>
             <NavLink to="/app/settings" className="utility-nav-item" title="Settings">
-              <Settings size={20} aria-hidden="true" /><span>Settings</span>
+              <Settings size={20} aria-hidden="true" />
+              <span>Settings</span>
             </NavLink>
           </div>
         </>
@@ -56,7 +58,11 @@ export default function SideNavigation({ collapsed = false, onToggle }) {
             {groupedHubs.map((hub) => {
               const HubIcon = hub.icon;
               return (
-                <section className="sidebar-navigation-group" key={hub.id} aria-labelledby={`sidebar-${hub.id}`}>
+                <section
+                  className="sidebar-navigation-group"
+                  key={hub.id}
+                  aria-labelledby={`sidebar-${hub.id}`}
+                >
                   <div className="sidebar-group-title" id={`sidebar-${hub.id}`}>
                     <HubIcon size={16} aria-hidden="true" />
                     <span>{hub.label}</span>
@@ -83,8 +89,14 @@ export default function SideNavigation({ collapsed = false, onToggle }) {
             })}
           </nav>
           <div className="sidebar-expanded-utilities">
-            <NavLink to="/app/import"><FileUp size={17} aria-hidden="true" /><span>Import &amp; backup</span></NavLink>
-            <NavLink to="/app/settings"><Settings size={17} aria-hidden="true" /><span>Settings</span></NavLink>
+            <NavLink to="/app/import">
+              <FileUp size={17} aria-hidden="true" />
+              <span>Import &amp; backup</span>
+            </NavLink>
+            <NavLink to="/app/settings">
+              <Settings size={17} aria-hidden="true" />
+              <span>Settings</span>
+            </NavLink>
           </div>
         </>
       )}

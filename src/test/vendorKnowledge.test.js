@@ -14,29 +14,33 @@ describe('vendorKnowledge compiler', () => {
     const payloads = [
       {
         sourceType: 'nsi',
-        records: [{
-          id: 'ro-digi',
-          canonicalName: 'Digi',
-          aliases: ['digi'],
-          regions: ['RO'],
-          category: 'Telecom',
-          subcategory: 'Mobile',
-          priority: 80,
-          tags: ['telecom'],
-        }],
+        records: [
+          {
+            id: 'ro-digi',
+            canonicalName: 'Digi',
+            aliases: ['digi'],
+            regions: ['RO'],
+            category: 'Telecom',
+            subcategory: 'Mobile',
+            priority: 80,
+            tags: ['telecom'],
+          },
+        ],
       },
       {
         sourceType: 'manual',
-        records: [{
-          id: 'ro-digi',
-          canonicalName: 'Digi',
-          aliases: ['rcs rds'],
-          regions: ['RO'],
-          category: 'Telecom',
-          subcategory: 'Internet & TV',
-          priority: 95,
-          tags: ['telecom', 'internet'],
-        }],
+        records: [
+          {
+            id: 'ro-digi',
+            canonicalName: 'Digi',
+            aliases: ['rcs rds'],
+            regions: ['RO'],
+            category: 'Telecom',
+            subcategory: 'Internet & TV',
+            priority: 95,
+            tags: ['telecom', 'internet'],
+          },
+        ],
       },
     ];
 
@@ -50,22 +54,26 @@ describe('vendorKnowledge compiler', () => {
   });
 
   it('produces a stable compiled contract across reruns', () => {
-    const payloads = [{
-      sourceType: 'manual',
-      records: [{
-        id: 'ro-test',
-        canonicalName: 'Test Store',
-        aliases: ['test store'],
-        regions: ['RO'],
-        category: 'Shopping',
-        subcategory: 'General',
-        priority: 50,
-        tags: ['shopping'],
-      }],
-    }];
+    const payloads = [
+      {
+        sourceType: 'manual',
+        records: [
+          {
+            id: 'ro-test',
+            canonicalName: 'Test Store',
+            aliases: ['test store'],
+            regions: ['RO'],
+            category: 'Shopping',
+            subcategory: 'General',
+            priority: 50,
+            tags: ['shopping'],
+          },
+        ],
+      },
+    ];
 
     expect(compileVendorKnowledgeFromSourcePayloads(payloads)).toEqual(
-      compileVendorKnowledgeFromSourcePayloads(payloads)
+      compileVendorKnowledgeFromSourcePayloads(payloads),
     );
   });
 });

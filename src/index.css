@@ -29,7 +29,7 @@
   --radius: 26px;
   --radius-md: 18px;
   --radius-sm: 14px;
-  --font: "Instrument Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font: 'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 :root[data-theme='dark'] {
@@ -83,7 +83,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  transition: background 180ms ease, color 180ms ease;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
 }
 
 #root {
@@ -294,8 +296,12 @@ textarea {
   width: 100%;
   border-radius: 30px;
   border: 1px solid var(--border);
-  background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.7) 42%, rgba(250, 252, 255, 0.82) 100%);
+  background: radial-gradient(
+    circle at top left,
+    rgba(255, 255, 255, 0.92),
+    rgba(255, 255, 255, 0.7) 42%,
+    rgba(250, 252, 255, 0.82) 100%
+  );
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(14px);
   overflow: hidden;
@@ -428,7 +434,10 @@ textarea {
   padding: 13px 18px;
   border-radius: 14px;
   font-weight: 800;
-  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
 }
 
 .landing-btn:hover {
@@ -1713,7 +1722,7 @@ tbody td {
 .category-legend-meta strong,
 .category-total-row strong {
   font-family: var(--font-numeric);
-  letter-spacing: -.03em;
+  letter-spacing: -0.03em;
 }
 
 .category-total-row {
@@ -1760,7 +1769,7 @@ tbody td {
   color: var(--text-secondary);
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -.03em;
+  letter-spacing: -0.03em;
   white-space: nowrap;
 }
 
