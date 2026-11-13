@@ -12,13 +12,18 @@ function getCurrencyLocale(currency) {
   return CURRENCY_LOCALES[currency] || 'en-US';
 }
 
-export const formatCurrency = (value, currency = 'RON') => {
+// Precision: pass { decimals: 2 } for single transactions and balances, { decimals: 0 } for
+// chart axes. By default large aggregates (100 or more) are whole units and smaller amounts
+// keep cents, so a non-zero amount never shows as 0.
+export const formatCurrency = (value, currency = 'RON', { decimals } = {}) => {
+  const amount = Number(value) || 0;
+  const digits = decimals ?? (amount !== 0 && Math.abs(amount) < 100 ? 2 : 0);
   return new Intl.NumberFormat(getCurrencyLocale(currency), {
     style: 'currency',
     currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(amount);
 };
 
 export const formatCurrencyK = (value, currency = 'RON') => {

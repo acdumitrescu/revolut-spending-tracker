@@ -111,3 +111,21 @@ describe('fx helpers', () => {
     expect(result).toContain('100');
   });
 });
+
+describe('formatCurrency precision', () => {
+  it('never shows a small non-zero amount as zero', () => {
+    expect(formatCurrency(0.4, 'EUR')).toMatch(/0,40/);
+    expect(formatCurrency(-3.2, 'RON')).toMatch(/3,20/);
+    expect(formatCurrency(99.99, 'USD')).toBe('$99.99');
+  });
+
+  it('keeps large aggregates in whole units by default', () => {
+    expect(formatCurrency(1234.56, 'USD')).toBe('$1,235');
+    expect(formatCurrency(0, 'USD')).toBe('$0');
+  });
+
+  it('honours an explicit precision', () => {
+    expect(formatCurrency(1234.56, 'USD', { decimals: 2 })).toBe('$1,234.56');
+    expect(formatCurrency(0.4, 'USD', { decimals: 0 })).toBe('$0');
+  });
+});

@@ -22,6 +22,7 @@ export default function Accounts() {
     updateAccountCurrency,
     updateAccountBalance,
     setAccountGroup,
+    setAccountReconciled,
     undoAccountBalance,
     updateAccountNote,
     removeAccount,
@@ -31,6 +32,7 @@ export default function Accounts() {
   const displayCurrency = data.displayCurrency;
   const today = new Date();
   const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  const todayDate = `${currentMonth}-${String(today.getDate()).padStart(2, '0')}`;
 
   const handleAdd = () => {
     if (newAccName.trim()) {
@@ -102,7 +104,9 @@ export default function Accounts() {
       <div className="kpi-grid">
         <div className="kpi blue">
           <div className="lbl">Latest Tracked Balance</div>
-          <div className="val">{formatCurrency(latestBalance, displayCurrency)}</div>
+          <div className="val">
+            {formatCurrency(latestBalance, displayCurrency, { decimals: 2 })}
+          </div>
           {balanceSnapshot.month && (
             <p className="section-note">
               As of {balanceSnapshot.month}: {balanceSnapshot.updated} of {data.accounts.length}{' '}
@@ -120,7 +124,7 @@ export default function Accounts() {
             {currencyTotals.map((item) => (
               <span key={item.currency} style={{ color: 'var(--muted)', fontSize: '12px' }}>
                 <strong style={{ color: 'var(--text)' }}>
-                  {formatCurrency(item.total, item.currency)}
+                  {formatCurrency(item.total, item.currency, { decimals: 2 })}
                 </strong>{' '}
                 · {item.accounts} account{item.accounts === 1 ? '' : 's'}
               </span>
@@ -243,6 +247,8 @@ export default function Accounts() {
               onNote={updateAccountNote}
               onCurrency={updateAccountCurrency}
               onDelete={removeAccount}
+              today={todayDate}
+              onReconciled={setAccountReconciled}
             />
           ))}
         </div>

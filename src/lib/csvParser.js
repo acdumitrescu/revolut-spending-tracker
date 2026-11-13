@@ -347,17 +347,21 @@ function detectProfile(columns) {
   };
 }
 
-function getFirstMappedValue(row, headerLookup, canonicalKeys) {
+function findFirstMapped(row, headerLookup, canonicalKeys) {
   for (const canonicalKey of canonicalKeys) {
     const actualHeaders = headerLookup.actualByCanonical[canonicalKey] || [];
     for (const header of actualHeaders) {
       const value = row[header];
       if (value !== undefined && value !== null && String(value).trim() !== '') {
-        return value;
+        return { key: canonicalKey, value };
       }
     }
   }
-  return '';
+  return null;
+}
+
+function getFirstMappedValue(row, headerLookup, canonicalKeys) {
+  return findFirstMapped(row, headerLookup, canonicalKeys)?.value ?? '';
 }
 
 export function categorizeTransactionDetailed(description, amount, customVendors = {}) {
@@ -588,12 +592,33 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
   const desc = String(
     getFirstMappedValue(row, headerLookup, profile.descriptionPriority) || '',
   ).trim();
-  const amount = parseAmount(getFirstMappedValue(row, headerLookup, profile.amountPriority));
+  const amountHit = findFirstMapped(row, headerLookup, profile.amountPriority);
+  const amount = parseAmount(amountHit?.value ?? '');
   const rawType = getFirstMappedValue(row, headerLookup, profile.typePriority);
   const type = normalizeType(rawType, desc);
-  const currency = String(getFirstMappedValue(row, headerLookup, profile.currencyPriority) || '')
+  const currencyHit = findFirstMapped(row, headerLookup, profile.currencyPriority);
+  const currency = String(currencyHit?.value ?? '')
     .trim()
     .toUpperCase();
+  // Profiles with several amount/currency columns pick each independently; record which
+  // columns were used so the currency audit can spot an amount and currency from different columns.
+  // If the currency column that pairs with the amount's column holds the same code, the row is
+  // consistent, so record that column.
+  let currencySource = currencyHit?.key;
+  const pairedCurrencyKey = amountHit && amountHit.key.replace(/^amount/, 'currency');
+  if (currencySource && pairedCurrencyKey && pairedCurrencyKey !== currencySource) {
+    const paired = findFirstMapped(row, headerLookup, [pairedCurrencyKey]);
+    if (paired && String(paired.value).trim().toUpperCase() === currency) {
+      currencySource = pairedCurrencyKey;
+    }
+  }
+  const sources =
+    profile.currencyPriority.length > 1
+      ? {
+          ...(amountHit && { amountSource: amountHit.key }),
+          ...(currencySource && { currencySource }),
+        }
+      : {};
   const importedRef = String(
     getFirstMappedValue(row, headerLookup, profile.referencePriority) || '',
   ).trim();
@@ -669,6 +694,7 @@ function buildTransaction(row, profile, headerLookup, customVendors, rowIndex) {
       currency: currency || undefined,
       ref: ref || undefined,
       source: profile.source,
+      ...sources,
       matchedVendor: classification.matchedVendor,
       matchedAlias: classification.matchedAlias,
       matchedVendorId: classification.matchedVendorId,

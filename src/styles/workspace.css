@@ -45,6 +45,14 @@
   color: var(--info);
   background: var(--info-soft);
 }
+.status-pill.warning {
+  /* Darkened in the light theme so the label meets 4.5:1 on its tint. */
+  color: color-mix(in srgb, var(--warning) 55%, #000);
+  background: var(--warning-soft);
+}
+:root[data-theme='dark'] .status-pill.warning {
+  color: var(--warning);
+}
 .visually-hidden {
   position: absolute !important;
   width: 1px;
@@ -1046,6 +1054,7 @@
 }
 .transaction-table-card {
   padding: 0;
+  container: txns / inline-size;
 }
 .transactions-table .align-right,
 .transaction-amount {
@@ -1054,6 +1063,9 @@
 .transaction-date,
 .transaction-currency {
   color: var(--muted);
+}
+.transaction-date {
+  white-space: nowrap;
 }
 .transaction-description {
   max-width: 320px;
@@ -1150,6 +1162,34 @@
 }
 .transaction-amount.debit {
   color: var(--danger);
+}
+/* The table adapts to its own card width, not the window: shrink padding first, then drop the
+   Flow column (the amount's sign and colour already show direction) so nothing scrolls off-screen. */
+@container txns (max-width: 1100px) {
+  .transactions-table thead th,
+  .transactions-table tbody td {
+    padding-inline: 10px;
+  }
+  .transactions-table th:nth-child(6),
+  .transactions-table td:nth-child(6) {
+    display: none;
+  }
+  .transaction-description {
+    max-width: clamp(140px, 22cqw, 320px);
+  }
+  .transaction-category-cell {
+    min-width: 180px;
+  }
+}
+@container txns (max-width: 860px) {
+  .transactions-table thead th,
+  .transactions-table tbody td {
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+  .transaction-category-source {
+    display: none;
+  }
 }
 .table-empty {
   padding: 32px;
@@ -2385,4 +2425,55 @@
   .spend-spark-panel {
     grid-template-columns: 1fr;
   }
+}
+.currency-audit-item {
+  align-items: flex-start;
+}
+.currency-audit-rows {
+  margin-top: 8px;
+  font-size: 11px;
+}
+.currency-audit-rows summary {
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+.currency-audit-rows ul {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.currency-audit-rows li {
+  display: grid;
+  gap: 2px;
+}
+.currency-audit-rows li a {
+  color: var(--accent-solid, var(--accent));
+  font-weight: 650;
+}
+.currency-audit-check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.currency-audit-check small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.transaction-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.transaction-bulk .input {
+  width: auto;
 }

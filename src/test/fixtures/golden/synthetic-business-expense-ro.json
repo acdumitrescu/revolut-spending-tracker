@@ -12,6 +12,8 @@
       "type": "Card Payment",
       "ym": "2026-03",
       "currency": "RON",
+      "amountSource": "amount_payment",
+      "currencySource": "currency_payment",
       "ref": "expense-ro-1",
       "source": "revolut-business-expense",
       "matchedVendor": "Starbucks",

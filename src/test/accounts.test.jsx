@@ -76,11 +76,11 @@ describe('Accounts tracking', () => {
     expect(screen.getByText('Imported Expenses Trend')).toBeInTheDocument();
     expect(screen.getByTestId('chart-bar')).toHaveAttribute('data-values', JSON.stringify([400]));
     expect(screen.getAllByText('Latest balance')).toHaveLength(2);
-    expect(screen.getByText(/480\s*RON equivalent/)).toBeInTheDocument();
+    expect(screen.getByText(/480,00\s*RON equivalent/)).toBeInTheDocument();
     expect(screen.getByText('Change since 2026-04')).toBeInTheDocument();
     expect(screen.getByText('Balance change')).toBeInTheDocument();
     expect(screen.getAllByText('Last recorded')).toHaveLength(2);
-    expect(screen.getByText(/\+100\s*RON/)).toBeInTheDocument();
+    expect(screen.getByText(/\+100,00\s*RON/)).toBeInTheDocument();
     expect(screen.getByText('+25.0%')).toBeInTheDocument();
     expect(screen.getByLabelText('USD Broker note for 2026-09')).toHaveValue('Estimate');
     expect(screen.getByLabelText('RON Bank note for 2026-12')).toBeInTheDocument();

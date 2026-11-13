@@ -13,7 +13,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { parseCSV } from '../lib/csvParser';
+import { parseCSV, txKey } from '../lib/csvParser';
+import { applySourceHints } from '../lib/currencyAudit';
 import { ImportReview, NORMALIZED_CSV_TEMPLATE, validateCsvFile } from '../lib/importReview';
 import { useAppContext } from '../lib/AppContext';
 import { parseImportedAppState } from '../lib/persistence';
@@ -21,6 +22,7 @@ import { listEncryptedBackups, loadEncryptedBackup } from '../lib/serverSync';
 import { downloadTextFile, exportExcelWorkbook, exportJsonBackup } from '../lib/workspaceExports';
 import { useToast } from '../components/Toast';
 import { ActionCard, PageHeader, StatusPill } from '../components/ui';
+import CurrencyAuditPanel from '../components/CurrencyAuditPanel';
 
 export default function ImportWorkspace() {
   const {
@@ -29,6 +31,7 @@ export default function ImportWorkspace() {
     commitTransactionImport,
     createBackupNow,
     importBackup,
+    recordImportSources,
     recordVendorObservations,
     runtimeConfig,
     syncStatus,
@@ -79,6 +82,21 @@ export default function ImportWorkspace() {
       toast.error(`Unable to import CSV: ${error.message}`);
     } finally {
       setBusy(false);
+    }
+  };
+
+  const handleSourceCheck = async (file) => {
+    try {
+      const result = await parseCSV(file, data.customVendors);
+      const { updated } = applySourceHints(data.transactions, result.transactions, txKey);
+      if (!updated) {
+        toast.info('No rows without recorded columns matched that file.');
+        return;
+      }
+      recordImportSources(result.transactions);
+      toast.success(`Recorded the source columns for ${updated} row${updated === 1 ? '' : 's'}.`);
+    } catch (error) {
+      toast.error(`Unable to check that CSV: ${error.message}`);
     }
   };
 
@@ -566,6 +584,8 @@ export default function ImportWorkspace() {
           </button>
         </section>
       )}
+
+      <CurrencyAuditPanel data={persistedState.data} onCheckFile={handleSourceCheck} />
 
       {importHistory.length > 0 && (
         <section className="import-history-section" aria-labelledby="import-history-title">

@@ -765,10 +765,23 @@ export function AppProvider({ children }) {
             baseSubcategory,
             getTransactionKey: txKey,
           }),
+        recordImportSources: (parsedTransactions) =>
+          dispatch({
+            type: 'record_import_sources',
+            parsedTransactions,
+            getTransactionKey: txKey,
+          }),
         setTransactionCurrency: (transactionKey, currency) =>
           dispatch({
             type: 'set_transaction_currency',
             transactionKey,
+            currency,
+            getTransactionKey: txKey,
+          }),
+        setTransactionsCurrency: (transactionKeys, currency) =>
+          dispatch({
+            type: 'set_transaction_currency',
+            transactionKeys,
             currency,
             getTransactionKey: txKey,
           }),
@@ -788,6 +801,8 @@ export function AppProvider({ children }) {
           }),
         setAccountGroup: (accountId, group) =>
           dispatch({ type: 'set_account_group', accountId, group }),
+        setAccountReconciled: (accountId, date) =>
+          dispatch({ type: 'set_account_reconciled', accountId, date }),
         undoAccountBalance: (accountId, month, previous, expected) =>
           dispatch({ type: 'undo_account_balance', accountId, month, previous, expected }),
         updateAccountCurrency: (accountId, currency) =>
