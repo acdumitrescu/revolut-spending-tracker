@@ -811,13 +811,15 @@ export function parseCSV(file, customVendors = {}) {
 // The key uses the currency the row was imported with (baseCurrency), so a manual
 // currency correction does not change identity: re-imports still dedupe and
 // category overrides still match.
+// Identity uses the imported currency, so a manual currency override never changes it.
+const importedCurrency = (t) => (t.baseCurrency !== undefined ? t.baseCurrency : t.currency);
+
 export function txKey(t) {
-  const importedCurrency = t.baseCurrency !== undefined ? t.baseCurrency : t.currency;
-  return [t.date, t.desc, t.amt, t.type, t.flow, importedCurrency || '', t.ref || ''].join('|');
+  return [t.date, t.desc, t.amt, t.type, t.flow, importedCurrency(t) || '', t.ref || ''].join('|');
 }
 
 function legacyTxKey(t) {
-  return [t.date, t.desc, t.amt, t.type, t.flow, t.currency || ''].join('|');
+  return [t.date, t.desc, t.amt, t.type, t.flow, importedCurrency(t) || ''].join('|');
 }
 
 export function analyzeTransactionImport(existing, incoming) {

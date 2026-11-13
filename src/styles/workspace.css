@@ -1064,6 +1064,11 @@
 .transaction-category {
   font-size: 11px;
   font-weight: 750;
+  /* Chart colours are too light as small text on white; darken them in the light theme. */
+  color: color-mix(in srgb, var(--category-color, var(--text)) 62%, #000);
+}
+:root[data-theme='dark'] .transaction-category {
+  color: var(--category-color, var(--text));
 }
 .transaction-category-cell {
   min-width: 210px;

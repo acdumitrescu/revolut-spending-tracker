@@ -250,6 +250,7 @@ export default function ImportWorkspace() {
         className="visually-hidden"
         type="file"
         accept=".csv"
+        aria-label="Choose CSV file"
         onChange={handleCsvUpload}
       />
       <input
@@ -257,6 +258,7 @@ export default function ImportWorkspace() {
         className="visually-hidden"
         type="file"
         accept=".json"
+        aria-label="Choose JSON backup to restore"
         onChange={handleRestore}
       />
       {pendingRestore && (

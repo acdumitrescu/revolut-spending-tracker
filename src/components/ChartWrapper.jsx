@@ -65,6 +65,13 @@ const DOUGHNUT_OPTIONS = {
   cutout: '68%',
 };
 
+// Canvas charts are images to assistive tech; give each one a text alternative.
+function describeChart(type, labels, datasets) {
+  const series = datasets.map((dataset) => dataset?.label).filter(Boolean);
+  const range = labels.length > 1 ? `${labels[0]} to ${labels[labels.length - 1]}` : labels[0];
+  return `${type === 'doughnut' ? 'Doughnut' : type === 'line' ? 'Line' : 'Bar'} chart${series.length ? ` of ${series.join(', ')}` : ''}${range ? `, ${range}` : ''}`;
+}
+
 export default function ChartWrapper({
   type,
   data,
@@ -73,6 +80,7 @@ export default function ChartWrapper({
   horizontal = false,
   showLegend = true,
   currency = 'RON',
+  ariaLabel,
 }) {
   const Component = CHART_COMPONENTS[type];
   if (!Component) {
@@ -287,7 +295,11 @@ export default function ChartWrapper({
 
   return (
     <div style={{ height: `${height}px`, position: 'relative', width: '100%' }}>
-      <Component data={data} options={mergedOptions} />
+      <Component
+        data={data}
+        options={mergedOptions}
+        aria-label={ariaLabel || describeChart(type, labels, datasets)}
+      />
     </div>
   );
 }

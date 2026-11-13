@@ -17,6 +17,9 @@ fi
 
 scripts/privacy-scan.sh
 
+# Only a commit on which `npm run check` passed (clean tree) may be deployed.
+node scripts/checkStamp.mjs verify
+
 REMOTE_HOST="${SSB_REMOTE_HOST:?Set SSB_REMOTE_HOST before deploying}"
 REMOTE_PATH="${SSB_REMOTE_PATH:-/srv/docker/ssb}"
 
