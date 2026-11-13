@@ -38,7 +38,6 @@ import {
 } from './serverSync';
 import { mergeTransactions, txKey } from './csvParser';
 import { resolveTransactionCategories } from './transactionCategories';
-import { prepareBrdImport } from './brdStatement';
 import {
   loadVendorObservations,
   recordVendorObservations as persistVendorObservations,
@@ -621,6 +620,7 @@ export function AppProvider({ children }) {
       throw new Error('Wait for private sync before importing.');
     await flushPendingChanges();
     const base = persistedStateRef.current;
+    const { prepareBrdImport } = await import('./brdStatement');
     const prepared = prepareBrdImport(base.data, request);
     const next = createPersistedAppState({
       ...base.data,

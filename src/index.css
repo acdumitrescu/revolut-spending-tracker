@@ -1201,15 +1201,15 @@ textarea {
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: #ffffff;
+  background: var(--accent-solid, var(--accent));
+  color: var(--on-accent, #ffffff);
   border-color: transparent;
   box-shadow: 0 12px 24px rgba(32, 166, 90, 0.16);
 }
 
 .btn-primary:hover {
-  background: var(--accent-hover);
-  color: #ffffff;
+  background: var(--accent-solid-hover, var(--accent-hover));
+  color: var(--on-accent, #ffffff);
 }
 
 .btn-ghost-danger {

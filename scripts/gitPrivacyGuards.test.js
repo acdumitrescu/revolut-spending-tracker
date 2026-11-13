@@ -61,12 +61,14 @@ beforeAll(() => {
     'git-privacy-guards.sh',
     'install-git-hooks.sh',
     'pre-push',
+    'pre-commit',
     'privacy-scan.sh',
   ]) {
     fs.copyFileSync(path.join(repoRoot, 'scripts', file), path.join(fixture, 'scripts', file));
   }
   fs.chmodSync(path.join(fixture, 'scripts/install-git-hooks.sh'), 0o755);
   fs.chmodSync(path.join(fixture, 'scripts/pre-push'), 0o755);
+  fs.chmodSync(path.join(fixture, 'scripts/pre-commit'), 0o755);
   fs.chmodSync(path.join(fixture, 'scripts/privacy-scan.sh'), 0o755);
 
   git('init', '-b', 'main', '--quiet');
@@ -157,6 +159,25 @@ describe('Git privacy guards', () => {
     const sha256ZeroOid = '0'.repeat(64);
     const deleteResult = runHook([`(delete) ${sha256ZeroOid} refs/heads/personal ${personalTip}`]);
     expect(deleteResult.status).toBe(0);
+  });
+
+  it('pre-commit hook blocks staged private-looking files and allows normal ones', () => {
+    const preCommit = () =>
+      spawnSync(path.join(fixture, 'scripts/pre-commit'), [], { cwd: fixture, encoding: 'utf8' });
+    fs.mkdirSync(path.join(fixture, 'exports'), { recursive: true });
+    fs.writeFileSync(path.join(fixture, 'exports/synthetic.json'), '{}\n');
+    git('add', '-f', 'exports/synthetic.json');
+    const blocked = preCommit();
+    expect(blocked.status).toBe(1);
+    expect(blocked.stderr).toMatch(/private finance data/);
+    git('rm', '--cached', '--quiet', 'exports/synthetic.json');
+    fs.rmSync(path.join(fixture, 'exports'), { recursive: true, force: true });
+
+    fs.writeFileSync(path.join(fixture, 'notes.txt'), 'synthetic public note\n');
+    git('add', 'notes.txt');
+    expect(preCommit().status).toBe(0);
+    git('rm', '--cached', '--quiet', 'notes.txt');
+    fs.rmSync(path.join(fixture, 'notes.txt'));
   });
 
   it('refuses first-install trust when private history exists without a public baseline', () => {

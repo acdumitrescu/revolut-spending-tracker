@@ -1,0 +1,62 @@
+{
+  "transactions": [
+    {
+      "date": "2026-02-01",
+      "desc": "Synthetic Amazon Marketplace",
+      "cat": "Shopping",
+      "sub": "Marketplace",
+      "baseCat": "Shopping",
+      "baseSub": "Marketplace",
+      "amt": -19.99,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2026-02",
+      "currency": "USD",
+      "ref": "business-tx-1",
+      "source": "revolut-business-transaction",
+      "matchedVendor": "Amazon",
+      "matchedAlias": "amazon marketplace",
+      "matchedVendorId": "global-amazon",
+      "matchedRegion": "Global",
+      "matchSource": "built-in-contains",
+      "matchStrategy": "boundary",
+      "confidence": "medium"
+    },
+    {
+      "date": "2026-02-02",
+      "desc": "Synthetic Transfer",
+      "cat": "Transfers",
+      "sub": "Transfers",
+      "baseCat": "Transfers",
+      "baseSub": "Transfers",
+      "amt": 5000,
+      "flow": "Credit",
+      "type": "Bank Transfer",
+      "ym": "2026-02",
+      "currency": "RON",
+      "ref": "business-tx-2",
+      "source": "revolut-business-transaction",
+      "matchedVendor": "Transfer",
+      "matchedAlias": "Bank Transfer",
+      "matchSource": "system",
+      "confidence": "high"
+    }
+  ],
+  "rejectedRows": [],
+  "summary": {
+    "detectedProfileId": "revolut-business-transaction",
+    "detectedProfileLabel": "Revolut Business Transaction Statement CSV",
+    "totalRows": 2,
+    "processedRows": 2,
+    "skippedRows": 0,
+    "duplicateRows": 0,
+    "existingDuplicateRows": 0,
+    "fileDuplicateRows": 0,
+    "warnings": [],
+    "skippedReasonCounts": {},
+    "skippedDetails": [],
+    "validationCategories": {},
+    "unknownVendorCount": 0
+  },
+  "vendorObservations": []
+}

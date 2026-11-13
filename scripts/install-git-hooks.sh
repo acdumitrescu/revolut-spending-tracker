@@ -58,3 +58,9 @@ fi
 cp "$SCRIPT_DIR/pre-push" "$HOOK"
 chmod +x "$HOOK"
 printf 'Installed pre-push privacy hook at %s\n' "$HOOK"
+
+if [ -f "$SCRIPT_DIR/pre-commit" ]; then
+  cp "$SCRIPT_DIR/pre-commit" "$HOOKS_DIR/pre-commit"
+  chmod +x "$HOOKS_DIR/pre-commit"
+  printf 'Installed pre-commit hook at %s\n' "$HOOKS_DIR/pre-commit"
+fi

@@ -172,7 +172,10 @@ describe('backend contract: network exposure and secret hygiene', () => {
       });
     });
     expect(error, 'backend is reachable on a non-loopback address').not.toBeNull();
-    expect(error.code).toBe('ECONNREFUSED');
+    // Refused, unreachable or silently dropped (VPN/firewall interfaces) all mean "not exposed".
+    expect(error.code || error.message).toMatch(
+      /^(ECONNREFUSED|EHOSTUNREACH|ENETUNREACH|timeout)$/,
+    );
   }, 30_000);
 
   it('never writes the sync token or a presented bad token to its log', async () => {

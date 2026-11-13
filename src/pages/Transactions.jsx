@@ -204,6 +204,7 @@ export default function Transactions() {
                         <div className="transaction-category-editor">
                           <select
                             className="input"
+                            aria-label="Category"
                             value={editCategory}
                             onChange={(event) => setEditCategory(event.target.value)}
                           >
@@ -218,6 +219,7 @@ export default function Transactions() {
                             className="input"
                             type="text"
                             placeholder="Subcategory"
+                            aria-label="Subcategory"
                             value={editSubcategory}
                             onChange={(event) => setEditSubcategory(event.target.value)}
                           />
@@ -239,7 +241,7 @@ export default function Transactions() {
                         >
                           <span
                             className="transaction-category"
-                            style={{ color: getColorForCategory(transaction.cat) }}
+                            style={{ '--category-color': getColorForCategory(transaction.cat) }}
                           >
                             {transaction.cat}
                           </span>
