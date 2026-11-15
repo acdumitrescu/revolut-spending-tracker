@@ -1,5 +1,6 @@
 /* global process */
 import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { isSafeSyncToken } from './backend/syncToken.js';
 import { requestBoundary } from './backend/requestBoundary.js';
@@ -80,11 +81,13 @@ export default defineConfig(() => {
       globals: true,
       environment: 'jsdom',
       setupFiles: './src/test/setup.js',
+      // Nested Claude Code worktrees (.claude/worktrees/*) are copies, not part of this repo.
+      exclude: [...configDefaults.exclude, '.claude/**'],
       coverage: {
         provider: 'v8',
         include: ['src/lib/**/*.{js,jsx}', 'backend/*.js'],
         // server.js is exercised end to end by the HTTP contract suite (npm run test:contract).
-        exclude: ['**/*.test.{js,jsx}', 'backend/server.js'],
+        exclude: ['**/*.test.{js,jsx}', 'backend/server.js', '.claude/**'],
         reporter: ['text-summary', 'json-summary'],
         // Floors set just below the 2026-11-13 baseline: coverage may only go up.
         // Baseline: statements 83.1, branches 75.6, functions 86.2, lines 85.2.
