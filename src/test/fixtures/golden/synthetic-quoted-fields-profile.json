@@ -1,0 +1,130 @@
+{
+  "transactions": [
+    {
+      "date": "2026-06-01",
+      "desc": "Synthetic Cafe, Downtown",
+      "cat": "Food",
+      "sub": "Dining",
+      "baseCat": "Food",
+      "baseSub": "Dining",
+      "amt": -12.5,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2026-06",
+      "currency": "RON",
+      "ref": "quoted-1",
+      "source": "master",
+      "matchSource": "none",
+      "matchStrategy": "none",
+      "confidence": "none"
+    },
+    {
+      "date": "2026-06-02",
+      "desc": "Synthetic \"Quoted\" Shop",
+      "cat": "Shopping",
+      "sub": "General",
+      "baseCat": "Shopping",
+      "baseSub": "General",
+      "amt": -8,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2026-06",
+      "currency": "RON",
+      "ref": "quoted-2",
+      "source": "master",
+      "matchSource": "none",
+      "matchStrategy": "none",
+      "confidence": "none"
+    },
+    {
+      "date": "2026-06-03",
+      "desc": "Synthetic Multi\nLine Merchant",
+      "cat": "Shopping",
+      "sub": "General",
+      "baseCat": "Shopping",
+      "baseSub": "General",
+      "amt": -15.25,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2026-06",
+      "currency": "RON",
+      "ref": "quoted-3",
+      "source": "master",
+      "matchSource": "none",
+      "matchStrategy": "none",
+      "confidence": "none"
+    },
+    {
+      "date": "2026-06-04",
+      "desc": "Synthetic, \"All\" Three\nCombined",
+      "cat": "Shopping",
+      "sub": "General",
+      "baseCat": "Shopping",
+      "baseSub": "General",
+      "amt": -1,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2026-06",
+      "currency": "RON",
+      "ref": "quoted-4",
+      "source": "master",
+      "matchSource": "none",
+      "matchStrategy": "none",
+      "confidence": "none"
+    }
+  ],
+  "rejectedRows": [],
+  "summary": {
+    "detectedProfileId": "normalized-csv",
+    "detectedProfileLabel": "Normalized CSV",
+    "totalRows": 4,
+    "processedRows": 4,
+    "skippedRows": 0,
+    "duplicateRows": 0,
+    "existingDuplicateRows": 0,
+    "fileDuplicateRows": 0,
+    "warnings": [],
+    "skippedReasonCounts": {},
+    "skippedDetails": [],
+    "validationCategories": {},
+    "unknownVendorCount": 4
+  },
+  "vendorObservations": [
+    {
+      "normalizedDescription": "synthetic multi line merchant",
+      "rawDescription": "Synthetic Multi\nLine Merchant",
+      "amountAbs": 15.25,
+      "count": 1,
+      "firstSeenAt": "2026-06-03",
+      "lastSeenAt": "2026-06-03",
+      "suggestedCandidates": []
+    },
+    {
+      "normalizedDescription": "synthetic cafe downtown",
+      "rawDescription": "Synthetic Cafe, Downtown",
+      "amountAbs": 12.5,
+      "count": 1,
+      "firstSeenAt": "2026-06-01",
+      "lastSeenAt": "2026-06-01",
+      "suggestedCandidates": []
+    },
+    {
+      "normalizedDescription": "synthetic quoted shop",
+      "rawDescription": "Synthetic \"Quoted\" Shop",
+      "amountAbs": 8,
+      "count": 1,
+      "firstSeenAt": "2026-06-02",
+      "lastSeenAt": "2026-06-02",
+      "suggestedCandidates": []
+    },
+    {
+      "normalizedDescription": "synthetic all three combined",
+      "rawDescription": "Synthetic, \"All\" Three\nCombined",
+      "amountAbs": 1,
+      "count": 1,
+      "firstSeenAt": "2026-06-04",
+      "lastSeenAt": "2026-06-04",
+      "suggestedCandidates": []
+    }
+  ]
+}

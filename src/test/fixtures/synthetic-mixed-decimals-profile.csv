@@ -1,0 +1,11 @@
+Date,Description,Amount,Category,Subcategory,Flow,Type,Currency,Reference
+2026-07-01,Synthetic Dot Thousands Comma Decimal,"1.234,56",Income,Salary,Credit,bank transfer,RON,decimals-1
+2026-07-02,Synthetic Comma Thousands Dot Decimal,"1,234.56",Income,Salary,Credit,bank transfer,RON,decimals-2
+2026-07-03,Synthetic Comma Decimal No Thousands,"1234,56",Income,Salary,Credit,bank transfer,RON,decimals-3
+2026-07-04,Synthetic Dot Decimal No Thousands,1234.56,Income,Salary,Credit,bank transfer,RON,decimals-4
+2026-07-05,Synthetic Negative Dot Thousands,"-1.234,56",Food,Groceries,Debit,card payment,RON,decimals-5
+2026-07-06,Synthetic Negative Comma Thousands,"-1,234.56",Food,Groceries,Debit,card payment,RON,decimals-6
+2026-07-07,Synthetic Space Thousands,"1 234,56",Income,Salary,Credit,bank transfer,RON,decimals-7
+2026-07-08,Synthetic Parentheses Negative,(12.50),Food,Groceries,Debit,card payment,RON,decimals-8
+2026-07-09,Synthetic Two Group Separators,"1.234.567,89",Income,Salary,Credit,bank transfer,RON,decimals-9
+2026-07-10,Synthetic One Digit Comma Decimal,"12,5",Income,Salary,Credit,bank transfer,RON,decimals-10

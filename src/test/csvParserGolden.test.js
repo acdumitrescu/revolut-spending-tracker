@@ -4,6 +4,9 @@ import personalFixture from './fixtures/synthetic-personal-profile.csv?raw';
 import businessFixture from './fixtures/synthetic-business-profile.csv?raw';
 import businessExpenseFixture from './fixtures/synthetic-business-expense-ro.csv?raw';
 import normalizedFixture from './fixtures/synthetic-normalized-profile.csv?raw';
+import mixedDecimalsFixture from './fixtures/synthetic-mixed-decimals-profile.csv?raw';
+import quotedFieldsFixture from './fixtures/synthetic-quoted-fields-profile.csv?raw';
+import duplicateRowsFixture from './fixtures/synthetic-duplicate-rows-profile.csv?raw';
 import demoFixture from '../../public/demo-revolut.csv?raw';
 
 // Golden files: every supported export profile has a synthetic CSV and a checked-in
@@ -14,6 +17,9 @@ const cases = [
   ['revolut-business-transaction', 'synthetic-business-profile', businessFixture],
   ['revolut-business-expense', 'synthetic-business-expense-ro', businessExpenseFixture],
   ['normalized-csv', 'synthetic-normalized-profile', normalizedFixture],
+  ['normalized-csv', 'synthetic-mixed-decimals-profile', mixedDecimalsFixture],
+  ['normalized-csv', 'synthetic-quoted-fields-profile', quotedFieldsFixture],
+  ['revolut-personal-raw', 'synthetic-duplicate-rows-profile', duplicateRowsFixture],
   ['revolut-personal-raw', 'demo-csv', demoFixture],
 ];
 

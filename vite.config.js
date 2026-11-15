@@ -99,7 +99,7 @@ export default defineConfig(() => {
           // Money logic gets a higher, per-file bar.
           'src/lib/fx.js': { statements: 96, branches: 88, functions: 100, lines: 99 },
           'src/lib/selectors.js': { statements: 93, branches: 80, functions: 96, lines: 95 },
-          'src/lib/csvParser.js': { statements: 87, branches: 85, functions: 92, lines: 87 },
+          'src/lib/csvParser.js': { statements: 89, branches: 90, functions: 92, lines: 90 },
           'src/lib/appState.js': { statements: 84, branches: 76, functions: 95, lines: 88 },
           'backend/workspaceChanges.js': {
             statements: 85,

@@ -1,0 +1,7 @@
+Started Date,Completed Date,Description,Amount,Type,Currency,Reference
+2026-08-01,2026-08-01,Synthetic Bakery,-10,card payment,RON,
+2026-08-01,2026-08-01,Synthetic Bakery,-10,card payment,RON,
+2026-08-02,2026-08-02,Synthetic Bakery,-10,card payment,RON,
+2026-08-03,2026-08-03,Synthetic Pharmacy,-20,card payment,RON,dup-ref-1
+2026-08-03,2026-08-03,Synthetic Pharmacy,-20,card payment,RON,dup-ref-1
+2026-08-03,2026-08-03,Synthetic Pharmacy,-20,card payment,RON,dup-ref-2

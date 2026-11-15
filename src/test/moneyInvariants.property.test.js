@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
 import { convertAmount, DEFAULT_FX_RATES, SUPPORTED_DISPLAY_CURRENCIES } from '../lib/fx';
-import { mergeTransactions, txKey } from '../lib/csvParser';
+import { analyzeTransactionImport, mergeTransactions, parseCSV, txKey } from '../lib/csvParser';
+import { serializeCsv } from './fixtures/csvSerializer';
 import { getCategoryTotals, getMonthlyExpense, getMonthlyIncome } from '../lib/selectors';
 import { appReducer, createInitialAppData, createPersistedAppState } from '../lib/appState';
 
@@ -99,6 +100,24 @@ describe('money invariants', () => {
         expect(twice).toHaveLength(once.length);
       }),
       RUNS,
+    );
+  });
+
+  it('importing the same parsed CSV file twice adds zero rows', async () => {
+    await fc.assert(
+      fc.asyncProperty(csvRows, async (file) => {
+        // Repeated rows inside the file are part of the point: they dedupe within one import too.
+        const text = serializeCsv(
+          'normalized-csv',
+          file.map((row) => ({ ...row, cents: Math.round(row.amt * 100) })),
+        );
+        const parse = async () =>
+          (await parseCSV(new File([text], 'synthetic-twice.csv'))).transactions;
+        const first = analyzeTransactionImport([], await parse());
+        const second = analyzeTransactionImport(first.acceptedTransactions, await parse());
+        expect(second.acceptedTransactions).toHaveLength(0);
+      }),
+      { numRuns: 60, seed: 20261113 },
     );
   });
 
