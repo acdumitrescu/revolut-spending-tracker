@@ -56,7 +56,15 @@ function parseTimestamp(value) {
 
 function normalizeSnapshot(body) {
   const remoteData = body && typeof body === 'object' ? body.data : null;
-  const remoteLogicalUpdatedAt = parseTimestamp(remoteData?.lastUpdated);
+  // body.data is normally the persisted envelope { schemaVersion, exportedAt, data }, so the
+  // workspace's own time is one level down. Legacy (unversioned) saves stored bare AppData.
+  // Same rule as migrations.js legacyToV1: an inner `data` object wins.
+  const innerData = remoteData?.data;
+  const appData =
+    innerData && typeof innerData === 'object' && !Array.isArray(innerData)
+      ? innerData
+      : remoteData;
+  const remoteLogicalUpdatedAt = parseTimestamp(appData?.lastUpdated);
   const remoteServerUpdatedAt = parseTimestamp(body?.updatedAt);
 
   return {

@@ -183,3 +183,89 @@ describe('serverSync', () => {
     }
   });
 });
+
+describe('serverSync logical timestamp', () => {
+  const WRITE_TIME = '2026-06-18T12:00:00.000Z';
+
+  function stubLoad(data, updatedAt = WRITE_TIME) {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data, version: 2, updatedAt }) }),
+    );
+  }
+
+  it('reads the logical time from inside a persisted envelope, not the write time', async () => {
+    const envelope = {
+      schemaVersion: 1,
+      exportedAt: null,
+      data: { lastUpdated: 1700000000000, transactions: [] },
+    };
+    stubLoad(envelope);
+    const snapshot = await loadServerSnapshot();
+    expect(snapshot.data).toBe(envelope);
+    expect(getRemoteLogicalUpdatedAt(snapshot)).toBe(1700000000000);
+    expect(snapshot.remoteServerUpdatedAt).toBe(Date.parse(WRITE_TIME));
+  });
+
+  it('reads the logical time from an unversioned envelope', async () => {
+    stubLoad({ exportedAt: 5, data: { lastUpdated: 1700000000000 } });
+    expect(getRemoteLogicalUpdatedAt(await loadServerSnapshot())).toBe(1700000000000);
+  });
+
+  it('reads the logical time from a legacy bare workspace', async () => {
+    stubLoad({ lastUpdated: 1700000000000, transactions: [] });
+    expect(getRemoteLogicalUpdatedAt(await loadServerSnapshot())).toBe(1700000000000);
+  });
+
+  it('parses an ISO string logical time', async () => {
+    stubLoad({ schemaVersion: 1, data: { lastUpdated: '2026-06-18T11:00:00.000Z' } });
+    expect(getRemoteLogicalUpdatedAt(await loadServerSnapshot())).toBe(
+      Date.parse('2026-06-18T11:00:00.000Z'),
+    );
+  });
+
+  it.each([
+    ['missing', undefined],
+    ['null', null],
+    ['zero', 0],
+    ['unparseable', 'not a date'],
+    ['an object', { at: 1 }],
+    ['NaN', Number.NaN],
+  ])('falls back to the server write time when lastUpdated is %s', async (_label, value) => {
+    stubLoad({ schemaVersion: 1, data: { lastUpdated: value } });
+    expect(getRemoteLogicalUpdatedAt(await loadServerSnapshot())).toBe(Date.parse(WRITE_TIME));
+  });
+
+  it('does not treat a non-object inner data value as the workspace', async () => {
+    stubLoad({ lastUpdated: 1700000000000, data: 'junk' });
+    expect(getRemoteLogicalUpdatedAt(await loadServerSnapshot())).toBe(1700000000000);
+  });
+
+  it('returns 0 when there is neither a logical time nor a write time', async () => {
+    stubLoad(null, null);
+    const snapshot = await loadServerSnapshot();
+    expect(snapshot.data).toBeNull();
+    expect(getRemoteLogicalUpdatedAt(snapshot)).toBe(0);
+  });
+
+  it('reads the logical time from a conflicting envelope', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 409,
+        json: async () => ({
+          error: 'Version conflict',
+          data: { schemaVersion: 1, exportedAt: null, data: { lastUpdated: 1700000009000 } },
+          version: 8,
+          updatedAt: '2020-01-01T00:00:00.000Z',
+        }),
+      }),
+    );
+    const error = await saveServerSnapshot({ schemaVersion: 1, data: {} }, 7).catch((e) => e);
+    expect(isVersionConflict(error)).toBe(true);
+    const conflict = getConflictSnapshot(error);
+    expect(getRemoteLogicalUpdatedAt(conflict)).toBe(1700000009000);
+    expect(conflict.remoteServerUpdatedAt).toBe(Date.parse('2020-01-01T00:00:00.000Z'));
+  });
+});
