@@ -232,13 +232,31 @@ function normalizeDate(rawValue) {
 
 function parseAmount(rawValue) {
   if (typeof rawValue === 'number') return rawValue;
-  const normalized = String(rawValue || '')
-    .replace(/[^\d,.-]/g, '')
-    .replace(/,(?=\d{1,2}$)/, '.')
-    .replace(/,/g, '');
+  const text = String(rawValue || '');
+  // Accounting notation: (12.50) is a negative amount.
+  const isParenthesized = /\(.*\)/.test(text);
+  let normalized = text.replace(/[^\d,.-]/g, '');
 
+  const lastComma = normalized.lastIndexOf(',');
+  const lastDot = normalized.lastIndexOf('.');
+  if (lastComma !== -1 && lastDot !== -1) {
+    // Both separators present: whichever comes last is the decimal point.
+    const [decimal, thousands] = lastComma > lastDot ? [',', '.'] : ['.', ','];
+    normalized = normalized.split(thousands).join('').replace(decimal, '.');
+  } else {
+    // A lone comma is a decimal point only when 1-2 digits follow it.
+    // Several dots can only be thousands separators (1.234.567).
+    normalized = normalized
+      .replace(/,(?=\d{1,2}$)/, '.')
+      .replace(/,/g, '')
+      .replace(/\.(?=.*\.)/g, '');
+  }
+
+  // Anything left that is not a plain number (1.2.3, 12-34, 5-) is rejected, not truncated.
+  if (!/^-?(\d+\.?\d*|\.\d+)$/.test(normalized)) return Number.NaN;
   const amount = Number.parseFloat(normalized);
-  return Number.isFinite(amount) ? amount : Number.NaN;
+  if (!Number.isFinite(amount)) return Number.NaN;
+  return isParenthesized ? -Math.abs(amount) : amount;
 }
 
 function normalizeType(type, desc) {
