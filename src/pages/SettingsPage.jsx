@@ -2,12 +2,18 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LockKeyhole, RefreshCw, Save, ShieldAlert, Trash2, UnlockKeyhole } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
+import { NEWER_SCHEMA_VERSION_MESSAGE } from '../lib/migrations';
 import { BASE_CURRENCY } from '../lib/fx';
 import { SUPPORTED_DISPLAY_CURRENCIES } from '../lib/utils';
 import { useToast } from '../components/Toast';
 import { PageHeader, StatusPill } from '../components/ui';
 import { phoneCopyBannerText } from '../lib/phoneCopy';
 import { RECEIVE_FROM_MAC_PATH } from '../components/PhoneCopyBanner';
+
+const RUNTIME_ISSUE_TEXT = {
+  'newer-local-state': NEWER_SCHEMA_VERSION_MESSAGE,
+  'newer-remote-state': NEWER_SCHEMA_VERSION_MESSAGE,
+};
 
 export default function SettingsPage() {
   const {
@@ -230,7 +236,8 @@ export default function SettingsPage() {
         </div>
         {runtimeIssues.length > 0 && (
           <div className="runtime-warning">
-            <ShieldAlert size={17} /> {runtimeIssues.join(', ')}
+            <ShieldAlert size={17} />{' '}
+            {runtimeIssues.map((issue) => RUNTIME_ISSUE_TEXT[issue] || issue).join(', ')}
           </div>
         )}
         {runtimeConfig.privateSyncEnabled && (

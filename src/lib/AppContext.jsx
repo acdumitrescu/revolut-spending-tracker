@@ -17,7 +17,8 @@ import {
   READ_ONLY_MESSAGE,
 } from './phoneCopy';
 import { fetchLatestFxRates } from './fxService';
-import { saveLocalAppState, loadLocalAppState } from './persistence';
+import { isNewerSchemaVersion, NEWER_SCHEMA_VERSION_MESSAGE } from './migrations';
+import { saveLocalAppState, loadLocalAppState, validateStoredAppState } from './persistence';
 import { runtimeConfig } from './runtimeConfig';
 import { getCurrencySummary } from './selectors';
 import {
@@ -27,7 +28,6 @@ import {
   CarListingSchema,
   CreditRecordSchema,
   CardPurchaseSchema,
-  PersistedAppStateSchema,
   sanitizePersistedAppState,
 } from './validation';
 import {
@@ -73,9 +73,11 @@ function appendIssue(setter, issue) {
 }
 
 function isValidRemoteState(rawState) {
-  return (
-    PersistedAppStateSchema.safeParse(rawState).success || AppDataSchema.safeParse(rawState).success
-  );
+  try {
+    return validateStoredAppState(rawState).success || AppDataSchema.safeParse(rawState).success;
+  } catch {
+    return false; // newer schema version: never load or overwrite it
+  }
 }
 
 async function saveSnapshotWithRetry(persistedState, version, signal) {
@@ -157,14 +159,14 @@ export function AppProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (runtimeConfig.encryptedStorage) return;
+    if (runtimeConfig.encryptedStorage || initialLoad.readOnly) return;
     try {
       saveLocalAppState(LS_KEY, appState);
     } catch (error) {
       console.error('Failed to save data to local storage', error);
       appendIssue(setRuntimeIssues, 'local-save-failed');
     }
-  }, [appState]);
+  }, [appState, initialLoad.readOnly]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = appState.data.themeMode || 'dark';
@@ -236,6 +238,16 @@ export function AppProvider({ children }) {
       try {
         const snapshot = await loadServerSnapshot(controller.signal);
         if (cancelled) return;
+
+        if (isNewerSchemaVersion(snapshot.data)) {
+          appendIssue(setRuntimeIssues, 'newer-remote-state');
+          setSyncRuntime({
+            phase: 'sync-delayed',
+            enabled: true,
+            message: NEWER_SCHEMA_VERSION_MESSAGE,
+          });
+          return;
+        }
 
         if (snapshot.data && !isValidRemoteState(snapshot.data)) {
           appendIssue(setRuntimeIssues, 'corrupted-remote-state');
@@ -508,6 +520,7 @@ export function AppProvider({ children }) {
 
   const resumeUserSession = async () => {
     const snapshot = await loadServerSnapshot();
+    if (isNewerSchemaVersion(snapshot.data)) throw new Error(NEWER_SCHEMA_VERSION_MESSAGE);
     if (!snapshot.data || !isValidRemoteState(snapshot.data))
       throw new Error('Unable to validate this user’s saved workspace');
     const current = persistedStateRef.current;

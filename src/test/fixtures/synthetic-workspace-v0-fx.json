@@ -1,0 +1,51 @@
+{
+  "transactions": [
+    {
+      "date": "2025-05-03",
+      "desc": "Synthetic Hardware Shop",
+      "cat": "Shopping",
+      "sub": "Home",
+      "amt": -129.99,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2025-05",
+      "currency": "RON"
+    },
+    {
+      "date": "2025-05-20",
+      "desc": "Synthetic Streaming Co",
+      "cat": "Entertainment",
+      "sub": "Subscriptions",
+      "amt": -9.99,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2025-05",
+      "currency": "USD"
+    }
+  ],
+  "customVendors": {},
+  "accounts": [
+    {
+      "id": "acc-fake-ron",
+      "name": "Fake Current Account",
+      "currency": "RON",
+      "balances": { "2025-05": 2100.4 },
+      "monthlyContribution": 0
+    },
+    {
+      "id": "acc-fake-eur",
+      "name": "Fake Euro Pocket",
+      "currency": "EUR",
+      "balances": { "2025-05": 310.1 },
+      "monthlyContribution": 50
+    }
+  ],
+  "budgets": {},
+  "goals": [],
+  "baseCurrency": "RON",
+  "displayCurrency": "EUR",
+  "fxRates": { "EUR": 4.97, "USD": 4.55 },
+  "fxUpdatedAt": 1746000000000,
+  "fxSource": "Frankfurter",
+  "lastUpdated": 1747000000000
+}

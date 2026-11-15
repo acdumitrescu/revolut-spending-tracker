@@ -113,6 +113,8 @@ export default defineConfig(() => {
             lines: 91,
           },
           'backend/localUsers.js': { statements: 92, branches: 86, functions: 96, lines: 95 },
+          // Upgrade path for saved workspaces: small and pure, so it stays fully covered.
+          'src/lib/migrations.js': { statements: 98, branches: 98, functions: 100, lines: 98 },
         },
       },
     },
