@@ -28,6 +28,7 @@ export default function Accounts() {
     undoAccountBalance,
     updateAccountNote,
     removeAccount,
+    readOnly,
   } = useAppContext();
   const [newAccName, setNewAccName] = useState('');
   const [newAccCurrency, setNewAccCurrency] = useState(BASE_CURRENCY);
@@ -226,7 +227,11 @@ export default function Accounts() {
               </option>
             ))}
           </select>
-          <button className="btn btn-primary" type="submit" disabled={!newAccName.trim()}>
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={readOnly || !newAccName.trim()}
+          >
             <Plus size={16} /> Add account
           </button>
         </form>
@@ -254,6 +259,7 @@ export default function Accounts() {
               onDelete={removeAccount}
               today={todayDate}
               onReconciled={setAccountReconciled}
+              readOnly={readOnly}
             />
           ))}
         </div>

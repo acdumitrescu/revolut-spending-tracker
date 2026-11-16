@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useAppContext } from '../lib/AppContext';
+import { runtimeConfig } from '../lib/runtimeConfig';
 import { EmptyState } from '../components/ui';
 import ComingUpCard from '../components/dashboard/ComingUpCard';
 import CumulativeSpendCard from '../components/dashboard/CumulativeSpendCard';
@@ -65,6 +66,12 @@ export default function Overview() {
           description="Import a Revolut CSV or add an account balance to see your net worth, spending and budget here."
           actionLabel="Import transactions"
           actionTo={DASHBOARD_ROUTES.importAndBackup}
+          {...(runtimeConfig.privateSyncEnabled
+            ? {}
+            : {
+                secondaryActionLabel: 'Receive from Mac',
+                secondaryActionTo: `${DASHBOARD_ROUTES.importAndBackup}#receive-from-mac`,
+              })}
         />
       </div>
     );

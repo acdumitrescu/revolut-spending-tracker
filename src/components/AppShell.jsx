@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAppContext } from '../lib/AppContext';
 import MixedCurrencyNotice from './MixedCurrencyNotice';
+import PhoneCopyBanner from './PhoneCopyBanner';
 import MobileNavigation from './MobileNavigation';
 import SideNavigation from './SideNavigation';
 import TopBar from './TopBar';
@@ -21,6 +22,7 @@ export default function AppShell() {
         onToggle={() => setNavigationCollapsed((current) => !current)}
       />
       <main className="new-content-scroll" id="main-content">
+        <PhoneCopyBanner />
         {currencySummary.hasMixedCurrencies && (
           <MixedCurrencyNotice currencies={currencySummary.currencies} />
         )}

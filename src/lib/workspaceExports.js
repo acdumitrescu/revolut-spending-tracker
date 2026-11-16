@@ -17,6 +17,17 @@ export function downloadTextFile(contents, filename, mimeType = 'text/plain;char
   downloadBlob(new Blob([contents], { type: mimeType }), filename);
 }
 
+/** Saves raw bytes (e.g. a .ssbsnap file) the same way the JSON backup is saved. */
+export function downloadBinaryFile(bytes, filename, mimeType = 'application/octet-stream') {
+  downloadBlob(new Blob([bytes], { type: mimeType }), filename);
+}
+
+export function snapshotFilename(now = new Date()) {
+  const pad = (value) => String(value).padStart(2, '0');
+  const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  return `SimpleSafeBanking-${date}${'.ssbsnap'}`;
+}
+
 function datedFilename(extension) {
   return `simple_safe_banking_backup_${new Date().toISOString().split('T')[0]}.${extension}`;
 }

@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { LockKeyhole, RefreshCw, Save, ShieldAlert, Trash2, UnlockKeyhole } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
 import { BASE_CURRENCY } from '../lib/fx';
 import { SUPPORTED_DISPLAY_CURRENCIES } from '../lib/utils';
 import { useToast } from '../components/Toast';
 import { PageHeader, StatusPill } from '../components/ui';
+import { phoneCopyBannerText } from '../lib/phoneCopy';
+import { RECEIVE_FROM_MAC_PATH } from '../components/PhoneCopyBanner';
 
 export default function SettingsPage() {
   const {
@@ -21,6 +24,8 @@ export default function SettingsPage() {
     setFxRates,
     refreshFxRates,
     clearData,
+    phoneCopy,
+    removePhoneCopy,
   } = useAppContext();
   const toast = useToast();
   const [manualRates, setManualRates] = useState({
@@ -57,6 +62,17 @@ export default function SettingsPage() {
     if (!window.confirm('Permanently delete all locally stored SimpleSafeBanking data?')) return;
     clearData();
     toast.warning('All local data has been cleared.');
+  };
+
+  const removeCopy = () => {
+    if (
+      !window.confirm(
+        'Remove the phone copy? This clears the workspace on this phone. The Mac is not affected, and you can receive the data again later.',
+      )
+    )
+      return;
+    removePhoneCopy();
+    toast.warning('Phone copy removed. This phone is empty and editable again.');
   };
 
   const unlockSync = () => {
@@ -127,6 +143,29 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
+
+      {!runtimeConfig.privateSyncEnabled && (
+        <section className="settings-section" aria-label="Phone copy">
+          <div className="settings-section-heading">
+            <h2>Copy from Mac</h2>
+            <p>
+              {phoneCopy
+                ? phoneCopyBannerText(phoneCopy)
+                : 'Receive a read-only copy of the Mac workspace on this phone.'}
+            </p>
+          </div>
+          <div className="settings-inline-actions">
+            <Link className="btn btn-primary" to={RECEIVE_FROM_MAC_PATH}>
+              Receive from Mac
+            </Link>
+            {phoneCopy && (
+              <button className="btn btn-ghost-danger" type="button" onClick={removeCopy}>
+                <Trash2 size={15} /> Remove phone copy
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       <section className="settings-section">
         <div className="settings-section-heading">
@@ -267,15 +306,17 @@ export default function SettingsPage() {
           a public account service and must stay on localhost or behind your own authenticated
           access gate.
         </p>
-        <div className="danger-zone">
-          <div>
-            <strong>Clear local data</strong>
-            <span>This cannot be undone unless you have a private JSON backup.</span>
+        {!phoneCopy && (
+          <div className="danger-zone">
+            <div>
+              <strong>Clear local data</strong>
+              <span>This cannot be undone unless you have a private JSON backup.</span>
+            </div>
+            <button className="btn btn-ghost-danger" type="button" onClick={clearAllData}>
+              <Trash2 size={15} /> Clear data
+            </button>
           </div>
-          <button className="btn btn-ghost-danger" type="button" onClick={clearAllData}>
-            <Trash2 size={15} /> Clear data
-          </button>
-        </div>
+        )}
       </section>
     </div>
   );

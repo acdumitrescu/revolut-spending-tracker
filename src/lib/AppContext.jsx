@@ -10,6 +10,12 @@ import {
   useState,
 } from 'react';
 import { appReducer, createPersistedAppState } from './appState';
+import {
+  clearPhoneCopyRecord,
+  commitPhoneCopy,
+  loadPhoneCopy,
+  READ_ONLY_MESSAGE,
+} from './phoneCopy';
 import { fetchLatestFxRates } from './fxService';
 import { saveLocalAppState, loadLocalAppState } from './persistence';
 import { runtimeConfig } from './runtimeConfig';
@@ -47,6 +53,14 @@ import {
 const AppContext = createContext(null);
 
 const LS_KEY = 'simple_safe_banking_state_v1';
+
+// Actions that stay allowed while the workspace is a read-only phone copy: display preferences only. Everything else is refused in
+// one place, the guarded dispatch below.
+const READ_ONLY_ALLOWED_ACTIONS = new Set([
+  'set_theme_mode',
+  'set_display_currency',
+  'set_fx_rates',
+]);
 
 function wait(ms) {
   return new Promise((resolve) => {
@@ -87,7 +101,30 @@ export function AppProvider({ children }) {
       ? { persistedState: createPersistedAppState(), issues: [] }
       : loadLocalAppState(LS_KEY),
   );
-  const [appState, dispatch] = useReducer(appReducer, initialLoad.persistedState);
+  const [appState, rawDispatch] = useReducer(appReducer, initialLoad.persistedState);
+  // The phone-copy record only exists in the plain browser-storage build.
+  const [phoneCopy, setPhoneCopy] = useState(() =>
+    runtimeConfig.privateSyncEnabled || runtimeConfig.encryptedStorage ? null : loadPhoneCopy(),
+  );
+  const readOnlyRef = useRef(Boolean(phoneCopy));
+  const [readOnlyNotice, setReadOnlyNotice] = useState(0);
+  // A workspace written by a newer app is never saved over (see the save effect) but stays
+  // editable in memory for the session; only the phone copy is refused at the data layer.
+  const readOnly = Boolean(phoneCopy);
+  // The one guard for every state change made through the context.
+  const dispatch = useCallback((action) => {
+    if (readOnlyRef.current && !READ_ONLY_ALLOWED_ACTIONS.has(action?.type)) {
+      setReadOnlyNotice((count) => count + 1);
+      return;
+    }
+    rawDispatch(action);
+  }, []);
+  const assertWritable = () => {
+    if (readOnlyRef.current) {
+      setReadOnlyNotice((count) => count + 1);
+      throw new Error(READ_ONLY_MESSAGE);
+    }
+  };
   const [runtimeIssues, setRuntimeIssues] = useState(initialLoad.issues);
   const [fxRuntime, setFxRuntime] = useState({
     status: runtimeConfig.fxRefreshEnabled ? 'idle' : 'disabled',
@@ -175,7 +212,7 @@ export function AppProvider({ children }) {
       cancelled = true;
       controller.abort();
     };
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!runtimeConfig.privateSyncEnabled) return undefined;
@@ -294,7 +331,7 @@ export function AppProvider({ children }) {
       controller.abort();
       syncReadyRef.current = false;
     };
-  }, [syncAuthRevision]);
+  }, [syncAuthRevision, dispatch]);
 
   useEffect(() => {
     if (!runtimeConfig.encryptedStorage) return;
@@ -467,7 +504,7 @@ export function AppProvider({ children }) {
         saveRequestRef.current = null;
       }
     };
-  }, [appState]);
+  }, [appState, dispatch]);
 
   const resumeUserSession = async () => {
     const snapshot = await loadServerSnapshot();
@@ -537,7 +574,7 @@ export function AppProvider({ children }) {
     } finally {
       saveRequestRef.current = null;
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(
     () => () => {
@@ -589,6 +626,7 @@ export function AppProvider({ children }) {
     batchId: requestedBatchId,
     isDemo = false,
   }) => {
+    assertWritable();
     const batchId =
       requestedBatchId ||
       globalThis.crypto?.randomUUID?.() ||
@@ -616,6 +654,7 @@ export function AppProvider({ children }) {
   const createBackupNow = () => createPrivateBackup(persistedStateRef.current, 'manual');
 
   const commitBrdStatement = async (request) => {
+    assertWritable();
     if (runtimeConfig.privateSyncEnabled && !syncReadyRef.current)
       throw new Error('Wait for private sync before importing.');
     await flushPendingChanges();
@@ -664,6 +703,38 @@ export function AppProvider({ children }) {
       });
       throw error;
     }
+  };
+
+  /**
+   * Receive from Mac: replace the whole workspace with a validated snapshot, or change nothing.
+   * The new workspace and the phone-copy record are written to localStorage first; only when
+   * both are stored does the in-memory state switch over. A failed write (quota) restores the
+   * previous stored values and throws PhoneStorageFullError.
+   */
+  const replaceWorkspaceFromSnapshot = (nextData, { fileCreatedAt = null, source = null } = {}) => {
+    if (runtimeConfig.privateSyncEnabled || runtimeConfig.encryptedStorage)
+      throw new Error('Receive from Mac is only available in the browser-only app.');
+    if (initialLoad.readOnly) throw new Error(NEWER_SCHEMA_VERSION_MESSAGE);
+    const validated = AppDataSchema.parse(nextData);
+    const next = appReducer(persistedStateRef.current, {
+      type: 'import_backup',
+      nextData: validated,
+    });
+    const record = { syncedAt: Date.now(), fileCreatedAt, source };
+    commitPhoneCopy({ storageKey: LS_KEY, persistedState: next, record });
+    readOnlyRef.current = true;
+    persistedStateRef.current = next;
+    rawDispatch({ type: 'replace_state', payload: next.data });
+    setPhoneCopy(record);
+    return record;
+  };
+
+  /** Settings: forget the phone copy. Clears the workspace and the record; the app is editable again. */
+  const removePhoneCopy = () => {
+    clearPhoneCopyRecord();
+    readOnlyRef.current = false;
+    setPhoneCopy(null);
+    rawDispatch({ type: 'clear_data' });
   };
 
   const unlockPrivateSync = (token) => {
@@ -858,6 +929,7 @@ export function AppProvider({ children }) {
         removeGoalContribution: (goalId, contributionId) =>
           dispatch({ type: 'remove_goal_contribution', goalId, contributionId }),
         importBackup: async (nextData, expectedUpdatedAt) => {
+          assertWritable();
           if (
             expectedUpdatedAt !== undefined &&
             persistedStateRef.current.data.lastUpdated !== expectedUpdatedAt
@@ -895,6 +967,11 @@ export function AppProvider({ children }) {
         resolveVendorObservation: (resolution, signal) =>
           persistVendorObservationResolution(resolution, signal),
         clearData: () => dispatch({ type: 'clear_data' }),
+        readOnly,
+        readOnlyNotice,
+        phoneCopy,
+        replaceWorkspaceFromSnapshot,
+        removePhoneCopy,
       }}
     >
       {databaseLoaded ? (

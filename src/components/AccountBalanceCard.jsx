@@ -26,6 +26,7 @@ export default function AccountBalanceCard({
   onUndo,
   today,
   onReconciled,
+  readOnly = false,
 }) {
   const [lastEdit, setLastEdit] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -114,7 +115,7 @@ export default function AccountBalanceCard({
           <ChevronDown size={16} aria-hidden="true" />
         </span>
       </summary>
-      <div className="account-editor">
+      <fieldset className="account-editor" disabled={readOnly}>
         <div className="account-editor-heading">
           <div>
             <h3>Monthly balances</h3>
@@ -295,7 +296,7 @@ export default function AccountBalanceCard({
             </div>
           )}
         </details>
-      </div>
+      </fieldset>
     </details>
   );
 }

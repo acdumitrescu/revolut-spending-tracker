@@ -95,6 +95,7 @@ export default function Transactions() {
     clearTransactionCategoryOverride,
     setTransactionCurrency,
     setTransactionsCurrency,
+    readOnly,
   } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('q') || '';
@@ -240,7 +241,7 @@ export default function Transactions() {
         ))}
       </div>
 
-      {(search || month || category || currency) && filtered.length > 0 && (
+      {!readOnly && (search || month || category || currency) && filtered.length > 0 && (
         <BulkCurrency
           rows={filtered}
           value={bulkCurrency}
@@ -326,6 +327,7 @@ export default function Transactions() {
                         <button
                           type="button"
                           className="transaction-category-button"
+                          disabled={readOnly}
                           onClick={() => startEditing(transaction)}
                           aria-label={`Edit category for ${transaction.desc}`}
                         >
@@ -352,7 +354,7 @@ export default function Transactions() {
                           <Pencil size={12} />
                         </button>
                       )}
-                      {!isEditing && transaction.categorySource === 'manual' ? (
+                      {!readOnly && !isEditing && transaction.categorySource === 'manual' ? (
                         <button
                           type="button"
                           className="transaction-use-automatic"
@@ -367,6 +369,7 @@ export default function Transactions() {
                         className="input"
                         value={transaction.currency || ''}
                         aria-label={`Currency for ${transaction.desc}`}
+                        disabled={readOnly}
                         onChange={(event) =>
                           event.target.value && setTransactionCurrency(key, event.target.value)
                         }
@@ -378,7 +381,7 @@ export default function Transactions() {
                           </option>
                         ))}
                       </select>
-                      {transaction.baseCurrency !== undefined ? (
+                      {!readOnly && transaction.baseCurrency !== undefined ? (
                         <button
                           type="button"
                           className="transaction-use-automatic"

@@ -36,7 +36,7 @@ function formatCurrencyDelta(value, currency) {
 }
 
 export default function Budget() {
-  const { data, setBudget, removeBudget, copyBudgets } = useAppContext();
+  const { data, setBudget, removeBudget, copyBudgets, readOnly } = useAppContext();
   const toast = useToast();
   const txns = data.transactions;
   const budgets = data.budgets || {};
@@ -150,7 +150,7 @@ export default function Budget() {
         <button
           className="btn"
           type="button"
-          disabled={copyableCategoryCount === 0}
+          disabled={readOnly || copyableCategoryCount === 0}
           onClick={handleCopyPrevious}
           title={
             copyableCategoryCount === 0
@@ -380,7 +380,7 @@ export default function Budget() {
               style={{ width: '100%' }}
             />
           </div>
-          <button className="btn btn-primary" type="button" onClick={handleAdd}>
+          <button className="btn btn-primary" type="button" disabled={readOnly} onClick={handleAdd}>
             <Plus size={16} /> Add
           </button>
         </div>
@@ -428,6 +428,7 @@ export default function Budget() {
                         className="btn"
                         type="button"
                         aria-label={`Remove ${b.cat} budget`}
+                        disabled={readOnly}
                         onClick={() => removeBudget(effectiveMonth, b.cat)}
                         style={{
                           padding: '2px 6px',

@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   CircleAlert,
@@ -23,6 +23,9 @@ import { downloadTextFile, exportExcelWorkbook, exportJsonBackup } from '../lib/
 import { useToast } from '../components/Toast';
 import { ActionCard, PageHeader, StatusPill } from '../components/ui';
 import CurrencyAuditPanel from '../components/CurrencyAuditPanel';
+import ReceiveFromMac from '../components/ReceiveFromMac';
+import SendToIphone from '../components/SendToIphone';
+import { READ_ONLY_MESSAGE } from '../lib/phoneCopy';
 
 export default function ImportWorkspace() {
   const {
@@ -31,6 +34,7 @@ export default function ImportWorkspace() {
     commitTransactionImport,
     createBackupNow,
     importBackup,
+    readOnly,
     recordImportSources,
     recordVendorObservations,
     runtimeConfig,
@@ -39,6 +43,7 @@ export default function ImportWorkspace() {
   } = useAppContext();
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const csvInputRef = useRef(null);
   const jsonInputRef = useRef(null);
   const [summary, setSummary] = useState(data.importMeta?.latestSummary || null);
@@ -59,8 +64,17 @@ export default function ImportWorkspace() {
   const importBackupReady =
     !runtimeConfig.privateBackupEnabled || pendingIsDemo || syncStatus.phase === 'synced';
 
+  useEffect(() => {
+    if (location.hash === '#receive-from-mac')
+      document.getElementById('receive-from-mac')?.scrollIntoView?.();
+  }, [location.hash]);
+
   const processCsv = async (file, isDemo = false) => {
     if (!file) return;
+    if (readOnly) {
+      toast.info(READ_ONLY_MESSAGE);
+      return;
+    }
     setBusy(true);
     try {
       validateCsvFile(file);
@@ -171,6 +185,11 @@ export default function ImportWorkspace() {
   const handleRestore = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    if (readOnly) {
+      toast.info(READ_ONLY_MESSAGE);
+      event.target.value = '';
+      return;
+    }
     try {
       const parsed = parseImportedAppState(await file.text());
       setPendingRestore({ fileName: file.name, state: parsed });
@@ -306,6 +325,15 @@ export default function ImportWorkspace() {
         </section>
       )}
 
+      {readOnly && (
+        <section className="runtime-warning" role="status">
+          {READ_ONLY_MESSAGE} Importing is switched off here.
+        </section>
+      )}
+
+      {!privateSyncEnabled && <ReceiveFromMac />}
+      {!readOnly && <SendToIphone />}
+
       <section className="import-primary-panel">
         <div className="import-primary-copy">
           <span className="step-marker">Recommended</span>
@@ -322,7 +350,7 @@ export default function ImportWorkspace() {
           <button
             className="btn btn-primary"
             type="button"
-            disabled={busy}
+            disabled={busy || readOnly}
             onClick={() => csvInputRef.current?.click()}
           >
             <FileUp size={17} /> {busy ? 'Processing…' : 'Choose CSV file'}
@@ -370,13 +398,13 @@ export default function ImportWorkspace() {
           icon={Sparkles}
           title="Try synthetic demo data"
           description="Explore the full dashboard without using personal records."
-          action={handleDemo}
+          action={readOnly ? () => toast.info(READ_ONLY_MESSAGE) : handleDemo}
         />
         <ActionCard
           icon={DatabaseBackup}
           title="Restore private backup"
           description="Load a versioned SimpleSafeBanking JSON backup."
-          action={() => jsonInputRef.current?.click()}
+          action={() => (readOnly ? toast.info(READ_ONLY_MESSAGE) : jsonInputRef.current?.click())}
         />
         <ActionCard
           icon={Download}

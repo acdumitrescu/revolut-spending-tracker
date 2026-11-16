@@ -19,6 +19,8 @@ export function EmptyState({
   description,
   actionLabel = 'Import transactions',
   actionTo = '/app/import',
+  secondaryActionLabel,
+  secondaryActionTo,
 }) {
   return (
     <section className="new-empty-state">
@@ -32,6 +34,11 @@ export function EmptyState({
       <Link className="btn btn-primary" to={actionTo}>
         {actionLabel}
       </Link>
+      {secondaryActionLabel && secondaryActionTo && (
+        <p>
+          <Link to={secondaryActionTo}>{secondaryActionLabel}</Link>
+        </p>
+      )}
     </section>
   );
 }
