@@ -13,6 +13,8 @@ import {
 } from '../lib/selectors';
 import ChartWrapper from '../components/ChartWrapper';
 import AccountBalanceCard from '../components/AccountBalanceCard';
+import AccountGroupTotals from '../components/AccountGroupTotals';
+import NetWorthBreakdown from '../components/NetWorthBreakdown';
 import '../components/AccountBalanceCard.css';
 
 export default function Accounts() {
@@ -137,6 +139,9 @@ export default function Accounts() {
           </div>
         </div>
       </div>
+
+      <AccountGroupTotals data={data} />
+      <NetWorthBreakdown data={data} />
 
       <div className="grid2">
         <div className="card">

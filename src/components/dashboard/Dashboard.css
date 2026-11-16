@@ -1,0 +1,339 @@
+/* One-screen dashboard (Plan 1, 1.2). The page and every card are containers, so layout follows
+   the space they get (sidebar open or collapsed, window size), not window media queries. */
+.dash-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  container: dash / inline-size;
+}
+.dash-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.dash-header h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.15;
+}
+.dash-range {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.dash-period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.dash-period label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.dash-period select,
+.dash-period input {
+  min-height: 34px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 12px;
+}
+.dash-kpi {
+  grid-column: span 4;
+}
+.dash-chart-card,
+.dash-categories {
+  grid-column: span 8;
+}
+.dash-coming,
+.dash-attention {
+  grid-column: span 4;
+}
+.dash-categories.is-wide {
+  grid-column: 1 / -1;
+}
+@container dash (max-width: 760px) {
+  .dash-chart-card,
+  .dash-categories,
+  .dash-coming,
+  .dash-attention {
+    grid-column: 1 / -1;
+  }
+}
+@container dash (max-width: 560px) {
+  .dash-kpi {
+    grid-column: 1 / -1;
+  }
+}
+
+.dash-card {
+  position: relative;
+  z-index: 0;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-sm);
+  container: dashcard / inline-size;
+}
+.dash-card:focus-within {
+  z-index: 20;
+}
+.dash-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.dash-card-head h2 {
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.dash-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.dash-value {
+  margin: 0;
+  overflow: hidden;
+  font-size: 28px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-value.is-over {
+  color: var(--danger);
+}
+.dash-sub {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.dash-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.dash-note-warn {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--warning-soft);
+  color: var(--text-secondary);
+}
+.dash-footer-link {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+.dash-mini-list,
+.dash-coming-list,
+.dash-attention-list,
+.dash-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dash-mini-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.dash-bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-strong);
+}
+.dash-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+.dash-bar.is-over i {
+  background: var(--danger);
+}
+.dash-budget {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dash-category-list li {
+  display: grid;
+  grid-template-columns: minmax(90px, 0.9fr) minmax(0, 1.4fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.dash-category-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.dash-category-bar {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-strong);
+}
+.dash-category-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+.dash-category-amount {
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-align: right;
+  white-space: nowrap;
+}
+.dash-category-other {
+  color: var(--muted);
+}
+@container dashcard (max-width: 420px) {
+  .dash-category-list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .dash-category-bar {
+    display: none;
+  }
+}
+@container dashcard (max-width: 230px) {
+  .dash-value {
+    font-size: 22px;
+  }
+}
+
+.dash-coming-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+.dash-coming-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dash-coming-name strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-coming-name small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.dash-coming-amount {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.dash-attention-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+.dash-severity {
+  flex: none;
+  padding: 1px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+}
+.dash-severity.high {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.dash-severity.medium {
+  border-color: var(--warning);
+}
+
+.dash-info {
+  position: relative;
+  flex: none;
+}
+.dash-info-button {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.dash-info-button:hover,
+.dash-info-button[aria-expanded='true'] {
+  background: var(--surface-strong);
+  color: var(--text);
+}
+.dash-info-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 30;
+  width: min(320px, calc(100cqw - 16px));
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.dash-info-panel[hidden] {
+  display: none;
+}

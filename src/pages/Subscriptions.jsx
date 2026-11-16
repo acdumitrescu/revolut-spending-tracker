@@ -15,6 +15,7 @@ import {
   imageFileToIcon,
   resolveSubscriptionIcon,
 } from '../lib/subscriptionIcons';
+import DetectedRecurring from '../components/DetectedRecurring';
 import './Subscriptions.css';
 
 const formatPrice = (amount, currency) =>
@@ -416,6 +417,7 @@ export default function Subscriptions() {
           </div>
         )}
       </section>
+      <DetectedRecurring />
     </div>
   );
 }
