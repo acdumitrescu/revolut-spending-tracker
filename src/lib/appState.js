@@ -269,6 +269,10 @@ export function appReducer(state, action) {
           creditRecords: (data.creditRecords || []).filter((record) => record.id !== action.id),
         }),
       );
+    case 'set_persisted_state':
+      // An already-valid persisted state (loaded from this device or just stored): kept as is, so
+      // the save effect can recognise it by identity and skip writing it back.
+      return action.state;
     case 'replace_state':
       return createPersistedAppState(action.payload, state.exportedAt);
     case 'set_transactions':

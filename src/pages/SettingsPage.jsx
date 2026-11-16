@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LockKeyhole, RefreshCw, Save, ShieldAlert, Trash2, UnlockKeyhole } from 'lucide-react';
 import { useAppContext } from '../lib/AppContext';
@@ -7,13 +7,88 @@ import { BASE_CURRENCY } from '../lib/fx';
 import { SUPPORTED_DISPLAY_CURRENCIES } from '../lib/utils';
 import { useToast } from '../components/Toast';
 import { PageHeader, StatusPill } from '../components/ui';
-import { phoneCopyBannerText } from '../lib/phoneCopy';
+import { formatRelativeDate, formatShortDate, phoneCopyBannerText } from '../lib/phoneCopy';
 import { RECEIVE_FROM_MAC_PATH } from '../components/PhoneCopyBanner';
 
 const RUNTIME_ISSUE_TEXT = {
   'newer-local-state': NEWER_SCHEMA_VERSION_MESSAGE,
   'newer-remote-state': NEWER_SCHEMA_VERSION_MESSAGE,
 };
+
+function formatMegabytes(bytes) {
+  const mb = bytes / (1024 * 1024);
+  return `${mb < 10 ? mb.toFixed(1) : Math.round(mb)} MB`;
+}
+
+function persistedText(persisted) {
+  if (persisted === true) return 'Yes, the browser has promised to keep it';
+  if (persisted === false)
+    return 'Not promised. The browser may clear it when the device runs low on storage';
+  return 'Not reported by this browser';
+}
+
+/** Client-only: where the workspace is kept on this device and whether the browser will keep it. */
+function DeviceStorageSection({ storageInfo, readStorageStatus, phoneCopy }) {
+  const [status, setStatus] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    readStorageStatus().then((next) => {
+      if (!cancelled) setStatus(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [readStorageStatus, storageInfo.persistGranted]);
+
+  const where =
+    storageInfo.backend === 'indexeddb'
+      ? 'This device · IndexedDB'
+      : 'This device · browser storage (localStorage fallback)';
+  let usage = status ? 'Not reported by this browser' : 'Checking…';
+  if (status?.usage !== null && status?.usage !== undefined) {
+    usage = `About ${formatMegabytes(status.usage)} used`;
+    if (status.quota) usage += ` of ${formatMegabytes(status.quota)} available`;
+  }
+  return (
+    <section className="settings-section" aria-label="Storage on this device">
+      <div className="settings-section-heading">
+        <h2>Storage on this device</h2>
+        <p>
+          The workspace stays in this browser on this device. It is a copy: keep the Mac (or a
+          backup file) as the source of truth.
+        </p>
+      </div>
+      <div className="settings-control-grid">
+        <div className="settings-readout">
+          <span>Stored in</span>
+          <strong>{where}</strong>
+        </div>
+        <div className="settings-readout">
+          <span>Kept by the browser</span>
+          <strong>{status ? persistedText(status.persisted) : 'Checking…'}</strong>
+        </div>
+        <div className="settings-readout">
+          <span>Space used</span>
+          <strong>{usage}</strong>
+        </div>
+        <div className="settings-readout">
+          <span>Last sync from the Mac</span>
+          <strong>
+            {phoneCopy
+              ? `${formatShortDate(phoneCopy.syncedAt)} (${formatRelativeDate(phoneCopy.syncedAt)})`
+              : 'Never'}
+          </strong>
+        </div>
+      </div>
+      {storageInfo.backend !== 'indexeddb' && storageInfo.fallbackReason && (
+        <p className="section-note">
+          {storageInfo.fallbackReason} The browser&apos;s smaller storage is used instead, so a
+          large workspace may not fit.
+        </p>
+      )}
+    </section>
+  );
+}
 
 export default function SettingsPage() {
   const {
@@ -32,6 +107,9 @@ export default function SettingsPage() {
     clearData,
     phoneCopy,
     removePhoneCopy,
+    storageInfo,
+    readStorageStatus,
+    flushWorkspace,
   } = useAppContext();
   const toast = useToast();
   const [manualRates, setManualRates] = useState({
@@ -44,13 +122,19 @@ export default function SettingsPage() {
     [currencySummary.currencies],
   );
 
-  const saveRates = () => {
+  const saveRates = async () => {
     const rates = { EUR: Number(manualRates.EUR), USD: Number(manualRates.USD) };
     if (Object.values(rates).some((rate) => !Number.isFinite(rate) || rate <= 0)) {
       toast.error('Enter valid positive EUR and USD rates.');
       return;
     }
     setFxRates(rates, 'manual');
+    try {
+      await flushWorkspace?.();
+    } catch (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success('FX rates saved locally.');
   };
 
@@ -70,14 +154,19 @@ export default function SettingsPage() {
     toast.warning('All local data has been cleared.');
   };
 
-  const removeCopy = () => {
+  const removeCopy = async () => {
     if (
       !window.confirm(
         'Remove the phone copy? This clears the workspace on this phone. The Mac is not affected, and you can receive the data again later.',
       )
     )
       return;
-    removePhoneCopy();
+    try {
+      await removePhoneCopy();
+    } catch {
+      toast.error('The phone copy could not be removed. Nothing was changed.');
+      return;
+    }
     toast.warning('Phone copy removed. This phone is empty and editable again.');
   };
 
@@ -171,6 +260,14 @@ export default function SettingsPage() {
             )}
           </div>
         </section>
+      )}
+
+      {!runtimeConfig.privateSyncEnabled && storageInfo && (
+        <DeviceStorageSection
+          storageInfo={storageInfo}
+          readStorageStatus={readStorageStatus}
+          phoneCopy={phoneCopy}
+        />
       )}
 
       <section className="settings-section">

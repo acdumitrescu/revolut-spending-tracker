@@ -2,37 +2,44 @@ import { createPersistedAppState } from './appState';
 import { migrateState, NewerSchemaVersionError } from './migrations';
 import { AppDataSchema, PersistedAppStateSchema, sanitizePersistedAppState } from './validation';
 
-export function loadLocalAppState(storageKey, storage = localStorage) {
-  try {
-    const raw = storage.getItem(storageKey);
-    if (!raw) {
-      return {
-        persistedState: createPersistedAppState(undefined),
-        issues: [],
-      };
-    }
+function emptyLoad(issues = []) {
+  return { persistedState: createPersistedAppState(undefined), issues };
+}
 
-    const parsed = JSON.parse(raw);
+/**
+ * Interprets a workspace value already read from this device (a parsed localStorage string or the
+ * structured-clone object kept in IndexedDB). Missing value (undefined): an empty workspace. A newer schema
+ * version: start empty and mark read-only so the stored copy is never saved over.
+ */
+export function loadStoredAppState(value) {
+  if (value === undefined) return emptyLoad();
+  try {
     return {
-      persistedState: sanitizePersistedAppState(parsed),
+      persistedState: sanitizePersistedAppState(value),
       issues: [],
     };
   } catch (error) {
     if (error instanceof NewerSchemaVersionError) {
       // Written by a newer app: start empty and never save over the stored copy.
       console.error('Saved workspace uses a newer schema version:', error.message);
-      return {
-        persistedState: createPersistedAppState(undefined),
-        issues: ['newer-local-state'],
-        readOnly: true,
-      };
+      return { ...emptyLoad(['newer-local-state']), readOnly: true };
     }
     console.error('Failed to load data from local storage', error);
-    return {
-      persistedState: createPersistedAppState(undefined),
-      issues: ['corrupted-local-state'],
-    };
+    return emptyLoad(['corrupted-local-state']);
   }
+}
+
+export function loadLocalAppState(storageKey, storage = localStorage) {
+  let parsed;
+  try {
+    const raw = storage.getItem(storageKey);
+    if (!raw) return emptyLoad();
+    parsed = JSON.parse(raw);
+  } catch (error) {
+    console.error('Failed to load data from local storage', error);
+    return emptyLoad(['corrupted-local-state']);
+  }
+  return loadStoredAppState(parsed);
 }
 
 export function saveLocalAppState(storageKey, persistedState, storage = localStorage) {

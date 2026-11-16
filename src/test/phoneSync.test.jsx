@@ -29,6 +29,8 @@ import {
   syntheticTransaction,
   syntheticWorkspace,
 } from './fixtures/appContextHarness';
+import { createFakeBackend, createFakeStore, quotaError } from './fixtures/fakeWorkspaceBackend';
+import { STORE_KEYS } from '../lib/workspaceStore';
 
 const PASSWORD = 'correct-horse-battery';
 const ITERATIONS = 100_000;
@@ -80,12 +82,12 @@ beforeEach(() => {
   vi.mocked(downloadBinaryFile).mockClear();
 });
 
-function mount(children) {
+function mount(children, workspaceStore = undefined) {
   const { ctx, Probe } = createProbe();
   render(
     <ToastProvider>
       <MemoryRouter>
-        <AppProvider>
+        <AppProvider workspaceStore={workspaceStore}>
           <Probe />
           {children}
         </AppProvider>
@@ -302,6 +304,48 @@ describe('Receive from Mac', () => {
     );
     expect(values.get(LS_KEY)).toBe(before);
     expect(values.has(PHONE_COPY_KEY)).toBe(false);
+    expect(ctx.current.readOnly).toBe(false);
+    expect(ctx.current.data.accounts.map((a) => a.id)).toEqual(['acc-fake']);
+  });
+});
+
+describe('Receive from Mac on the IndexedDB store', () => {
+  async function mountWithStore(backend) {
+    memoryLocalStorage();
+    const { store } = createFakeStore({ backend, storageKey: LS_KEY });
+    const ctx = mount(<ReceiveFromMac />, store);
+    await screen.findByTestId('workspace');
+    pick(fileOf(newerFile));
+    await openWithPassword(PASSWORD);
+    await screen.findByText('What will change');
+    return ctx;
+  }
+
+  it('replaces the workspace and records the sync in one transaction', async () => {
+    const backend = createFakeBackend({ [STORE_KEYS.workspace]: PHONE_WORKSPACE });
+    const ctx = await mountWithStore(backend);
+    fireEvent.click(screen.getByRole('button', { name: 'Replace phone copy' }));
+
+    await waitFor(() => expect(ctx.current.readOnly).toBe(true));
+    expect(ctx.current.data.transactions).toHaveLength(3);
+    expect(backend.values.get(STORE_KEYS.phoneCopy)).toMatchObject({
+      fileCreatedAt: Date.UTC(2026, 1, 10),
+      source: 'Mac',
+    });
+    expect(backend.values.get(STORE_KEYS.workspace).data.transactions).toHaveLength(3);
+    expect(backend.writes.at(-1).put).toEqual([STORE_KEYS.workspace, STORE_KEYS.phoneCopy]);
+  });
+
+  it('on a quota abort says nothing was replaced and keeps the old data', async () => {
+    const backend = createFakeBackend({ [STORE_KEYS.workspace]: PHONE_WORKSPACE });
+    const ctx = await mountWithStore(backend);
+    const before = structuredClone(backend.values.get(STORE_KEYS.workspace));
+    backend.failWrite = () => quotaError();
+    fireEvent.click(screen.getByRole('button', { name: 'Replace phone copy' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Nothing was replaced/);
+    expect(backend.values.get(STORE_KEYS.workspace)).toEqual(before);
+    expect(backend.values.has(STORE_KEYS.phoneCopy)).toBe(false);
     expect(ctx.current.readOnly).toBe(false);
     expect(ctx.current.data.accounts.map((a) => a.id)).toEqual(['acc-fake']);
   });

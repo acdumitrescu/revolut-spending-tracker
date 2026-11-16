@@ -101,12 +101,12 @@ export default function ReceiveFromMac({ id = 'receive-from-mac' }) {
     }
   };
 
-  const replace = () => {
+  const replace = async () => {
     if (!snapshot || busy) return;
     setBusy(true);
     setError('');
     try {
-      replaceWorkspaceFromSnapshot(snapshot.appState.data, {
+      await replaceWorkspaceFromSnapshot(snapshot.appState.data, {
         fileCreatedAt: Date.parse(snapshot.meta.createdAt),
         source: snapshot.meta.source,
       });

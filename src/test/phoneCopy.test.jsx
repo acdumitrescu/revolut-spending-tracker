@@ -1,5 +1,5 @@
 // Phone copy: all-or-nothing replace, the read-only data-layer guard, removal. Synthetic data only.
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -31,6 +31,8 @@ import {
   syntheticTransaction,
   syntheticWorkspace,
 } from './fixtures/appContextHarness';
+import { createFakeBackend, createFakeStore } from './fixtures/fakeWorkspaceBackend';
+import { STORE_KEYS } from '../lib/workspaceStore';
 
 const OLD_WORKSPACE = syntheticWorkspace();
 const NEW_DATA = syntheticWorkspace({
@@ -52,12 +54,12 @@ function quotaError() {
   return Object.assign(new Error('The quota has been exceeded.'), { name: 'QuotaExceededError' });
 }
 
-function mount(children = null) {
+function mount(children = null, workspaceStore = undefined) {
   const { ctx, Probe } = createProbe();
   const view = render(
     <ToastProvider>
       <MemoryRouter>
-        <AppProvider>
+        <AppProvider workspaceStore={workspaceStore}>
           <Probe />
           {children}
         </AppProvider>
@@ -72,13 +74,13 @@ beforeEach(() => {
 });
 
 describe('replaceWorkspaceFromSnapshot', () => {
-  it('replaces the workspace, writes the record after it, and turns read-only on', () => {
+  it('replaces the workspace, writes the record after it, and turns read-only on', async () => {
     const values = memoryLocalStorage({ [LS_KEY]: JSON.stringify(OLD_WORKSPACE) });
     const { ctx } = mount();
     expect(ctx.current.readOnly).toBe(false);
 
-    act(() => {
-      ctx.current.replaceWorkspaceFromSnapshot(NEW_DATA, {
+    await act(async () => {
+      await ctx.current.replaceWorkspaceFromSnapshot(NEW_DATA, {
         fileCreatedAt: 1_800_000_000_000,
         source: 'Mac',
       });
@@ -94,7 +96,7 @@ describe('replaceWorkspaceFromSnapshot', () => {
     expect(loadPhoneCopy()).not.toBeNull();
   });
 
-  it('keeps the old phone data intact when saving hits the storage quota', () => {
+  it('keeps the old phone data intact when saving hits the storage quota', async () => {
     const values = memoryLocalStorage({ [LS_KEY]: JSON.stringify(OLD_WORKSPACE) });
     const { ctx } = mount();
     const before = values.get(LS_KEY);
@@ -105,9 +107,12 @@ describe('replaceWorkspaceFromSnapshot', () => {
     });
 
     let failure;
-    act(() => {
+    await act(async () => {
       try {
-        ctx.current.replaceWorkspaceFromSnapshot(NEW_DATA, { fileCreatedAt: 1, source: 'Mac' });
+        await ctx.current.replaceWorkspaceFromSnapshot(NEW_DATA, {
+          fileCreatedAt: 1,
+          source: 'Mac',
+        });
       } catch (error) {
         failure = error;
       }
@@ -226,6 +231,79 @@ describe('read-only phone copy', () => {
     fireEvent.click(screen.getByRole('button', { name: /Remove phone copy/ }));
     expect(values.has(PHONE_COPY_KEY)).toBe(true);
     expect(ctx.current.readOnly).toBe(true);
+  });
+});
+
+describe('phone copy on the IndexedDB store', () => {
+  async function mountWithStore(backend, children = null) {
+    const { store } = createFakeStore({ backend, storageKey: LS_KEY });
+    const mounted = mount(children, store);
+    await screen.findByTestId('workspace');
+    return mounted;
+  }
+
+  it('replaces workspace and record in one transaction and stays read-only after a reload', async () => {
+    memoryLocalStorage();
+    const backend = createFakeBackend({ [STORE_KEYS.workspace]: OLD_WORKSPACE });
+    const { ctx, view } = await mountWithStore(backend);
+
+    await act(async () => {
+      await ctx.current.replaceWorkspaceFromSnapshot(NEW_DATA, { fileCreatedAt: 1, source: 'Mac' });
+    });
+    expect(ctx.current.readOnly).toBe(true);
+    expect(backend.writes.at(-1)).toEqual({
+      put: [STORE_KEYS.workspace, STORE_KEYS.phoneCopy],
+      remove: [],
+    });
+    expect(backend.values.get(STORE_KEYS.workspace).data.transactions).toHaveLength(2);
+    expect(window.localStorage.setItem).not.toHaveBeenCalledWith(LS_KEY, expect.anything());
+
+    view.unmount();
+    const reloaded = await mountWithStore(backend, <PhoneCopyBanner />);
+    expect(reloaded.ctx.current.readOnly).toBe(true);
+    expect(reloaded.ctx.current.phoneCopy).toMatchObject({ fileCreatedAt: 1, source: 'Mac' });
+    expect(reloaded.ctx.current.data.transactions).toHaveLength(2);
+    expect(screen.getByRole('status')).toHaveTextContent(/Read-only on this phone/);
+    act(() => reloaded.ctx.current.addAccount('Sneaky Account', 'RON'));
+    expect(reloaded.ctx.current.data.accounts.map((a) => a.id)).toEqual(['acc-new']);
+  });
+
+  it('a quota abort keeps the old workspace, no record, and the app editable', async () => {
+    memoryLocalStorage();
+    const backend = createFakeBackend({ [STORE_KEYS.workspace]: OLD_WORKSPACE });
+    const { ctx } = await mountWithStore(backend);
+    const before = structuredClone(backend.values.get(STORE_KEYS.workspace));
+    backend.failWrite = () => quotaError();
+
+    let failure;
+    await act(async () => {
+      failure = await ctx.current
+        .replaceWorkspaceFromSnapshot(NEW_DATA, { fileCreatedAt: 1, source: 'Mac' })
+        .catch((error) => error);
+    });
+    expect(failure).toBeInstanceOf(PhoneStorageFullError);
+    expect(backend.values.get(STORE_KEYS.workspace)).toEqual(before);
+    expect(backend.values.has(STORE_KEYS.phoneCopy)).toBe(false);
+    expect(ctx.current.readOnly).toBe(false);
+    expect(ctx.current.data.accounts.map((a) => a.id)).toEqual(['acc-fake']);
+  });
+
+  it('Remove phone copy clears workspace and record together', async () => {
+    memoryLocalStorage();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const backend = createFakeBackend({
+      [STORE_KEYS.workspace]: OLD_WORKSPACE,
+      [STORE_KEYS.phoneCopy]: RECORD,
+    });
+    const { ctx } = await mountWithStore(backend, <SettingsPage />);
+    expect(ctx.current.readOnly).toBe(true);
+
+    fireEvent.click(screen.getByRole('button', { name: /Remove phone copy/ }));
+
+    await waitFor(() => expect(ctx.current.readOnly).toBe(false));
+    expect(backend.values.has(STORE_KEYS.phoneCopy)).toBe(false);
+    expect(backend.values.get(STORE_KEYS.workspace).data.accounts).toEqual([]);
+    expect(backend.writes.at(-1).remove).toEqual([STORE_KEYS.phoneCopy]);
   });
 });
 

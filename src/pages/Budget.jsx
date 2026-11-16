@@ -36,7 +36,7 @@ function formatCurrencyDelta(value, currency) {
 }
 
 export default function Budget() {
-  const { data, setBudget, removeBudget, copyBudgets, readOnly } = useAppContext();
+  const { data, setBudget, removeBudget, copyBudgets, readOnly, flushWorkspace } = useAppContext();
   const toast = useToast();
   const txns = data.transactions;
   const budgets = data.budgets || {};
@@ -83,8 +83,14 @@ export default function Budget() {
     setCustomCat(false);
   };
 
-  const handleCopyPrevious = () => {
+  const handleCopyPrevious = async () => {
     copyBudgets(previousMonth, effectiveMonth);
+    try {
+      await flushWorkspace?.();
+    } catch (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(
       `Copied ${copyableCategoryCount} missing ${copyableCategoryCount === 1 ? 'category' : 'categories'} from ${formatMonthLabel(previousMonth)}. Existing categories were kept.`,
     );

@@ -19,6 +19,13 @@ import {
 import { fetchLatestFxRates } from './fxService';
 import { isNewerSchemaVersion, NEWER_SCHEMA_VERSION_MESSAGE } from './migrations';
 import { saveLocalAppState, loadLocalAppState, validateStoredAppState } from './persistence';
+import {
+  createBrowserWorkspaceStore,
+  readStorageStatus as readBrowserStorageStatus,
+  requestPersistentStorage,
+  STORAGE_UNAVAILABLE_MESSAGE,
+  WorkspaceSaveError,
+} from './workspaceStore';
 import { runtimeConfig } from './runtimeConfig';
 import { getCurrencySummary } from './selectors';
 import {
@@ -97,17 +104,55 @@ async function saveSnapshotWithRetry(persistedState, version, signal) {
   throw lastError || new Error('Private server sync failed');
 }
 
-export function AppProvider({ children }) {
+function warnUnsaved(event) {
+  event.preventDefault();
+  event.returnValue = '';
+}
+
+function hasUserData(state) {
+  return Boolean(state?.data?.transactions?.length || state?.data?.accounts?.length);
+}
+
+const INDEXEDDB_MISSING = 'IndexedDB is not available in this browser.';
+
+/**
+ * `workspaceStore` (optional, tests): the client-only store to use instead of the browser's
+ * IndexedDB one (see workspaceStore.js). Ignored outside the client-only profile.
+ */
+export function AppProvider({ children, workspaceStore = undefined }) {
+  const clientOnly = !runtimeConfig.privateSyncEnabled && !runtimeConfig.encryptedStorage;
+  // Client-only with IndexedDB: the workspace is loaded asynchronously (hydration) and nothing is
+  // saved before that. Without IndexedDB, and in every other profile, the synchronous
+  // localStorage path below is unchanged.
+  const [store] = useState(() =>
+    clientOnly ? (workspaceStore ?? createBrowserWorkspaceStore(LS_KEY)) : null,
+  );
   const [initialLoad] = useState(() =>
-    runtimeConfig.encryptedStorage
+    runtimeConfig.encryptedStorage || store
       ? { persistedState: createPersistedAppState(), issues: [] }
       : loadLocalAppState(LS_KEY),
   );
   const [appState, rawDispatch] = useReducer(appReducer, initialLoad.persistedState);
+  // 'ready' | 'loading' | 'failed' (client-only IndexedDB store only).
+  const [hydration, setHydration] = useState(store ? 'loading' : 'ready');
+  const [hydrationRevision, setHydrationRevision] = useState(0);
+  const hydrated = hydration === 'ready';
+  // The last state known to be stored; the save effect never writes it back.
+  const storedStateRef = useRef(null);
+  // A workspace written by a newer app (never saved over).
+  const [newerLocalCopy, setNewerLocalCopy] = useState(Boolean(initialLoad.readOnly));
+  const newerLocalCopyRef = useRef(newerLocalCopy);
+  const [storageInfo, setStorageInfo] = useState(() => ({
+    backend: store ? null : 'localStorage',
+    fallbackReason: store ? '' : INDEXEDDB_MISSING,
+    persistRequested: false,
+    persistGranted: null,
+  }));
+  const persistAskedRef = useRef(false);
+  const flushRequestsRef = useRef([]);
+  const [flushTick, setFlushTick] = useState(0);
   // The phone-copy record only exists in the plain browser-storage build.
-  const [phoneCopy, setPhoneCopy] = useState(() =>
-    runtimeConfig.privateSyncEnabled || runtimeConfig.encryptedStorage ? null : loadPhoneCopy(),
-  );
+  const [phoneCopy, setPhoneCopy] = useState(() => (!clientOnly || store ? null : loadPhoneCopy()));
   const readOnlyRef = useRef(Boolean(phoneCopy));
   const [readOnlyNotice, setReadOnlyNotice] = useState(0);
   // A workspace written by a newer app is never saved over (see the save effect) but stays
@@ -158,15 +203,126 @@ export function AppProvider({ children }) {
     if (runtimeConfig.privateSyncAutoAuth) clearSyncAccessToken();
   }, []);
 
+  /** Client-only: ask once for persistent storage after the first save that holds real data. */
+  const maybeRequestPersist = useCallback(
+    (state, force = false) => {
+      if (!clientOnly || persistAskedRef.current) return;
+      if (!force && !hasUserData(state)) return;
+      persistAskedRef.current = true;
+      const request = store
+        ? store.requestPersist()
+        : requestPersistentStorage(globalThis.navigator?.storage);
+      void request.then((granted) =>
+        setStorageInfo((current) => ({
+          ...current,
+          persistRequested: true,
+          persistGranted: granted,
+        })),
+      );
+    },
+    [clientOnly, store],
+  );
+
+  // Hydration of the client-only IndexedDB store (with the one-time localStorage carry-over).
   useEffect(() => {
-    if (runtimeConfig.encryptedStorage || initialLoad.readOnly) return;
+    if (!store) return undefined;
+    let cancelled = false;
+    store.hydrate().then(
+      (result) => {
+        if (cancelled) return;
+        const loaded = result.load;
+        storedStateRef.current = loaded.persistedState;
+        persistedStateRef.current = loaded.persistedState;
+        newerLocalCopyRef.current = Boolean(loaded.readOnly);
+        readOnlyRef.current = Boolean(result.phoneCopy);
+        rawDispatch({ type: 'set_persisted_state', state: loaded.persistedState });
+        setNewerLocalCopy(Boolean(loaded.readOnly));
+        setPhoneCopy(result.phoneCopy);
+        setRuntimeIssues(loaded.issues);
+        setStorageInfo((current) => ({
+          ...current,
+          backend: result.backend,
+          fallbackReason: result.fallbackReason,
+        }));
+        setHydration('ready');
+        // Carrying existing data over counts as the first meaningful save.
+        if (result.migrated) maybeRequestPersist(loaded.persistedState);
+      },
+      (error) => {
+        if (cancelled) return;
+        console.error('Failed to open the workspace on this device', error);
+        setHydration('failed');
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [store, hydrationRevision, maybeRequestPersist]);
+
+  useEffect(() => {
+    if (!store) return undefined;
+    store.setListener({
+      onSaved: (state) => maybeRequestPersist(state),
+      onSaveError: (error) => {
+        console.error('Failed to save data on this device', error);
+        appendIssue(setRuntimeIssues, 'local-save-failed');
+      },
+      // While anything is unwritten, ask desktop browsers to confirm leaving the page.
+      onBusyChange: (busy) => {
+        if (busy) window.addEventListener('beforeunload', warnUnsaved);
+        else window.removeEventListener('beforeunload', warnUnsaved);
+      },
+    });
+    if (store.isBusy()) window.addEventListener('beforeunload', warnUnsaved);
+    return () => {
+      store.setListener(null);
+      window.removeEventListener('beforeunload', warnUnsaved);
+    };
+  }, [store, maybeRequestPersist]);
+
+  useEffect(() => {
+    if (runtimeConfig.encryptedStorage || newerLocalCopy) return;
+    if (store) {
+      if (!hydrated || appState === storedStateRef.current) return;
+      store.scheduleSave(appState);
+      return;
+    }
     try {
       saveLocalAppState(LS_KEY, appState);
     } catch (error) {
       console.error('Failed to save data to local storage', error);
       appendIssue(setRuntimeIssues, 'local-save-failed');
+      return;
     }
-  }, [appState, initialLoad.readOnly]);
+    maybeRequestPersist(appState);
+  }, [appState, newerLocalCopy, store, hydrated, maybeRequestPersist]);
+
+  // Answers flushWorkspace() calls. Declared after the save effect, so in the commit that carries
+  // the caller's change the save is already queued when this waits for it.
+  useEffect(() => {
+    const requests = flushRequestsRef.current.splice(0);
+    if (!requests.length || !store) return;
+    store.whenSaved().then(
+      () => requests.forEach((request) => request.resolve()),
+      (error) =>
+        requests.forEach((request) => request.reject(new WorkspaceSaveError({ cause: error }))),
+    );
+  }, [flushTick, store]);
+
+  /**
+   * Client-only IndexedDB store: resolves once the current workspace is stored on this device;
+   * rejects with WorkspaceSaveError when it could not be. It waits for the render that carries the
+   * caller's change, so the save effect has queued it. Without the store it resolves at once: the
+   * synchronous localStorage path writes during that render's effects, and the server profiles
+   * report durability through their own sync status.
+   */
+  const flushWorkspace = useCallback(() => {
+    if (!store) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      flushRequestsRef.current.push({ resolve, reject });
+      setFlushTick((tick) => tick + 1);
+    });
+  }, [store]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = appState.data.themeMode || 'dark';
@@ -175,7 +331,7 @@ export function AppProvider({ children }) {
   }, [appState.data.themeMode]);
 
   useEffect(() => {
-    if (!runtimeConfig.fxRefreshEnabled) return undefined;
+    if (!runtimeConfig.fxRefreshEnabled || !hydrated) return undefined;
 
     let cancelled = false;
     const controller = new AbortController();
@@ -214,7 +370,7 @@ export function AppProvider({ children }) {
       cancelled = true;
       controller.abort();
     };
-  }, [dispatch]);
+  }, [dispatch, hydrated]);
 
   useEffect(() => {
     if (!runtimeConfig.privateSyncEnabled) return undefined;
@@ -661,6 +817,7 @@ export function AppProvider({ children }) {
     }
 
     dispatch(action);
+    await flushWorkspace();
     return { batchId, backup };
   };
 
@@ -687,6 +844,7 @@ export function AppProvider({ children }) {
     if (persistedStateRef.current.data.lastUpdated !== base.data.lastUpdated)
       throw new Error('Workspace changed while preparing the backup. Review and retry the import.');
     dispatch({ type: 'replace_state', payload: next.data });
+    await flushWorkspace();
     return { added: prepared.added, duplicates: prepared.duplicates };
   };
 
@@ -720,35 +878,58 @@ export function AppProvider({ children }) {
 
   /**
    * Receive from Mac: replace the whole workspace with a validated snapshot, or change nothing.
-   * The new workspace and the phone-copy record are written to localStorage first; only when
-   * both are stored does the in-memory state switch over. A failed write (quota) restores the
-   * previous stored values and throws PhoneStorageFullError.
+   * The new workspace and the phone-copy record are stored first (IndexedDB: one transaction;
+   * localStorage fallback: written in turn and put back on failure); only when both are stored
+   * does the in-memory state switch over. A failed write (quota) leaves the previous stored values
+   * and rejects with PhoneStorageFullError.
    */
-  const replaceWorkspaceFromSnapshot = (nextData, { fileCreatedAt = null, source = null } = {}) => {
-    if (runtimeConfig.privateSyncEnabled || runtimeConfig.encryptedStorage)
-      throw new Error('Receive from Mac is only available in the browser-only app.');
-    if (initialLoad.readOnly) throw new Error(NEWER_SCHEMA_VERSION_MESSAGE);
+  const replaceWorkspaceFromSnapshot = async (
+    nextData,
+    { fileCreatedAt = null, source = null } = {},
+  ) => {
+    if (!clientOnly) throw new Error('Receive from Mac is only available in the browser-only app.');
+    if (store && !hydrated) throw new Error('The workspace on this device is still opening.');
+    if (newerLocalCopyRef.current) throw new Error(NEWER_SCHEMA_VERSION_MESSAGE);
     const validated = AppDataSchema.parse(nextData);
     const next = appReducer(persistedStateRef.current, {
       type: 'import_backup',
       nextData: validated,
     });
     const record = { syncedAt: Date.now(), fileCreatedAt, source };
-    commitPhoneCopy({ storageKey: LS_KEY, persistedState: next, record });
+    if (store) await store.replaceWithPhoneCopy(next, record);
+    else commitPhoneCopy({ storageKey: LS_KEY, persistedState: next, record });
     readOnlyRef.current = true;
+    storedStateRef.current = next;
     persistedStateRef.current = next;
-    rawDispatch({ type: 'replace_state', payload: next.data });
+    rawDispatch({ type: 'set_persisted_state', state: next });
     setPhoneCopy(record);
+    maybeRequestPersist(next, true);
     return record;
   };
 
   /** Settings: forget the phone copy. Clears the workspace and the record; the app is editable again. */
-  const removePhoneCopy = () => {
+  const removePhoneCopy = async () => {
+    if (store) {
+      const next = appReducer(persistedStateRef.current, { type: 'clear_data' });
+      await store.removePhoneCopy(next);
+      storedStateRef.current = next;
+      persistedStateRef.current = next;
+      readOnlyRef.current = false;
+      setPhoneCopy(null);
+      rawDispatch({ type: 'set_persisted_state', state: next });
+      return;
+    }
     clearPhoneCopyRecord();
     readOnlyRef.current = false;
     setPhoneCopy(null);
     rawDispatch({ type: 'clear_data' });
   };
+
+  /** Settings: what the browser reports about this device's storage (feature-detected). */
+  const readStorageStatus = useCallback(
+    () => readBrowserStorageStatus(store ? store.storageManager : globalThis.navigator?.storage),
+    [store],
+  );
 
   const unlockPrivateSync = (token) => {
     setSyncAccessToken(token);
@@ -961,8 +1142,16 @@ export function AppProvider({ children }) {
               persistedStateRef.current.data.lastUpdated !== expectedUpdatedAt
             )
               throw new Error('Workspace changed during recovery backup; try again.');
+          } else if (store) {
+            await store.saveBeforeRestore(persistedStateRef.current);
+            if (
+              expectedUpdatedAt !== undefined &&
+              persistedStateRef.current.data.lastUpdated !== expectedUpdatedAt
+            )
+              throw new Error('Workspace changed during recovery backup; try again.');
           } else saveLocalAppState(`${LS_KEY}_before_restore`, persistedStateRef.current);
           dispatch({ type: 'import_backup', nextData: validated });
+          await flushWorkspace();
         },
         recordImportSummary: (fileName, summary) =>
           dispatch({
@@ -985,9 +1174,31 @@ export function AppProvider({ children }) {
         phoneCopy,
         replaceWorkspaceFromSnapshot,
         removePhoneCopy,
+        storageInfo,
+        readStorageStatus,
+        flushWorkspace,
       }}
     >
-      {databaseLoaded ? (
+      {hydration === 'loading' ? (
+        <main className="card" aria-busy="true">
+          <h2>Opening workspace</h2>
+          <p>Loading the data stored on this device…</p>
+        </main>
+      ) : hydration === 'failed' ? (
+        <main className="card" role="alert">
+          <h2>Workspace could not be opened</h2>
+          <p>{STORAGE_UNAVAILABLE_MESSAGE}</p>
+          <button
+            className="btn"
+            onClick={() => {
+              setHydration('loading');
+              setHydrationRevision((value) => value + 1);
+            }}
+          >
+            Retry
+          </button>
+        </main>
+      ) : databaseLoaded ? (
         children
       ) : (
         <main className="card">

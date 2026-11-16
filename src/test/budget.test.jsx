@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Budget from '../pages/Budget';
 import { ToastProvider } from '../components/Toast';
@@ -36,7 +36,7 @@ describe('Budget page', () => {
     vi.useRealTimers();
   });
 
-  it('plans empty and future months independently of imported transactions', () => {
+  it('plans empty and future months independently of imported transactions', async () => {
     render(
       <ToastProvider>
         <Budget />
@@ -59,6 +59,7 @@ describe('Budget page', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /copy previous/i }));
     expect(context.copyBudgets).toHaveBeenCalledWith('2026-08', '2026-09');
+    await act(async () => {}); // the success toast waits for the (here absent) save flush
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Copied 1 missing category from August 2026. Existing categories were kept.',
     );

@@ -1,9 +1,10 @@
 // The phone's read-only copy of a Mac workspace (plan 04, task 3.3/3.4, decision D2).
 //
-// `ssb.phoneCopy` is a tiny record kept next to the workspace in localStorage:
-// `{ syncedAt, fileCreatedAt, source }`. While it exists the workspace is read-only on this
-// device (AppContext enforces that). It is written only after a replace has succeeded and it holds
-// no financial data.
+// The phone-copy record is a tiny value kept next to the workspace: `{ syncedAt, fileCreatedAt,
+// source }`. Where IndexedDB works it sits in the same object store as the workspace
+// (workspaceStore.js) and both are written in one transaction; in the localStorage fallback it is
+// the `ssb.phoneCopy` key. While it exists the workspace is read-only on this device (AppContext
+// enforces that). It is written only together with a replaced workspace and holds no financial data.
 
 export const PHONE_COPY_KEY = 'ssb.phoneCopy';
 
@@ -24,18 +25,22 @@ function isTimestamp(value) {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
+/** A stored record value (already parsed), or null when it is missing or unusable. */
+export function parsePhoneCopyRecord(parsed) {
+  if (!parsed || typeof parsed !== 'object' || !isTimestamp(parsed.syncedAt)) return null;
+  return {
+    syncedAt: parsed.syncedAt,
+    fileCreatedAt: isTimestamp(parsed.fileCreatedAt) ? parsed.fileCreatedAt : null,
+    source: typeof parsed.source === 'string' ? parsed.source : null,
+  };
+}
+
 /** The stored record, or null when there is none (or it is unreadable: then the app stays editable). */
 export function loadPhoneCopy(storage = globalThis.localStorage) {
   try {
     const raw = storage?.getItem(PHONE_COPY_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object' || !isTimestamp(parsed.syncedAt)) return null;
-    return {
-      syncedAt: parsed.syncedAt,
-      fileCreatedAt: isTimestamp(parsed.fileCreatedAt) ? parsed.fileCreatedAt : null,
-      source: typeof parsed.source === 'string' ? parsed.source : null,
-    };
+    return parsePhoneCopyRecord(JSON.parse(raw));
   } catch {
     return null;
   }
