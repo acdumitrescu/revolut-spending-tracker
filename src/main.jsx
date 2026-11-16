@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Chart from 'chart.js/auto';
 import App from './App';
+import { registerServiceWorker } from './lib/registerServiceWorker';
 import './index.css';
 import './styles/tokens.css';
 import './styles/shell.css';
@@ -30,3 +31,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>,
 );
+
+// After load, so caching the app never competes with the first render.
+window.addEventListener('load', () => registerServiceWorker());

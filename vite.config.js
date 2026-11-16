@@ -4,6 +4,7 @@ import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { isSafeSyncToken } from './backend/syncToken.js';
 import { requestBoundary } from './backend/requestBoundary.js';
+import serviceWorkerPlugin from './scripts/vite/serviceWorkerPlugin.js';
 
 export default defineConfig(() => {
   const localPort = Number(process.env.SSB_DEV_PORT || 5173);
@@ -17,6 +18,7 @@ export default defineConfig(() => {
   return {
     plugins: [
       react(),
+      serviceWorkerPlugin(),
       ...(trustedDevProxy
         ? [
             {

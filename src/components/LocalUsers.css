@@ -92,3 +92,13 @@
   width: 100%;
   min-width: 0;
 }
+
+@media (max-width: 760px) {
+  .local-user-bar {
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  .local-user-bar .btn {
+    min-height: 44px;
+  }
+}
