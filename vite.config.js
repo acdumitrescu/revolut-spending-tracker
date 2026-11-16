@@ -73,6 +73,8 @@ export default defineConfig(() => {
             // rolldown >=1.2.16 merges this shared dependency into the entry chunk
             // (+~23 kB); keep it separate so the entry stays under the bundle budget.
             if (id.includes('papaparse')) return 'csv-vendor';
+            // zod (~100 kB) backs the shared state schema; keep it out of the entry chunk.
+            if (id.includes('/node_modules/zod/')) return 'schema-vendor';
           },
         },
       },
