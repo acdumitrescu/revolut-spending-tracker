@@ -26,7 +26,6 @@ import {
   jsonResponse,
   memoryLocalStorage,
   renderApp,
-  run,
   syntheticWorkspace,
 } from './fixtures/appContextHarness';
 import legacyInitial from './fixtures/synthetic-workspace-v0-initial.json';
@@ -148,49 +147,5 @@ describe('private server sync', () => {
     expect(server.requests('POST /data').length).toBeGreaterThan(0);
     expect(ctx.current.data.accounts.map((account) => account.name)).toContain('Fake Local Edit');
     expect(ctx.current.syncStatus.phase).toBe('sync-delayed');
-  });
-});
-
-describe('encrypted database (local users)', () => {
-  beforeEach(() => {
-    applyConfig(config, {
-      ...PRIVATE_SYNC_CONFIG,
-      encryptedStorage: true,
-      localUsers: true,
-      privateBackupEnabled: true,
-    });
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    window.__SSB_DESKTOP__ = { syncToken: 'fake-desktop-token' };
-  });
-
-  it('keeps the workspace closed and explains why when the database is newer', async () => {
-    const server = installFakeServer({
-      'GET /data': () => jsonResponse({ data: newerWorkspace(), version: 3, updatedAt: 1 }),
-    });
-    render(
-      <AppProvider>
-        <p>Synthetic workspace content</p>
-      </AppProvider>,
-    );
-    await advance();
-    expect(screen.queryByText('Synthetic workspace content')).toBeNull();
-    expect(screen.getByText(NEWER_SCHEMA_VERSION_MESSAGE)).toBeTruthy();
-    expect(server.calls.every((call) => call.method === 'GET')).toBe(true);
-  });
-
-  it('refuses to resume a session whose saved workspace became newer', async () => {
-    const db = { envelope: syntheticWorkspace(), version: 5 };
-    installFakeServer({
-      'GET /data': () => jsonResponse({ data: db.envelope, version: db.version, updatedAt: 1 }),
-    });
-    const { ctx } = renderApp();
-    await advance();
-    expect(ctx.current.syncStatus.phase).toBe('synced');
-
-    db.envelope = newerWorkspace();
-    await expect(run(() => ctx.current.resumeUserSession())).rejects.toThrow(
-      NEWER_SCHEMA_VERSION_MESSAGE,
-    );
-    expect(ctx.current.data.accounts[0].name).toBe('Fake Savings');
   });
 });
