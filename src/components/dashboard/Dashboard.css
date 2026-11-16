@@ -121,6 +121,8 @@
 }
 .dash-value {
   margin: 0;
+  /* Set explicitly: WebKit kept the previous theme's inherited colour here after a theme switch. */
+  color: var(--text);
   overflow: hidden;
   font-size: 28px;
   font-weight: 760;
@@ -152,6 +154,10 @@
   margin: 2px 0 0;
   font-size: 12px;
   font-weight: 700;
+}
+/* Explicit for the same WebKit reason as .dash-value. */
+.dash-footer-link > a {
+  color: var(--text);
 }
 .dash-mini-list,
 .dash-coming-list,

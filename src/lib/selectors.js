@@ -131,19 +131,6 @@ export function getMonthlySummary(transactions, options = {}) {
   });
 }
 
-export function getCalendarYearMonthlySummary(
-  transactions,
-  year = new Date().getFullYear(),
-  options = {},
-) {
-  return Array.from({ length: 12 }, (_, index) => {
-    const month = `${year}-${String(index + 1).padStart(2, '0')}`;
-    const inc = getMonthlyIncome(transactions, month, options);
-    const exp = getMonthlyExpense(transactions, month, options);
-    return { month, inc, exp, net: inc - exp };
-  });
-}
-
 export function getRolling12MonthSummary(transactions, endDate = new Date(), options = {}) {
   const endYear = endDate.getFullYear();
   const endMonth = endDate.getMonth();
@@ -201,19 +188,6 @@ export function getCategoryTotals(transactions, month = null, options = {}) {
           Math.abs(convertTxnAmount(txn, displayCurrency, fxRates));
       }
       return totals;
-    }, {});
-}
-
-export function getVendorTotals(transactions, month = null, options = {}) {
-  const { displayCurrency = BASE_CURRENCY, fxRates } = options;
-  return transactions
-    .filter((txn) => (month ? txn.ym === month : true))
-    .reduce((vendors, txn) => {
-      if (!isExpenseTransaction(txn)) return vendors;
-      if (!vendors[txn.desc]) vendors[txn.desc] = { total: 0, count: 0, cat: txn.cat };
-      vendors[txn.desc].total += Math.abs(convertTxnAmount(txn, displayCurrency, fxRates));
-      vendors[txn.desc].count += 1;
-      return vendors;
     }, {});
 }
 
