@@ -1,5 +1,6 @@
 /* global Buffer, process */
 import express from 'express';
+import { rateLimit } from 'express-rate-limit';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { createLocalUsers } from './localUsers.js';
 import crypto from 'node:crypto';
@@ -99,6 +100,21 @@ const ALLOWED_HOSTS = String(process.env.SSB_ALLOWED_HOSTS || '')
   .filter(Boolean);
 app.use(securityHeaders());
 app.use(hostGuard({ allowedHosts: ALLOWED_HOSTS }));
+// One request budget per client for every route (API and static), applied before the API token
+// check so guessing a token or password is slowed down too. Generous enough for normal use
+// (a full page load is well under 100 requests); tune with SSB_RATE_LIMIT_PER_MINUTE.
+app.use(
+  rateLimit({
+    windowMs: 60_000,
+    limit: Number.parseInt(process.env.SSB_RATE_LIMIT_PER_MINUTE || '', 10) || 600,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { error: 'Too many requests, slow down and try again shortly' },
+    // Behind a reverse proxy without 'trust proxy' every request shares one budget, which is the
+    // safe direction; do not log a warning about the forwarded header on every start.
+    validate: { xForwardedForHeader: false },
+  }),
+);
 app.use('/api', authenticatePrivateApi);
 app.use('/api', (req, res, next) =>
   requestBoundary({

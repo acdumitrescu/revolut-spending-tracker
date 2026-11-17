@@ -48,6 +48,8 @@ const backend = spawn(process.execPath, [path.join(root, 'backend/server.js')], 
     SSB_BACKUP_DIR: path.join(dataRoot, 'backups'),
     SSB_STATIC_DIR: outDir,
     SSB_EXIT_ON_STDIN_CLOSE: 'true',
+    // One test browser makes every request; the per-client budget is not what e2e tests.
+    SSB_RATE_LIMIT_PER_MINUTE: '100000',
   },
 });
 
