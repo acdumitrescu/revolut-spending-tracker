@@ -20,6 +20,8 @@ services:
       - /var/cache/nginx:rw,noexec,nosuid,size=16m
       - /var/run:rw,noexec,nosuid,size=1m
       - /tmp:rw,noexec,nosuid,size=8m
+      # The nginx entrypoint renders its config template here at start; the rest stays read-only.
+      - /etc/nginx/conf.d:rw,noexec,nosuid,size=1m
     healthcheck:
       test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1/ || exit 1']
       interval: 30s
