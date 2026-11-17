@@ -17,8 +17,13 @@ export default function GlobalSearch() {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const results = useMemo(() => buildSearchResults(data.transactions, query), [data.transactions, query]);
-  const selectedIndex = results.length ? Math.min(Math.max(activeIndex, 0), results.length - 1) : -1;
+  const results = useMemo(
+    () => buildSearchResults(data.transactions, query),
+    [data.transactions, query],
+  );
+  const selectedIndex = results.length
+    ? Math.min(Math.max(activeIndex, 0), results.length - 1)
+    : -1;
 
   useEffect(() => {
     const handleShortcut = (event) => {
@@ -64,7 +69,9 @@ export default function GlobalSearch() {
         aria-autocomplete="list"
         aria-controls="global-search-results"
         aria-expanded={open}
-        aria-activedescendant={selectedIndex >= 0 ? `global-search-result-${selectedIndex}` : undefined}
+        aria-activedescendant={
+          selectedIndex >= 0 ? `global-search-result-${selectedIndex}` : undefined
+        }
         onKeyDown={handleKeyDown}
         onFocus={() => setOpen(true)}
         onChange={(event) => {
@@ -82,28 +89,37 @@ export default function GlobalSearch() {
       )}
 
       {open && query.length >= 2 && (
-        <div id="global-search-results" className="search-results" role="listbox" aria-label="Search results">
-          {results.length ? results.map((result, index) => {
-            const Icon = RESULT_ICONS[result.type];
-            return (
-              <Link
-                id={`global-search-result-${index}`}
-                key={result.id}
-                to={result.to}
-                className={`search-result${selectedIndex === index ? ' active' : ''}`}
-                role="option"
-                aria-selected={selectedIndex === index}
-                onMouseEnter={() => setActiveIndex(index)}
-                onClick={() => setOpen(false)}
-              >
-                <span className="search-result-icon"><Icon size={16} /></span>
-                <span>
-                  <strong>{result.title}</strong>
-                  <small>{result.meta}</small>
-                </span>
-              </Link>
-            );
-          }) : (
+        <div
+          id="global-search-results"
+          className="search-results"
+          role="listbox"
+          aria-label="Search results"
+        >
+          {results.length ? (
+            results.map((result, index) => {
+              const Icon = RESULT_ICONS[result.type];
+              return (
+                <Link
+                  id={`global-search-result-${index}`}
+                  key={result.id}
+                  to={result.to}
+                  className={`search-result${selectedIndex === index ? ' active' : ''}`}
+                  role="option"
+                  aria-selected={selectedIndex === index}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  onClick={() => setOpen(false)}
+                >
+                  <span className="search-result-icon">
+                    <Icon size={16} />
+                  </span>
+                  <span>
+                    <strong>{result.title}</strong>
+                    <small>{result.meta}</small>
+                  </span>
+                </Link>
+              );
+            })
+          ) : (
             <div className="search-empty">No matching activity yet.</div>
           )}
         </div>

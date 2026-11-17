@@ -1,0 +1,67 @@
+.phone-copy-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--info-soft);
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.phone-copy-banner a {
+  color: var(--info);
+  font-weight: 600;
+}
+.phone-sync-card {
+  display: grid;
+  gap: 12px;
+}
+.phone-sync-card h2,
+.phone-sync-card h3 {
+  margin: 0;
+}
+.phone-sync-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.phone-sync-row .input {
+  flex: 1 1 220px;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.phone-sync-compare {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.phone-sync-compare th,
+.phone-sync-compare td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.phone-sync-warning {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--warning-soft);
+}
+.phone-sync-error {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--danger-soft);
+}
+.phone-sync-success {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--success-soft);
+}
+fieldset.account-editor {
+  border-width: 1px 0 0;
+  margin: 0;
+  min-width: 0;
+}

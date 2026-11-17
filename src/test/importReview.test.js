@@ -59,7 +59,10 @@ describe('ImportReview', () => {
   });
 
   it('generates a complete, escaped report for invalid and duplicate rows', () => {
-    const quotedTransaction = { ...transaction, desc: '=HYPERLINK("https://example.invalid","Market")' };
+    const quotedTransaction = {
+      ...transaction,
+      desc: '=HYPERLINK("https://example.invalid","Market")',
+    };
     const review = new ImportReview({
       fileName: 'review.csv',
       parsedResult: parsedResult([quotedTransaction]),
@@ -88,13 +91,17 @@ describe('ImportReview', () => {
 
 describe('CSV import guardrails', () => {
   it('provides a valid normalized template', () => {
-    expect(NORMALIZED_CSV_TEMPLATE).toContain('Date,Description,Category,Subcategory,Amount,Flow,Type,Currency,Reference');
+    expect(NORMALIZED_CSV_TEMPLATE).toContain(
+      'Date,Description,Category,Subcategory,Amount,Flow,Type,Currency,Reference',
+    );
     expect(NORMALIZED_CSV_TEMPLATE).toContain('Example Grocery Store');
   });
 
   it('rejects unsupported, empty, and oversized files', () => {
     expect(() => validateCsvFile(new File(['x'], 'transactions.txt'))).toThrow(/\.csv extension/i);
     expect(() => validateCsvFile(new File([], 'empty.csv'))).toThrow(/empty/i);
-    expect(() => validateCsvFile({ name: 'large.csv', size: MAX_CSV_FILE_BYTES + 1 })).toThrow(/10 MB/i);
+    expect(() => validateCsvFile({ name: 'large.csv', size: MAX_CSV_FILE_BYTES + 1 })).toThrow(
+      /10 MB/i,
+    );
   });
 });

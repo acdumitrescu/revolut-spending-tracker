@@ -98,19 +98,35 @@ describe('private portable backups', () => {
   it('rejects unversioned state and unsafe import batch identifiers', async () => {
     const backupDir = await createBackupDirectory();
 
-    await expect(writePortableBackup({
-      backupDir,
-      data: { data: { transactions: [], accounts: [] } },
-      reason: 'manual',
-      maxPayloadBytes: 1024 * 1024,
-    })).rejects.toMatchObject({ status: 400 });
+    await expect(
+      writePortableBackup({
+        backupDir,
+        data: { data: { transactions: [], accounts: [] } },
+        reason: 'manual',
+        maxPayloadBytes: 1024 * 1024,
+      }),
+    ).rejects.toMatchObject({ status: 400 });
 
-    await expect(writePortableBackup({
-      backupDir,
-      data: sampleState(),
-      reason: 'import',
-      importBatchId: '../../private-data',
-      maxPayloadBytes: 1024 * 1024,
-    })).rejects.toMatchObject({ status: 400 });
+    await expect(
+      writePortableBackup({
+        backupDir,
+        data: sampleState(),
+        reason: 'import',
+        importBatchId: '../../private-data',
+        maxPayloadBytes: 1024 * 1024,
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+});
+
+describe('backupPath', () => {
+  it('keeps backup files inside the backup folder', async () => {
+    const { backupPath } = await import('./encryptedBackups.js');
+    expect(backupPath('/tmp/ssb-backups', 'manual-1-a.ssbdb')).toBe(
+      '/tmp/ssb-backups/manual-1-a.ssbdb',
+    );
+    for (const name of ['../escape.ssbdb', 'nested/file.ssbdb', '..', '']) {
+      expect(() => backupPath('/tmp/ssb-backups', name)).toThrow(/Invalid backup filename/);
+    }
   });
 });

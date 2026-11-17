@@ -2,12 +2,19 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import CustomMappings from '../components/CustomMappings';
 
-const vendors = { STARBUCKS: ['Food & Dining', 'Coffee'], NETFLIX: ['Subscriptions', ''], ALDI: ['Food & Dining', 'Groceries'] };
+const vendors = {
+  STARBUCKS: ['Food & Dining', 'Coffee'],
+  NETFLIX: ['Subscriptions', ''],
+  ALDI: ['Food & Dining', 'Groceries'],
+};
 
 describe('CustomMappings', () => {
   it('lists mappings sorted by category, then vendor, and filters by search', () => {
     render(<CustomMappings customVendors={vendors} onSave={vi.fn()} onRemove={vi.fn()} />);
-    const names = screen.getAllByRole('row').slice(1).map((row) => within(row).getAllByRole('cell')[0].textContent);
+    const names = screen
+      .getAllByRole('row')
+      .slice(1)
+      .map((row) => within(row).getAllByRole('cell')[0].textContent);
     expect(names).toEqual(['ALDI', 'STARBUCKS', 'NETFLIX']);
     fireEvent.change(screen.getByLabelText('Search mappings'), { target: { value: 'coffee' } });
     expect(screen.getAllByRole('row')).toHaveLength(2);
@@ -39,7 +46,14 @@ describe('CustomMappings', () => {
   });
 
   it('opens the add form prefilled when the page requests it', () => {
-    render(<CustomMappings customVendors={{}} onSave={vi.fn()} onRemove={vi.fn()} request={{ mode: 'add', vendor: 'ACME' }} />);
+    render(
+      <CustomMappings
+        customVendors={{}}
+        onSave={vi.fn()}
+        onRemove={vi.fn()}
+        request={{ mode: 'add', vendor: 'ACME' }}
+      />,
+    );
     expect(screen.getByLabelText('Vendor name')).toHaveValue('ACME');
   });
 });

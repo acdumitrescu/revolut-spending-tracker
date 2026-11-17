@@ -18,34 +18,40 @@ export default class ErrorBoundary extends React.Component {
   render() {
     if (this.state.error) {
       return (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          padding: '40px',
-          color: 'var(--muted)',
-          gap: '16px'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            padding: '40px',
+            color: 'var(--muted)',
+            gap: '16px',
+          }}
+        >
           <div style={{ fontSize: '48px', opacity: 0.4 }}>!</div>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--red)' }}>Something went wrong</div>
+          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--red)' }}>
+            Something went wrong
+          </div>
           <div style={{ fontSize: '12px', maxWidth: '480px', textAlign: 'center' }}>
             {this.state.error.message}
           </div>
           {typeof window !== 'undefined' && import.meta.env?.DEV && this.state.errorInfo && (
-            <pre style={{
-              fontSize: '10px',
-              maxWidth: '600px',
-              maxHeight: '200px',
-              overflow: 'auto',
-              background: 'var(--surface)',
-              padding: '12px',
-              borderRadius: '6px',
-              border: '1px solid var(--border)',
-              color: 'var(--muted)',
-              textAlign: 'left',
-            }}>
+            <pre
+              style={{
+                fontSize: '10px',
+                maxWidth: '600px',
+                maxHeight: '200px',
+                overflow: 'auto',
+                background: 'var(--surface)',
+                padding: '12px',
+                borderRadius: '6px',
+                border: '1px solid var(--border)',
+                color: 'var(--muted)',
+                textAlign: 'left',
+              }}
+            >
               {this.state.errorInfo.componentStack}
             </pre>
           )}

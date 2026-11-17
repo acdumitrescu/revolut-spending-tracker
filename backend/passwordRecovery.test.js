@@ -24,14 +24,27 @@ describe('password-protected recovery key', () => {
   });
   it('rejects wrong passwords, tampering and unsupported parameters', async () => {
     const envelope = await protectRecoveryKey(randomBytes(32), password);
-    await expect(unlockRecoveryKey(envelope, Buffer.from('A different synthetic password'))).rejects.toThrow('Wrong recovery password');
-    const changed = { ...envelope, tag: (envelope.tag[0] === '0' ? '1' : '0') + envelope.tag.slice(1) };
+    await expect(
+      unlockRecoveryKey(envelope, Buffer.from('A different synthetic password')),
+    ).rejects.toThrow('Wrong recovery password');
+    const changed = {
+      ...envelope,
+      tag: (envelope.tag[0] === '0' ? '1' : '0') + envelope.tag.slice(1),
+    };
     await expect(unlockRecoveryKey(changed, password)).rejects.toThrow('damaged');
-    await expect(unlockRecoveryKey({ ...envelope, kdf: 'unbounded' }, password)).rejects.toThrow('Invalid recovery file');
-    await expect(unlockRecoveryKey({ ...envelope, salt: 'x'.repeat(64) }, password)).rejects.toThrow('Invalid recovery file');
+    await expect(unlockRecoveryKey({ ...envelope, kdf: 'unbounded' }, password)).rejects.toThrow(
+      'Invalid recovery file',
+    );
+    await expect(
+      unlockRecoveryKey({ ...envelope, salt: 'x'.repeat(64) }, password),
+    ).rejects.toThrow('Invalid recovery file');
   });
   it('rejects short and oversized passwords', async () => {
-    await expect(protectRecoveryKey(randomBytes(32), Buffer.from('short'))).rejects.toThrow('16 to 256');
-    await expect(protectRecoveryKey(randomBytes(32), Buffer.alloc(257))).rejects.toThrow('16 to 256');
+    await expect(protectRecoveryKey(randomBytes(32), Buffer.from('short'))).rejects.toThrow(
+      '16 to 256',
+    );
+    await expect(protectRecoveryKey(randomBytes(32), Buffer.alloc(257))).rejects.toThrow(
+      '16 to 256',
+    );
   });
 });

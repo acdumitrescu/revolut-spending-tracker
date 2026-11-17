@@ -29,7 +29,10 @@ export async function verifyRecoveryBackup(filename, key) {
     if (!(await db.integrity())) throw new Error('Backup integrity failed');
     const state = (await db.read()).data;
     const receipt = await db.getDocument('backup-receipt');
-    if (!state || !receipt || receipt.digest !== stateDigest(state)) throw new Error('Backup reconciliation failed');
+    if (!state || !receipt || receipt.digest !== stateDigest(state))
+      throw new Error('Backup reconciliation failed');
     return { verified: true, digest: receipt.digest };
-  } finally { await db.close(); }
+  } finally {
+    await db.close();
+  }
 }

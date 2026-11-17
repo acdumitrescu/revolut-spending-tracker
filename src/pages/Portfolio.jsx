@@ -39,11 +39,17 @@ function parseDraft(draft) {
   const currentPrice = Number(draft.currentPrice);
   if (!draft.ticker.trim() || !draft.name.trim()) return { error: 'Ticker and name are required.' };
   if (draft.quoteSymbol.trim() && !isYahooQuoteSymbol(draft.quoteSymbol)) {
-    return { error: 'Yahoo symbol may contain only letters, numbers, dots, carets, equals signs, and hyphens.' };
+    return {
+      error:
+        'Yahoo symbol may contain only letters, numbers, dots, carets, equals signs, and hyphens.',
+    };
   }
-  if (!Number.isFinite(quantity) || quantity <= 0) return { error: 'Quantity must be greater than zero.' };
-  if (!Number.isFinite(avgCost) || avgCost < 0) return { error: 'Average cost cannot be negative.' };
-  if (!Number.isFinite(currentPrice) || currentPrice < 0) return { error: 'Current price cannot be negative.' };
+  if (!Number.isFinite(quantity) || quantity <= 0)
+    return { error: 'Quantity must be greater than zero.' };
+  if (!Number.isFinite(avgCost) || avgCost < 0)
+    return { error: 'Average cost cannot be negative.' };
+  if (!Number.isFinite(currentPrice) || currentPrice < 0)
+    return { error: 'Current price cannot be negative.' };
   return {
     holding: {
       id: globalThis.crypto?.randomUUID?.() || `portfolio-${Date.now()}`,
@@ -65,13 +71,8 @@ function parseDraft(draft) {
 }
 
 export default function Portfolio() {
-  const {
-    data,
-    runtimeConfig,
-    syncStatus,
-    upsertPortfolioHolding,
-    removePortfolioHolding,
-  } = useAppContext();
+  const { data, runtimeConfig, syncStatus, upsertPortfolioHolding, removePortfolioHolding } =
+    useAppContext();
   const [draft, setDraft] = useState(EMPTY_DRAFT);
   const [error, setError] = useState('');
   const [activeCurrency, setActiveCurrency] = useState('RON');
@@ -83,25 +84,33 @@ export default function Portfolio() {
   const [quoteStatus, setQuoteStatus] = useState({ phase: 'idle', message: '' });
   const holdings = useMemo(() => data.portfolioHoldings || [], [data.portfolioHoldings]);
   const quoteRefreshAvailable = runtimeConfig.privateSyncEnabled && syncStatus.phase === 'synced';
-  const localInstruments = useMemo(() => searchLocalInstruments(instrumentQuery), [instrumentQuery]);
+  const localInstruments = useMemo(
+    () => searchLocalInstruments(instrumentQuery),
+    [instrumentQuery],
+  );
   const insightRows = useMemo(
     () => getPortfolioInsightRows(holdings, data.fxRates),
-    [data.fxRates, holdings]
+    [data.fxRates, holdings],
   );
   const summary = useMemo(
     () => getPortfolioCurrencySummary(insightRows, activeCurrency),
-    [activeCurrency, insightRows]
+    [activeCurrency, insightRows],
   );
   const topInvestment = summary.topInvestments[0] || null;
-  const investmentChartData = useMemo(() => ({
-    labels: summary.topInvestments.map((holding) => holding.ticker),
-    datasets: [{
-      label: 'Cost basis',
-      data: summary.topInvestments.map((holding) => holding.costBasis),
-      backgroundColor: '#0f9d72',
-      borderRadius: 7,
-    }],
-  }), [summary.topInvestments]);
+  const investmentChartData = useMemo(
+    () => ({
+      labels: summary.topInvestments.map((holding) => holding.ticker),
+      datasets: [
+        {
+          label: 'Cost basis',
+          data: summary.topInvestments.map((holding) => holding.costBasis),
+          backgroundColor: '#0f9d72',
+          borderRadius: 7,
+        },
+      ],
+    }),
+    [summary.topInvestments],
+  );
 
   const updateDraft = (field) => (event) => {
     setDraft((current) => ({ ...current, [field]: event.target.value }));
@@ -122,16 +131,25 @@ export default function Portfolio() {
     }));
     setInstrumentQuery(`${instrument.ticker} · ${instrument.name}`);
     setYahooInstruments([]);
-    setInstrumentStatus({ phase: 'ready', message: `${instrument.ticker} selected. You can still edit any field below.` });
+    setInstrumentStatus({
+      phase: 'ready',
+      message: `${instrument.ticker} selected. You can still edit any field below.`,
+    });
   };
 
   const handleYahooInstrumentSearch = async () => {
     if (instrumentQuery.trim().length < 2) {
-      setInstrumentStatus({ phase: 'degraded', message: 'Enter at least two characters to search Yahoo.' });
+      setInstrumentStatus({
+        phase: 'degraded',
+        message: 'Enter at least two characters to search Yahoo.',
+      });
       return;
     }
     if (!quoteRefreshAvailable) {
-      setInstrumentStatus({ phase: 'degraded', message: 'Unlock private sync in Settings before searching Yahoo.' });
+      setInstrumentStatus({
+        phase: 'degraded',
+        message: 'Unlock private sync in Settings before searching Yahoo.',
+      });
       return;
     }
 
@@ -141,10 +159,15 @@ export default function Portfolio() {
       setYahooInstruments(results);
       setInstrumentStatus({
         phase: results.length ? 'ready' : 'degraded',
-        message: results.length ? 'Yahoo results are shown below. Select the matching exchange.' : 'No Yahoo matches found.',
+        message: results.length
+          ? 'Yahoo results are shown below. Select the matching exchange.'
+          : 'No Yahoo matches found.',
       });
     } catch {
-      setInstrumentStatus({ phase: 'degraded', message: 'Yahoo search is unavailable. Use a local result or enter the holding manually.' });
+      setInstrumentStatus({
+        phase: 'degraded',
+        message: 'Yahoo search is unavailable. Use a local result or enter the holding manually.',
+      });
     }
   };
 
@@ -166,7 +189,9 @@ export default function Portfolio() {
   };
 
   const handleQuoteSymbolBlur = (holding) => {
-    const nextSymbol = String(quoteSymbolDrafts[holding.id] ?? holding.quoteSymbol ?? holding.ticker)
+    const nextSymbol = String(
+      quoteSymbolDrafts[holding.id] ?? holding.quoteSymbol ?? holding.ticker,
+    )
       .trim()
       .toUpperCase();
     if (!isYahooQuoteSymbol(nextSymbol)) {
@@ -180,7 +205,10 @@ export default function Portfolio() {
     const savedHolding = holdings.find((candidate) => candidate.id === holding.id);
     if (savedHolding && savedHolding.quoteSymbol !== nextSymbol) {
       upsertPortfolioHolding({ ...savedHolding, quoteSymbol: nextSymbol });
-      setQuoteStatus({ phase: 'ready', message: `${holding.ticker} will refresh as ${nextSymbol}.` });
+      setQuoteStatus({
+        phase: 'ready',
+        message: `${holding.ticker} will refresh as ${nextSymbol}.`,
+      });
     }
     setQuoteSymbolDrafts((current) => ({ ...current, [holding.id]: nextSymbol }));
   };
@@ -211,9 +239,10 @@ export default function Portfolio() {
     } catch (refreshError) {
       setQuoteStatus({
         phase: 'degraded',
-        message: refreshError?.status === 401
-          ? 'Private sync is locked. Unlock it in Settings before refreshing prices.'
-          : 'Yahoo prices are unavailable. Saved manual or previous prices remain active.',
+        message:
+          refreshError?.status === 401
+            ? 'Private sync is locked. Unlock it in Settings before refreshing prices.'
+            : 'Yahoo prices are unavailable. Saved manual or previous prices remain active.',
       });
     }
   }, [holdings, quoteRefreshAvailable, quoteStatus.phase, upsertPortfolioHolding]);
@@ -236,26 +265,43 @@ export default function Portfolio() {
         <div>
           <div className="eyebrow">Private assets</div>
           <h1>Portfolio</h1>
-          <p>Holdings split by account currency, with manual prices and optional Yahoo quote refresh.</p>
+          <p>
+            Holdings split by account currency, with manual prices and optional Yahoo quote refresh.
+          </p>
         </div>
       </header>
 
       <section className="card" aria-labelledby="portfolio-price-refresh-title">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: 16,
+            flexWrap: 'wrap',
+          }}
+        >
           <div>
-            <div className="card-title" id="portfolio-price-refresh-title">Market price refresh</div>
+            <div className="card-title" id="portfolio-price-refresh-title">
+              Market price refresh
+            </div>
             <p className="section-note">
-              Best-effort Yahoo quotes may be delayed or unavailable. Only quote symbols are sent; quantities,
-              costs, accounts, and portfolio values stay in your private app.
+              Best-effort Yahoo quotes may be delayed or unavailable. Only quote symbols are sent;
+              quantities, costs, accounts, and portfolio values stay in your private app.
             </p>
           </div>
           <button
             className="btn btn-primary"
             type="button"
-            disabled={!quoteRefreshAvailable || holdings.length === 0 || quoteStatus.phase === 'refreshing'}
+            disabled={
+              !quoteRefreshAvailable || holdings.length === 0 || quoteStatus.phase === 'refreshing'
+            }
             onClick={handleRefreshPrices}
           >
-            <RefreshCw size={16} className={quoteStatus.phase === 'refreshing' ? 'spin' : undefined} />
+            <RefreshCw
+              size={16}
+              className={quoteStatus.phase === 'refreshing' ? 'spin' : undefined}
+            />
             {quoteStatus.phase === 'refreshing' ? 'Refreshing…' : 'Refresh prices'}
           </button>
         </div>
@@ -270,7 +316,8 @@ export default function Portfolio() {
         </label>
         {!runtimeConfig.privateSyncEnabled && (
           <p className="section-note" role="status" style={{ marginTop: 10 }}>
-            Price refresh requires the private-sync server; manual prices remain available in browser-only mode.
+            Price refresh requires the private-sync server; manual prices remain available in
+            browser-only mode.
           </p>
         )}
         {runtimeConfig.privateSyncEnabled && syncStatus.phase !== 'synced' && (
@@ -279,23 +326,51 @@ export default function Portfolio() {
           </p>
         )}
         {quoteStatus.message && (
-          <p className={quoteStatus.phase === 'degraded' ? 'form-error' : 'section-note'} role="status" style={{ marginTop: 10 }}>
+          <p
+            className={quoteStatus.phase === 'degraded' ? 'form-error' : 'section-note'}
+            role="status"
+            style={{ marginTop: 10 }}
+          >
             {quoteStatus.message}
           </p>
         )}
       </section>
 
-      <div className="card" style={{ padding: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }} aria-label="Portfolio currency">
+      <div
+        className="card"
+        style={{ padding: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}
+        aria-label="Portfolio currency"
+      >
         {SUPPORTED_DISPLAY_CURRENCIES.map((currency) => {
-          const count = insightRows.filter((holding) => holding.reportingCurrency === currency).length;
-          return <button key={currency} className={`btn${activeCurrency === currency ? ' btn-primary' : ''}`} type="button" onClick={() => setActiveCurrency(currency)}>{currency} ({count})</button>;
+          const count = insightRows.filter(
+            (holding) => holding.reportingCurrency === currency,
+          ).length;
+          return (
+            <button
+              key={currency}
+              className={`btn${activeCurrency === currency ? ' btn-primary' : ''}`}
+              type="button"
+              onClick={() => setActiveCurrency(currency)}
+            >
+              {currency} ({count})
+            </button>
+          );
         })}
       </div>
 
       <div className="kpi-grid" aria-label={`${activeCurrency} portfolio summary`}>
-        <div className="kpi blue"><div className="lbl">Positions</div><div className="val">{summary.rows.length}</div></div>
-        <div className="kpi green"><div className="lbl">Market value</div><div className="val">{formatCurrency(summary.totalMarketValue, activeCurrency)}</div></div>
-        <div className="kpi amber"><div className="lbl">Cost basis</div><div className="val">{formatCurrency(summary.totalCostBasis, activeCurrency)}</div></div>
+        <div className="kpi blue">
+          <div className="lbl">Positions</div>
+          <div className="val">{summary.rows.length}</div>
+        </div>
+        <div className="kpi green">
+          <div className="lbl">Market value</div>
+          <div className="val">{formatCurrency(summary.totalMarketValue, activeCurrency)}</div>
+        </div>
+        <div className="kpi amber">
+          <div className="lbl">Cost basis</div>
+          <div className="val">{formatCurrency(summary.totalCostBasis, activeCurrency)}</div>
+        </div>
         <div className={`kpi ${summary.gainLoss >= 0 ? 'green' : 'red'}`}>
           <div className="lbl">Unrealized P/L</div>
           <div className="val">{formatCurrency(summary.gainLoss, activeCurrency)}</div>
@@ -304,18 +379,55 @@ export default function Portfolio() {
 
       <div className="grid2">
         <section className="card" aria-labelledby="portfolio-investment-chart-title">
-          <div className="card-title" id="portfolio-investment-chart-title">Most invested · cost basis</div>
-          {topInvestment && <p className="section-note" style={{ marginBottom: 12 }}>Largest investment: <strong>{topInvestment.ticker}</strong> · {formatCurrency(topInvestment.costBasis, activeCurrency)}</p>}
-          <ChartWrapper type="bar" data={investmentChartData} height={260} horizontal showLegend={false} currency={activeCurrency} />
+          <div className="card-title" id="portfolio-investment-chart-title">
+            Most invested · cost basis
+          </div>
+          {topInvestment && (
+            <p className="section-note" style={{ marginBottom: 12 }}>
+              Largest investment: <strong>{topInvestment.ticker}</strong> ·{' '}
+              {formatCurrency(topInvestment.costBasis, activeCurrency)}
+            </p>
+          )}
+          <ChartWrapper
+            type="bar"
+            data={investmentChartData}
+            height={260}
+            horizontal
+            showLegend={false}
+            currency={activeCurrency}
+          />
         </section>
         <section className="card" aria-labelledby="portfolio-account-totals-title">
-          <div className="card-title" id="portfolio-account-totals-title">Broker account totals</div>
-          {summary.accountTotals.length ? summary.accountTotals.map((account) => (
-            <div key={account.key} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
-              <div><strong>{account.broker}</strong><div className="section-note">{account.account}</div></div>
-              <div style={{ textAlign: 'right' }}><strong>{formatCurrency(account.marketValue, activeCurrency)}</strong><div className="section-note">Cost {formatCurrency(account.costBasis, activeCurrency)}</div></div>
-            </div>
-          )) : <p className="section-note">No {activeCurrency} portfolio positions yet.</p>}
+          <div className="card-title" id="portfolio-account-totals-title">
+            Broker account totals
+          </div>
+          {summary.accountTotals.length ? (
+            summary.accountTotals.map((account) => (
+              <div
+                key={account.key}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: 16,
+                  padding: '12px 0',
+                  borderBottom: '1px solid var(--border)',
+                }}
+              >
+                <div>
+                  <strong>{account.broker}</strong>
+                  <div className="section-note">{account.account}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <strong>{formatCurrency(account.marketValue, activeCurrency)}</strong>
+                  <div className="section-note">
+                    Cost {formatCurrency(account.costBasis, activeCurrency)}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="section-note">No {activeCurrency} portfolio positions yet.</p>
+          )}
         </section>
       </div>
 
@@ -345,99 +457,301 @@ export default function Portfolio() {
               {instrumentStatus.phase === 'searching' ? 'Searching…' : 'Search Yahoo'}
             </button>
           </div>
-          <p className="section-note">Local BVB and common global instruments appear instantly. Yahoo search is optional and sends only this search phrase.</p>
+          <p className="section-note">
+            Local BVB and common global instruments appear instantly. Yahoo search is optional and
+            sends only this search phrase.
+          </p>
           {localInstruments.length > 0 && (
             <div className="tbl-wrap" style={{ marginTop: 8 }}>
-              <table><tbody>{localInstruments.map((instrument) => (
-                <tr key={`${instrument.exchange}:${instrument.quoteSymbol}`}>
-                  <td><strong>{instrument.ticker}</strong><div className="section-note">{instrument.name}</div></td>
-                  <td className="section-note">{instrument.exchange} · {instrument.assetClass} · {instrument.currency}</td>
-                  <td><button className="btn" type="button" onClick={() => selectInstrument(instrument)}>Use</button></td>
-                </tr>
-              ))}</tbody></table>
+              <table>
+                <tbody>
+                  {localInstruments.map((instrument) => (
+                    <tr key={`${instrument.exchange}:${instrument.quoteSymbol}`}>
+                      <td>
+                        <strong>{instrument.ticker}</strong>
+                        <div className="section-note">{instrument.name}</div>
+                      </td>
+                      <td className="section-note">
+                        {instrument.exchange} · {instrument.assetClass} · {instrument.currency}
+                      </td>
+                      <td>
+                        <button
+                          className="btn"
+                          type="button"
+                          onClick={() => selectInstrument(instrument)}
+                        >
+                          Use
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
           {yahooInstruments.length > 0 && (
             <div className="tbl-wrap" style={{ marginTop: 8 }}>
-              <table><tbody>{yahooInstruments.map((instrument) => (
-                <tr key={`yahoo:${instrument.quoteSymbol}`}>
-                  <td><strong>{instrument.ticker}</strong><div className="section-note">{instrument.name}</div></td>
-                  <td className="section-note">{instrument.exchange} · {instrument.assetClass} · {instrument.currency || 'currency unknown'}</td>
-                  <td><button className="btn" type="button" onClick={() => selectInstrument(instrument)}>Use</button></td>
-                </tr>
-              ))}</tbody></table>
+              <table>
+                <tbody>
+                  {yahooInstruments.map((instrument) => (
+                    <tr key={`yahoo:${instrument.quoteSymbol}`}>
+                      <td>
+                        <strong>{instrument.ticker}</strong>
+                        <div className="section-note">{instrument.name}</div>
+                      </td>
+                      <td className="section-note">
+                        {instrument.exchange} · {instrument.assetClass} ·{' '}
+                        {instrument.currency || 'currency unknown'}
+                      </td>
+                      <td>
+                        <button
+                          className="btn"
+                          type="button"
+                          onClick={() => selectInstrument(instrument)}
+                        >
+                          Use
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-          {instrumentStatus.message && <p className={instrumentStatus.phase === 'degraded' ? 'form-error' : 'section-note'} role="status">{instrumentStatus.message}</p>}
+          {instrumentStatus.message && (
+            <p
+              className={instrumentStatus.phase === 'degraded' ? 'form-error' : 'section-note'}
+              role="status"
+            >
+              {instrumentStatus.message}
+            </p>
+          )}
         </div>
         <div className="portfolio-form-grid">
-          <label className="field-stack"><span>Broker</span><input className="input" value={draft.broker} onChange={updateDraft('broker')} autoComplete="off" /></label>
-          <label className="field-stack"><span>Account</span><input className="input" value={draft.account} onChange={updateDraft('account')} autoComplete="off" /></label>
-          <label className="field-stack"><span>Account currency</span><select className="input" value={draft.accountCurrency} onChange={updateDraft('accountCurrency')}>{SUPPORTED_DISPLAY_CURRENCIES.map((currency) => <option key={currency}>{currency}</option>)}</select></label>
-          <label className="field-stack"><span>Ticker</span><input className="input" value={draft.ticker} onChange={updateDraft('ticker')} autoComplete="off" /></label>
-          <label className="field-stack"><span>Yahoo symbol (optional)</span><input className="input" value={draft.quoteSymbol} onChange={updateDraft('quoteSymbol')} placeholder="e.g. TLV.RO" autoComplete="off" /></label>
-          <label className="field-stack"><span>Name</span><input className="input" value={draft.name} onChange={updateDraft('name')} autoComplete="off" /></label>
-          <label className="field-stack"><span>Asset class</span><input className="input" value={draft.assetClass} onChange={updateDraft('assetClass')} /></label>
-          <label className="field-stack"><span>Quantity</span><input className="input" type="number" min="0" step="any" inputMode="decimal" value={draft.quantity} onChange={updateDraft('quantity')} /></label>
-          <label className="field-stack"><span>Average cost</span><input className="input" type="number" min="0" step="any" inputMode="decimal" value={draft.avgCost} onChange={updateDraft('avgCost')} /></label>
-          <label className="field-stack"><span>Currency</span><select className="input" value={draft.currency} onChange={updateDraft('currency')}>{SUPPORTED_DISPLAY_CURRENCIES.map((currency) => <option key={currency}>{currency}</option>)}</select></label>
-          <label className="field-stack"><span>Current price</span><input className="input" type="number" min="0" step="any" inputMode="decimal" value={draft.currentPrice} onChange={updateDraft('currentPrice')} /></label>
-          <button className="btn btn-primary" type="submit"><Plus size={16} /> Add holding</button>
+          <label className="field-stack">
+            <span>Broker</span>
+            <input
+              className="input"
+              value={draft.broker}
+              onChange={updateDraft('broker')}
+              autoComplete="off"
+            />
+          </label>
+          <label className="field-stack">
+            <span>Account</span>
+            <input
+              className="input"
+              value={draft.account}
+              onChange={updateDraft('account')}
+              autoComplete="off"
+            />
+          </label>
+          <label className="field-stack">
+            <span>Account currency</span>
+            <select
+              className="input"
+              value={draft.accountCurrency}
+              onChange={updateDraft('accountCurrency')}
+            >
+              {SUPPORTED_DISPLAY_CURRENCIES.map((currency) => (
+                <option key={currency}>{currency}</option>
+              ))}
+            </select>
+          </label>
+          <label className="field-stack">
+            <span>Ticker</span>
+            <input
+              className="input"
+              value={draft.ticker}
+              onChange={updateDraft('ticker')}
+              autoComplete="off"
+            />
+          </label>
+          <label className="field-stack">
+            <span>Yahoo symbol (optional)</span>
+            <input
+              className="input"
+              value={draft.quoteSymbol}
+              onChange={updateDraft('quoteSymbol')}
+              placeholder="e.g. TLV.RO"
+              autoComplete="off"
+            />
+          </label>
+          <label className="field-stack">
+            <span>Name</span>
+            <input
+              className="input"
+              value={draft.name}
+              onChange={updateDraft('name')}
+              autoComplete="off"
+            />
+          </label>
+          <label className="field-stack">
+            <span>Asset class</span>
+            <input
+              className="input"
+              value={draft.assetClass}
+              onChange={updateDraft('assetClass')}
+            />
+          </label>
+          <label className="field-stack">
+            <span>Quantity</span>
+            <input
+              className="input"
+              type="number"
+              min="0"
+              step="any"
+              inputMode="decimal"
+              value={draft.quantity}
+              onChange={updateDraft('quantity')}
+            />
+          </label>
+          <label className="field-stack">
+            <span>Average cost</span>
+            <input
+              className="input"
+              type="number"
+              min="0"
+              step="any"
+              inputMode="decimal"
+              value={draft.avgCost}
+              onChange={updateDraft('avgCost')}
+            />
+          </label>
+          <label className="field-stack">
+            <span>Currency</span>
+            <select className="input" value={draft.currency} onChange={updateDraft('currency')}>
+              {SUPPORTED_DISPLAY_CURRENCIES.map((currency) => (
+                <option key={currency}>{currency}</option>
+              ))}
+            </select>
+          </label>
+          <label className="field-stack">
+            <span>Current price</span>
+            <input
+              className="input"
+              type="number"
+              min="0"
+              step="any"
+              inputMode="decimal"
+              value={draft.currentPrice}
+              onChange={updateDraft('currentPrice')}
+            />
+          </label>
+          <button className="btn btn-primary" type="submit">
+            <Plus size={16} /> Add holding
+          </button>
         </div>
-        {error && <p className="form-error" role="alert">{error}</p>}
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
       </form>
 
       <section className="card">
         <div className="card-title">Portfolio recovery</div>
-        <p className="section-note">Portfolio positions are included in SSB JSON backups and private sync. Restore a backup instead of compiling private holdings into the application bundle.</p>
-        <Link className="btn" to="/app/import">Restore a backup</Link>
+        <p className="section-note">
+          Portfolio positions are included in SSB JSON backups and private sync. Restore a backup
+          instead of compiling private holdings into the application bundle.
+        </p>
+        <Link className="btn" to="/app/import">
+          Restore a backup
+        </Link>
       </section>
 
       <section className="card" aria-labelledby="portfolio-positions-title">
-        <div className="card-title" id="portfolio-positions-title">Positions</div>
+        <div className="card-title" id="portfolio-positions-title">
+          Positions
+        </div>
         {summary.rows.length === 0 ? (
-          <p className="section-note">No positions yet. Add only synthetic data when preparing screenshots or public demos.</p>
+          <p className="section-note">
+            No positions yet. Add only synthetic data when preparing screenshots or public demos.
+          </p>
         ) : (
           <div className="tbl-wrap">
             <table>
-              <thead><tr><th scope="col">Holding</th><th scope="col">Source</th><th scope="col">Asset class</th><th scope="col">Market value</th><th scope="col">P/L</th><th scope="col"><span className="visually-hidden">Actions</span></th></tr></thead>
-              <tbody>{summary.rows.map((holding) => (
-                <tr key={holding.id}>
-                  <td>
-                    <strong>{holding.ticker}</strong>
-                    <div className="section-note">{holding.name}</div>
-                    <label className="section-note">
-                      Yahoo symbol
-                      <input
-                        className="input"
-                        style={{ width: 110, minHeight: 32, marginLeft: 6, padding: '4px 7px' }}
-                        value={quoteSymbolDrafts[holding.id] ?? holding.quoteSymbol ?? holding.ticker}
-                        onChange={(event) => setQuoteSymbolDrafts((current) => ({
-                          ...current,
-                          [holding.id]: event.target.value,
-                        }))}
-                        onBlur={() => handleQuoteSymbolBlur(holding)}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter') event.currentTarget.blur();
-                        }}
-                        autoComplete="off"
-                      />
-                    </label>
-                  </td>
-                  <td>{holding.broker || 'Manual'}{holding.account ? <div className="section-note">{holding.account}</div> : null}</td>
-                  <td>{holding.assetClass}</td>
-                  <td>
-                    {formatCurrency(holding.marketValue, activeCurrency)}
-                    <div className="section-note">{holding.quantity} × {formatCurrency(holding.currentPrice, holding.currency)}</div>
-                    <div className="section-note">
-                      {holding.priceSource === 'yahoo' ? `Yahoo · ${holding.quoteSymbol || holding.ticker}` : 'Manual price'}
-                      {holding.priceUpdatedAt ? ` · ${new Date(holding.priceUpdatedAt).toLocaleString()}` : ''}
-                    </div>
-                  </td>
-                  <td>{formatCurrency(holding.gainLoss, activeCurrency)} <span className="section-note">({(holding.gainLossPct * 100).toFixed(1)}%)</span></td>
-                  <td><button className="icon-button danger-button" type="button" aria-label={`Remove ${holding.ticker}`} onClick={() => handleRemove(holding)}><Trash2 size={15} /></button></td>
+              <thead>
+                <tr>
+                  <th scope="col">Holding</th>
+                  <th scope="col">Source</th>
+                  <th scope="col">Asset class</th>
+                  <th scope="col">Market value</th>
+                  <th scope="col">P/L</th>
+                  <th scope="col">
+                    <span className="visually-hidden">Actions</span>
+                  </th>
                 </tr>
-              ))}</tbody>
+              </thead>
+              <tbody>
+                {summary.rows.map((holding) => (
+                  <tr key={holding.id}>
+                    <td>
+                      <strong>{holding.ticker}</strong>
+                      <div className="section-note">{holding.name}</div>
+                      <label className="section-note">
+                        Yahoo symbol
+                        <input
+                          className="input"
+                          style={{ width: 110, minHeight: 32, marginLeft: 6, padding: '4px 7px' }}
+                          value={
+                            quoteSymbolDrafts[holding.id] ?? holding.quoteSymbol ?? holding.ticker
+                          }
+                          onChange={(event) =>
+                            setQuoteSymbolDrafts((current) => ({
+                              ...current,
+                              [holding.id]: event.target.value,
+                            }))
+                          }
+                          onBlur={() => handleQuoteSymbolBlur(holding)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') event.currentTarget.blur();
+                          }}
+                          autoComplete="off"
+                        />
+                      </label>
+                    </td>
+                    <td>
+                      {holding.broker || 'Manual'}
+                      {holding.account ? (
+                        <div className="section-note">{holding.account}</div>
+                      ) : null}
+                    </td>
+                    <td>{holding.assetClass}</td>
+                    <td>
+                      {formatCurrency(holding.marketValue, activeCurrency)}
+                      <div className="section-note">
+                        {holding.quantity} ×{' '}
+                        {formatCurrency(holding.currentPrice, holding.currency)}
+                      </div>
+                      <div className="section-note">
+                        {holding.priceSource === 'yahoo'
+                          ? `Yahoo · ${holding.quoteSymbol || holding.ticker}`
+                          : 'Manual price'}
+                        {holding.priceUpdatedAt
+                          ? ` · ${new Date(holding.priceUpdatedAt).toLocaleString()}`
+                          : ''}
+                      </div>
+                    </td>
+                    <td>
+                      {formatCurrency(holding.gainLoss, activeCurrency)}{' '}
+                      <span className="section-note">
+                        ({(holding.gainLossPct * 100).toFixed(1)}%)
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="icon-button danger-button"
+                        type="button"
+                        aria-label={`Remove ${holding.ticker}`}
+                        onClick={() => handleRemove(holding)}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         )}

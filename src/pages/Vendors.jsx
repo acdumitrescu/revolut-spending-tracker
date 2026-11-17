@@ -24,7 +24,7 @@ export default function Vendors() {
   const txns = data.transactions;
   const customVendors = data.customVendors || {};
   const displayCurrency = data.displayCurrency;
-  
+
   const [timeFilter, setTimeFilter] = useState('ALL TIME');
   const [yearFilter, setYearFilter] = useState('ALL');
   const [mappingRequest, setMappingRequest] = useState(null);
@@ -37,21 +37,26 @@ export default function Vendors() {
 
   const filteredTxns = useMemo(() => {
     return filterTransactionsByPeriod(txns, timeFilter, yearFilter).filter(
-      (txn) => txn.flow === 'Debit' && EXPENSE_CATS.has(txn.cat)
+      (txn) => txn.flow === 'Debit' && EXPENSE_CATS.has(txn.cat),
     );
   }, [txns, timeFilter, yearFilter]);
 
   const vendors = {};
-  filteredTxns.forEach(t => {
+  filteredTxns.forEach((t) => {
     if (!vendors[t.desc]) vendors[t.desc] = { total: 0, count: 0, cat: t.cat };
-    vendors[t.desc].total += Math.abs(convertAmountToDisplay(t.amt, t.currency || 'RON', displayCurrency, data.fxRates));
+    vendors[t.desc].total += Math.abs(
+      convertAmountToDisplay(t.amt, t.currency || 'RON', displayCurrency, data.fxRates),
+    );
     vendors[t.desc].count += 1;
   });
 
-  const sorted = Object.entries(vendors).map(([v, d]) => ({ v, ...d })).sort((a, b) => b.total - a.total).slice(0, 100);
+  const sorted = Object.entries(vendors)
+    .map(([v, d]) => ({ v, ...d }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 100);
   const otherVendorGroups = useMemo(
     () => getOtherVendorGroups(txns, displayCurrency, data.fxRates),
-    [data.fxRates, displayCurrency, txns]
+    [data.fxRates, displayCurrency, txns],
   );
 
   useEffect(() => {
@@ -119,7 +124,11 @@ export default function Vendors() {
 
   const handleApplyObservation = async (observation, candidate) => {
     if (!candidate) return;
-    updateCustomVendor(observation.normalizedDescription, candidate.category, candidate.subcategory);
+    updateCustomVendor(
+      observation.normalizedDescription,
+      candidate.category,
+      candidate.subcategory,
+    );
     try {
       const result = await resolveVendorObservation({
         normalizedDescription: observation.normalizedDescription,
@@ -157,10 +166,19 @@ export default function Vendors() {
     return (
       <div className="page-stack">
         <div>
-          <h2 className="page-title" style={{ marginBottom: '10px' }}>Vendors</h2>
-          <div className="page-subtitle">Understand where spending concentrates and override vendor categorization when you want tighter control.</div>
+          <h2 className="page-title" style={{ marginBottom: '10px' }}>
+            Vendors
+          </h2>
+          <div className="page-subtitle">
+            Understand where spending concentrates and override vendor categorization when you want
+            tighter control.
+          </div>
         </div>
-        <EmptyState icon={Store} title="No vendor activity yet" description="Import transactions to reveal merchant concentration and category mappings." />
+        <EmptyState
+          icon={Store}
+          title="No vendor activity yet"
+          description="Import transactions to reveal merchant concentration and category mappings."
+        />
       </div>
     );
   }
@@ -170,12 +188,15 @@ export default function Vendors() {
       <div className="page-header">
         <div>
           <h2 className="page-title">Vendors</h2>
-          <div className="page-subtitle">Track your heaviest merchants, review custom overrides, and narrow the dataset with the same time filters used on Overview.</div>
+          <div className="page-subtitle">
+            Track your heaviest merchants, review custom overrides, and narrow the dataset with the
+            same time filters used on Overview.
+          </div>
         </div>
         <div className="page-actions">
-          <select 
+          <select
             className="input select-inline"
-            value={timeFilter} 
+            value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value)}
           >
             <option value="ALL TIME">All Time</option>
@@ -184,13 +205,17 @@ export default function Vendors() {
             <option value="Last Month">Last 30 Days</option>
             <option value="Last Year">Last 365 Days</option>
           </select>
-          <select 
+          <select
             className="input select-inline"
-            value={yearFilter} 
+            value={yearFilter}
             onChange={(e) => setYearFilter(e.target.value)}
           >
             <option value="ALL">All Years</option>
-            {uniqueYears.map(y => <option key={y} value={y}>{y}</option>)}
+            {uniqueYears.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
           </select>
           {(timeFilter !== 'ALL TIME' || yearFilter !== 'ALL') && (
             <div className="tag-pill">Filtered vendors</div>
@@ -212,11 +237,22 @@ export default function Vendors() {
 
       {otherVendorGroups.length > 0 && (
         <div className="card" style={{ marginBottom: '0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '12px',
+              flexWrap: 'wrap',
+            }}
+          >
             <div>
-              <div className="card-title" style={{ marginBottom: '4px' }}>Other Vendor Review</div>
+              <div className="card-title" style={{ marginBottom: '4px' }}>
+                Other Vendor Review
+              </div>
               <div className="section-note" style={{ marginBottom: 0 }}>
-                Review uncategorized vendors using only the bundled local knowledge base. Merchant descriptions are not sent to an external service.
+                Review uncategorized vendors using only the bundled local knowledge base. Merchant
+                descriptions are not sent to an external service.
               </div>
             </div>
             <div className="tag-pill">{otherVendorGroups.length} vendors</div>
@@ -241,10 +277,13 @@ export default function Vendors() {
                 <div style={{ minWidth: '220px', flex: 1 }}>
                   <strong style={{ display: 'block' }}>{group.samples[0]}</strong>
                   <span className="section-note" style={{ marginBottom: 0 }}>
-                    {group.count} {group.count === 1 ? 'transaction' : 'transactions'} · {formatCurrency(group.total, displayCurrency)}
+                    {group.count} {group.count === 1 ? 'transaction' : 'transactions'} ·{' '}
+                    {formatCurrency(group.total, displayCurrency)}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}
+                >
                   {group.suggestions.map((candidate) => (
                     <button
                       key={`${group.vendorKey}-${candidate.canonicalName}-${candidate.alias}`}
@@ -253,7 +292,8 @@ export default function Vendors() {
                       onClick={() => handleSuggestedOtherMapping(group, candidate)}
                       title={`Local similarity score ${candidate.score}; lower is closer`}
                     >
-                      <Sparkles size={13} /> {candidate.category}{candidate.subcategory ? ` / ${candidate.subcategory}` : ''}
+                      <Sparkles size={13} /> {candidate.category}
+                      {candidate.subcategory ? ` / ${candidate.subcategory}` : ''}
                     </button>
                   ))}
                   <button
@@ -278,25 +318,49 @@ export default function Vendors() {
       />
 
       <div className="card" style={{ marginBottom: '0' }}>
-        <div className="card-title">Top 100 Vendors {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}</div>
+        <div className="card-title">
+          Top 100 Vendors {timeFilter !== 'ALL TIME' || yearFilter !== 'ALL' ? '(Filtered)' : ''}
+        </div>
         <div className="section-note" style={{ marginBottom: '14px' }}>
-          Total spend reflects expense-only transactions in the selected period, converted to your current display currency.
+          Total spend reflects expense-only transactions in the selected period, converted to your
+          current display currency.
         </div>
         <div className="tbl-wrap">
           {sorted.length === 0 ? (
-            <div className="section-note" style={{ padding: '20px', textAlign: 'center' }}>No vendors match the selected filters.</div>
+            <div className="section-note" style={{ padding: '20px', textAlign: 'center' }}>
+              No vendors match the selected filters.
+            </div>
           ) : (
             <table>
               <thead>
-                <tr><th>#</th><th>Vendor</th><th>Category</th><th style={{textAlign:'right'}}>Total Spend</th><th style={{textAlign:'right'}}>Transactions</th><th></th></tr>
+                <tr>
+                  <th>#</th>
+                  <th>Vendor</th>
+                  <th>Category</th>
+                  <th style={{ textAlign: 'right' }}>Total Spend</th>
+                  <th style={{ textAlign: 'right' }}>Transactions</th>
+                  <th></th>
+                </tr>
               </thead>
               <tbody>
                 {sorted.map((v, i) => (
                   <tr key={v.v}>
                     <td style={{ color: 'var(--muted)' }}>{i + 1}</td>
                     <td style={{ fontWeight: 500 }}>{v.v}</td>
-                    <td><span style={{ color: getColorForCategory(v.cat), fontSize: '11px', fontWeight: 600 }}>{v.cat}</span></td>
-                    <td style={{ textAlign: 'right' }}>{formatCurrency(v.total, displayCurrency)}</td>
+                    <td>
+                      <span
+                        style={{
+                          color: getColorForCategory(v.cat),
+                          fontSize: '11px',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {v.cat}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      {formatCurrency(v.total, displayCurrency)}
+                    </td>
                     <td style={{ textAlign: 'right', color: 'var(--muted)' }}>{v.count}</td>
                     <td>
                       <button

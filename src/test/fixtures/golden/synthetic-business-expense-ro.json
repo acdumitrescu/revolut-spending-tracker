@@ -1,0 +1,51 @@
+{
+  "transactions": [
+    {
+      "date": "2026-03-01",
+      "desc": "Synthetic Starbucks",
+      "cat": "Food & Dining",
+      "sub": "Coffee",
+      "baseCat": "Food & Dining",
+      "baseSub": "Coffee",
+      "amt": -24.5,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2026-03",
+      "currency": "RON",
+      "amountSource": "amount_payment",
+      "currencySource": "currency_payment",
+      "ref": "expense-ro-1",
+      "source": "revolut-business-expense",
+      "matchedVendor": "Starbucks",
+      "matchedAlias": "starbucks",
+      "matchedVendorId": "global-starbucks",
+      "matchedRegion": "Global",
+      "matchSource": "built-in-contains",
+      "matchStrategy": "boundary",
+      "confidence": "medium"
+    }
+  ],
+  "rejectedRows": [],
+  "summary": {
+    "detectedProfileId": "revolut-business-expense",
+    "detectedProfileLabel": "Revolut Business Expense CSV",
+    "totalRows": 1,
+    "processedRows": 1,
+    "skippedRows": 0,
+    "duplicateRows": 0,
+    "existingDuplicateRows": 0,
+    "fileDuplicateRows": 0,
+    "warnings": [
+      "Both payment and original amount columns detected. Payment amount is used for analytics.",
+      "Both payment and original currency columns detected. Payment currency is preferred when available."
+    ],
+    "skippedReasonCounts": {},
+    "skippedDetails": [],
+    "validationCategories": {
+      "multiple-amount-sources": 1,
+      "multiple-currency-sources": 1
+    },
+    "unknownVendorCount": 0
+  },
+  "vendorObservations": []
+}

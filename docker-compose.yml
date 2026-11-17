@@ -4,13 +4,13 @@ services:
       context: .
       args:
         VITE_DEPLOYMENT_PROFILE: private-sync
-        VITE_PRIVATE_SYNC_ENABLED: "true"
+        VITE_PRIVATE_SYNC_ENABLED: 'true'
         VITE_API_BASE_PATH: /api
         VITE_FX_REFRESH_ENABLED: ${VITE_FX_REFRESH_ENABLED:-true}
         VITE_FX_REFRESH_RETRIES: ${VITE_FX_REFRESH_RETRIES:-2}
         VITE_FX_REFRESH_RETRY_DELAY_MS: ${VITE_FX_REFRESH_RETRY_DELAY_MS:-450}
     ports:
-      - "127.0.0.1:3176:80"
+      - '127.0.0.1:3176:80'
     restart: unless-stopped
     mem_limit: 64m
     pids_limit: 128
@@ -25,7 +25,7 @@ services:
       api:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1/ || exit 1']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -46,7 +46,7 @@ services:
     volumes:
       - app-state:/data
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3177/healthz || exit 1"]
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:3177/healthz || exit 1']
       interval: 30s
       timeout: 5s
       retries: 3

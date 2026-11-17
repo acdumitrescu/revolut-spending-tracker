@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchPortfolioQuotes, isYahooQuoteSymbol, searchYahooInstruments } from '../lib/quoteService';
+import {
+  fetchPortfolioQuotes,
+  isYahooQuoteSymbol,
+  searchYahooInstruments,
+} from '../lib/quoteService';
 import { clearSyncAccessToken, setSyncAccessToken } from '../lib/serverSync';
 
 afterEach(() => {
@@ -40,11 +44,14 @@ describe('portfolio quote service', () => {
   });
 
   it('surfaces server errors with their status', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: false,
-      status: 502,
-      json: async () => ({ error: 'Unable to retrieve market quotes' }),
-    }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 502,
+        json: async () => ({ error: 'Unable to retrieve market quotes' }),
+      }),
+    );
 
     await expect(fetchPortfolioQuotes(['AAPL'])).rejects.toMatchObject({
       status: 502,
@@ -65,7 +72,7 @@ describe('portfolio quote service', () => {
     ]);
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/instruments/search?q=Banca+Transilvania',
-      expect.objectContaining({ headers: { Authorization: 'Bearer synthetic-session-token' } })
+      expect.objectContaining({ headers: { Authorization: 'Bearer synthetic-session-token' } }),
     );
   });
 });

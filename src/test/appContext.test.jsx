@@ -7,10 +7,28 @@ function BackupHarness() {
 
   const payload = {
     transactions: [
-      { date: '2024-05-01', ym: '2024-05', desc: 'Salary', cat: 'Income', sub: 'Income', amt: 5000, flow: 'Credit', type: 'Bank Transfer', currency: 'RON' },
+      {
+        date: '2024-05-01',
+        ym: '2024-05',
+        desc: 'Salary',
+        cat: 'Income',
+        sub: 'Income',
+        amt: 5000,
+        flow: 'Credit',
+        type: 'Bank Transfer',
+        currency: 'RON',
+      },
     ],
     customVendors: { uber: ['Transport', 'Taxi'] },
-    accounts: [{ id: 'acc-1', name: 'Savings', currency: 'EUR', balances: { '2024-05': 1000 }, notes: { '2024-05': 'Opening balance' } }],
+    accounts: [
+      {
+        id: 'acc-1',
+        name: 'Savings',
+        currency: 'EUR',
+        balances: { '2024-05': 1000 },
+        notes: { '2024-05': 'Opening balance' },
+      },
+    ],
     budgets: { '2024-05': { Groceries: 800 } },
     goals: [{ id: 'goal-1', name: 'Fund', targetAmount: 15000, targetMonth: '2025-12' }],
     baseCurrency: 'RON',
@@ -23,7 +41,9 @@ function BackupHarness() {
 
   return (
     <div>
-      <button type="button" onClick={() => importBackup(payload)}>Import backup</button>
+      <button type="button" onClick={() => importBackup(payload)}>
+        Import backup
+      </button>
       <div data-testid="display-currency">{data.displayCurrency}</div>
       <div data-testid="eur-rate">{data.fxRates.EUR}</div>
       <div data-testid="account-currency">{data.accounts[0]?.currency || ''}</div>
@@ -51,7 +71,9 @@ function ThemeHarness() {
 
   return (
     <div>
-      <button type="button" onClick={() => setThemeMode('dark')}>Dark</button>
+      <button type="button" onClick={() => setThemeMode('dark')}>
+        Dark
+      </button>
       <div data-testid="theme-mode">{data.themeMode}</div>
     </div>
   );
@@ -62,7 +84,7 @@ describe('AppContext trust behavior', () => {
     render(
       <AppProvider>
         <BackupHarness />
-      </AppProvider>
+      </AppProvider>,
     );
 
     act(() => {
@@ -98,7 +120,7 @@ describe('AppContext trust behavior', () => {
     render(
       <AppProvider>
         <RatesHarness />
-      </AppProvider>
+      </AppProvider>,
     );
 
     await waitFor(() => {
@@ -124,7 +146,7 @@ describe('AppContext trust behavior', () => {
     render(
       <AppProvider>
         <BackupHarness />
-      </AppProvider>
+      </AppProvider>,
     );
 
     act(() => {
@@ -142,7 +164,7 @@ describe('AppContext trust behavior', () => {
     render(
       <AppProvider>
         <ThemeHarness />
-      </AppProvider>
+      </AppProvider>,
     );
 
     act(() => {

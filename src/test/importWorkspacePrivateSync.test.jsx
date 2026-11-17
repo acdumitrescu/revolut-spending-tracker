@@ -20,13 +20,17 @@ describe('ImportWorkspace private-sync privacy copy', () => {
     render(
       <AppProvider>
         <ToastProvider>
-          <MemoryRouter><ImportWorkspace /></MemoryRouter>
+          <MemoryRouter>
+            <ImportWorkspace />
+          </MemoryRouter>
         </ToastProvider>
-      </AppProvider>
+      </AppProvider>,
     );
 
     expect(screen.getByText(/how private sync handles data/i)).toBeInTheDocument();
     expect(screen.getAllByText(/copied to your.*private server/i).length).toBeGreaterThan(0);
-    expect(screen.queryByText(/nothing from a csv import is stored on our server/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/nothing from a csv import is stored on our server/i),
+    ).not.toBeInTheDocument();
   });
 });

@@ -1,0 +1,7 @@
+Date,Description,Amount,Category,Subcategory,Flow,Type,Currency,Reference
+2026-06-01,"Synthetic Cafe, Downtown",-12.50,Food,Dining,Debit,card payment,RON,quoted-1
+2026-06-02,"Synthetic ""Quoted"" Shop",-8.00,Shopping,General,Debit,card payment,RON,quoted-2
+2026-06-03,"Synthetic Multi
+Line Merchant",-15.25,Shopping,General,Debit,card payment,RON,quoted-3
+2026-06-04,"Synthetic, ""All"" Three
+Combined",-1.00,Shopping,General,Debit,card payment,RON,quoted-4

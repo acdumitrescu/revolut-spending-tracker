@@ -1,5 +1,7 @@
 function normalize(value) {
-  return String(value || '').trim().toLocaleLowerCase();
+  return String(value || '')
+    .trim()
+    .toLocaleLowerCase();
 }
 
 export function buildSearchResults(transactions, query) {
@@ -7,8 +9,11 @@ export function buildSearchResults(transactions, query) {
   if (needle.length < 2) return [];
 
   const transactionMatches = transactions
-    .filter((transaction) => [transaction.desc, transaction.cat, transaction.sub, transaction.matchedVendor]
-      .some((value) => normalize(value).includes(needle)))
+    .filter((transaction) =>
+      [transaction.desc, transaction.cat, transaction.sub, transaction.matchedVendor].some(
+        (value) => normalize(value).includes(needle),
+      ),
+    )
     .slice(0, 5)
     .map((transaction) => ({
       id: `transaction-${transaction.id}`,

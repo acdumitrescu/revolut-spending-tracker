@@ -1,0 +1,3 @@
+Date,Description,Amount,Category,Subcategory,Flow,Type,Currency,Reference
+2026-09-01,Synthetic Complete Row,-30.00,Food,Groceries,Debit,card payment,RON,trunc-1
+2026-09-02,Synthetic Cut Off Row,

@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "exportedAt": null,
+  "data": {
+    "carListings": [
+      {
+        "id": "car-fake-1",
+        "name": "Synthetic Hatchback",
+        "url": "",
+        "priceEur": 12000,
+        "year": 2021,
+        "mileageKm": 45000,
+        "status": "considering",
+        "notes": ""
+      }
+    ],
+    "subscriptions": [
+      {
+        "id": "sub-fake-1",
+        "name": "Synthetic Music",
+        "amount": 11.99,
+        "currency": "USD",
+        "cycle": "monthly",
+        "nextRenewal": "2026-04-01",
+        "status": "active",
+        "notes": "",
+        "icon": ""
+      }
+    ],
+    "moneyFlow": {
+      "incomes": [],
+      "transfers": []
+    },
+    "transactions": [
+      {
+        "date": "2026-02-03",
+        "desc": "Synthetic Grocer One",
+        "cat": "Groceries",
+        "sub": "Supermarket",
+        "importBatchId": "batch-fake-1",
+        "amt": -58.4,
+        "flow": "Debit",
+        "type": "Card Payment",
+        "ym": "2026-02",
+        "currency": "RON",
+        "matchedVendor": "Synthetic Grocer One",
+        "matchSource": "custom",
+        "matchStrategy": "custom",
+        "confidence": "high",
+        "baseSub": "",
+        "manualSub": ""
+      },
+      {
+        "date": "2026-02-10",
+        "desc": "Synthetic Employer Ltd",
+        "cat": "Income",
+        "sub": "",
+        "importBatchId": "batch-fake-1",
+        "amt": 5120.75,
+        "flow": "Credit",
+        "type": "Transfer",
+        "ym": "2026-02",
+        "currency": "RON",
+        "baseSub": "",
+        "manualSub": ""
+      },
+      {
+        "date": "2026-02-14",
+        "desc": "Synthetic Bistro",
+        "cat": "Restaurants",
+        "sub": "",
+        "baseCat": "Other",
+        "baseSub": "",
+        "manualCat": "Restaurants",
+        "manualSub": "",
+        "manualCategoryUpdatedAt": 1770000000000,
+        "importBatchId": "batch-fake-1",
+        "amt": -23.6,
+        "flow": "Debit",
+        "type": "Card Payment",
+        "ym": "2026-02",
+        "currency": "EUR",
+        "baseCurrency": "RON",
+        "amountSource": "Amount",
+        "currencySource": "Currency"
+      },
+      {
+        "date": "2026-03-01",
+        "desc": "Synthetic Streaming Co",
+        "cat": "Entertainment",
+        "sub": "Subscriptions",
+        "amt": -11.99,
+        "flow": "Debit",
+        "type": "Card Payment",
+        "ym": "2026-03",
+        "currency": "USD",
+        "baseSub": "",
+        "manualSub": ""
+      }
+    ],
+    "customVendors": {
+      "Synthetic Grocer One": ["Groceries", "Supermarket"]
+    },
+    "accounts": [
+      {
+        "group": "bank",
+        "id": "acc-fake-bank",
+        "name": "Fake Bank Account",
+        "currency": "RON",
+        "balances": {
+          "2026-02": 2400.5,
+          "2026-03": 2550
+        },
+        "notes": {
+          "2026-02": "Synthetic note"
+        },
+        "reconciledOn": "2026-03-01"
+      },
+      {
+        "group": "credit",
+        "id": "acc-fake-card",
+        "name": "Fake Credit Card",
+        "currency": "RON",
+        "balances": {
+          "2026-03": -320.25
+        },
+        "notes": {}
+      },
+      {
+        "group": "other",
+        "id": "acc-fake-eur",
+        "name": "Fake Euro Pocket",
+        "currency": "EUR",
+        "balances": {
+          "2026-03": 410
+        },
+        "notes": {}
+      }
+    ],
+    "creditRecords": [
+      {
+        "id": "credit-fake-vendor",
+        "monthlyPayment": null,
+        "dueDate": "",
+        "notes": "",
+        "kind": "vendor",
+        "name": "Synthetic Appliance Store",
+        "currency": "RON",
+        "remainingBalance": 900
+      }
+    ],
+    "portfolioHoldings": [
+      {
+        "id": "hold-fake-1",
+        "ticker": "FAKE",
+        "name": "Synthetic Index Fund",
+        "assetClass": "ETF",
+        "quantity": 3,
+        "avgCost": 100.5,
+        "currency": "EUR",
+        "currentPrice": 110.25,
+        "priceSource": "manual"
+      }
+    ],
+    "budgets": {
+      "2026-03": {
+        "Groceries": 800,
+        "Restaurants": 200
+      }
+    },
+    "goals": [
+      {
+        "id": "goal-fake-1",
+        "name": "Synthetic Emergency Fund",
+        "targetAmount": 10000,
+        "targetMonth": "2027-01",
+        "currency": "RON",
+        "linkedAccountIds": ["acc-fake-bank"],
+        "contributions": [
+          {
+            "id": "contrib-fake-1",
+            "date": "2026-02-15",
+            "amount": 500
+          }
+        ],
+        "createdAt": "2026-01-10"
+      }
+    ],
+    "baseCurrency": "RON",
+    "displayCurrency": "RON",
+    "themeMode": "light",
+    "fxRates": {
+      "EUR": 4.98,
+      "USD": 4.51
+    },
+    "fxUpdatedAt": 1772000000000,
+    "fxSource": "manual",
+    "importMeta": {
+      "latestSummary": null,
+      "history": [
+        {
+          "detectedProfileId": "normalized-csv",
+          "detectedProfileLabel": "Normalized CSV",
+          "totalRows": 3,
+          "processedRows": 3,
+          "skippedRows": 0,
+          "duplicateRows": 0,
+          "existingDuplicateRows": 0,
+          "fileDuplicateRows": 0,
+          "warnings": [],
+          "skippedReasonCounts": {},
+          "skippedDetails": [],
+          "validationCategories": {},
+          "unknownVendorCount": 0,
+          "fileName": "synthetic-statement.csv",
+          "importedAt": 1771000000000,
+          "batchId": "batch-fake-1",
+          "status": "active",
+          "undoneAt": null
+        }
+      ]
+    },
+    "syncInfo": {
+      "lastSuccessfulSyncAt": null,
+      "lastRemoteVersion": 0,
+      "lastRemoteUpdatedAt": null
+    },
+    "lastUpdated": 1772500000000
+  }
+}

@@ -121,3 +121,27 @@ ssb_find_private_path_in_outgoing_history() {
 
   return 1
 }
+
+# Policy: no AI/assistant attribution in commit messages.
+# Reads a commit message on stdin; returns 0 when it contains such a line.
+SSB_AI_NAMES='claude|anthropic|copilot|chatgpt|openai|codex|gemini'
+
+ssb_message_has_ai_attribution() {
+  grep -Eiq "^[[:space:]]*co-authored-by:.*($SSB_AI_NAMES)|generated with (\[)?claude code"
+}
+
+# Prints "<short sha> <subject>" for the first outgoing commit carrying AI attribution.
+ssb_find_ai_attribution_in_outgoing_history() {
+  local_commit="$1"
+  remote_oid="$2"
+  remote_name="${3:-}"
+
+  for commit_oid in $(ssb_outgoing_commits "$local_commit" "$remote_oid" "$remote_name"); do
+    if git log -1 --format=%B "$commit_oid" | ssb_message_has_ai_attribution; then
+      git log -1 --format='%h %s' "$commit_oid"
+      return 0
+    fi
+  done
+
+  return 1
+}

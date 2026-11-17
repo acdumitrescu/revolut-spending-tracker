@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.claude/worktrees/
 *.local
 .env
 .env.local
@@ -64,3 +65,10 @@ REPORT-20*.md
 # Local-user encrypted recovery bundles
 *.ssbuser
 
+# Test coverage reports
+coverage/
+
+# End-to-end test output (synthetic data only)
+dist-e2e/
+test-results/
+playwright-report/

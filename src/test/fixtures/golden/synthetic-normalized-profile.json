@@ -1,0 +1,103 @@
+{
+  "transactions": [
+    {
+      "date": "2026-05-02",
+      "desc": "Synthetic Employer",
+      "cat": "Income",
+      "sub": "Salary",
+      "baseCat": "Income",
+      "baseSub": "Salary",
+      "amt": 4200,
+      "flow": "Credit",
+      "type": "Bank Transfer",
+      "ym": "2026-05",
+      "currency": "RON",
+      "ref": "normalized-1",
+      "source": "master",
+      "matchSource": "none",
+      "matchStrategy": "none",
+      "confidence": "none"
+    },
+    {
+      "date": "2026-05-03",
+      "desc": "Synthetic Grocer",
+      "cat": "Food",
+      "sub": "Groceries",
+      "baseCat": "Food",
+      "baseSub": "Groceries",
+      "amt": -87.45,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2026-05",
+      "currency": "RON",
+      "ref": "normalized-2",
+      "source": "master",
+      "matchSource": "none",
+      "matchStrategy": "none",
+      "confidence": "none"
+    },
+    {
+      "date": "2026-05-04",
+      "desc": "Synthetic Cafe",
+      "cat": "Food",
+      "sub": "Coffee",
+      "baseCat": "Food",
+      "baseSub": "Coffee",
+      "amt": -3.2,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2026-05",
+      "currency": "EUR",
+      "ref": "normalized-3",
+      "source": "master",
+      "matchSource": "none",
+      "matchStrategy": "none",
+      "confidence": "none"
+    }
+  ],
+  "rejectedRows": [],
+  "summary": {
+    "detectedProfileId": "normalized-csv",
+    "detectedProfileLabel": "Normalized CSV",
+    "totalRows": 3,
+    "processedRows": 3,
+    "skippedRows": 0,
+    "duplicateRows": 0,
+    "existingDuplicateRows": 0,
+    "fileDuplicateRows": 0,
+    "warnings": [],
+    "skippedReasonCounts": {},
+    "skippedDetails": [],
+    "validationCategories": {},
+    "unknownVendorCount": 3
+  },
+  "vendorObservations": [
+    {
+      "normalizedDescription": "synthetic employer",
+      "rawDescription": "Synthetic Employer",
+      "amountAbs": 4200,
+      "count": 1,
+      "firstSeenAt": "2026-05-02",
+      "lastSeenAt": "2026-05-02",
+      "suggestedCandidates": []
+    },
+    {
+      "normalizedDescription": "synthetic grocer",
+      "rawDescription": "Synthetic Grocer",
+      "amountAbs": 87.45,
+      "count": 1,
+      "firstSeenAt": "2026-05-03",
+      "lastSeenAt": "2026-05-03",
+      "suggestedCandidates": []
+    },
+    {
+      "normalizedDescription": "synthetic cafe",
+      "rawDescription": "Synthetic Cafe",
+      "amountAbs": 3.2,
+      "count": 1,
+      "firstSeenAt": "2026-05-04",
+      "lastSeenAt": "2026-05-04",
+      "suggestedCandidates": []
+    }
+  ]
+}

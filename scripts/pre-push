@@ -34,6 +34,13 @@ while read -r local_ref local_oid remote_ref remote_oid; do
     echo "Refusing to push $local_ref because outgoing history contains a private-only path: $private_match" >&2
     exit 1
   fi
+
+  if [ "${SSB_ALLOW_AI_ATTRIBUTION:-0}" != '1' ] \
+    && ai_match="$(ssb_find_ai_attribution_in_outgoing_history "$local_commit" "$remote_oid" "$remote_name")"; then
+    echo "Refusing to push $local_ref because outgoing history contains AI attribution: $ai_match" >&2
+    echo 'Remove the Co-Authored-By / "Generated with" line from that commit message (see AGENTS.md, "Commit attribution").' >&2
+    exit 1
+  fi
 done
 
 if [ -x "scripts/privacy-scan.sh" ]; then

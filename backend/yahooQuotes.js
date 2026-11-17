@@ -16,11 +16,17 @@ function requestError(message, status = 400) {
 }
 
 export function normalizeYahooSymbols(values) {
-  const symbols = [...new Set(
-    values
-      .map((value) => String(value || '').trim().toUpperCase())
-      .filter(Boolean)
-  )];
+  const symbols = [
+    ...new Set(
+      values
+        .map((value) =>
+          String(value || '')
+            .trim()
+            .toUpperCase(),
+        )
+        .filter(Boolean),
+    ),
+  ];
 
   if (symbols.length === 0) {
     throw requestError('At least one quote symbol is required');
@@ -50,17 +56,21 @@ function normalizeQuote(symbol, payload, fallbackUpdatedAt) {
   const delayedBySeconds = Number(meta.exchangeDataDelayedBy);
 
   return {
-    symbol: String(meta.symbol || symbol).trim().toUpperCase(),
+    symbol: String(meta.symbol || symbol)
+      .trim()
+      .toUpperCase(),
     price,
-    currency: String(meta.currency || '').trim().toUpperCase(),
+    currency: String(meta.currency || '')
+      .trim()
+      .toUpperCase(),
     marketState: String(meta.marketState || '').trim() || null,
     exchange: String(meta.fullExchangeName || meta.exchangeName || '').trim() || null,
-    updatedAt: Number.isFinite(marketTimestamp) && marketTimestamp > 0
-      ? marketTimestamp * 1000
-      : fallbackUpdatedAt,
-    delayedBySeconds: Number.isFinite(delayedBySeconds) && delayedBySeconds >= 0
-      ? delayedBySeconds
-      : null,
+    updatedAt:
+      Number.isFinite(marketTimestamp) && marketTimestamp > 0
+        ? marketTimestamp * 1000
+        : fallbackUpdatedAt,
+    delayedBySeconds:
+      Number.isFinite(delayedBySeconds) && delayedBySeconds >= 0 ? delayedBySeconds : null,
     source: 'yahoo-unofficial',
   };
 }
@@ -94,15 +104,22 @@ function normalizeSearchQuery(value) {
 }
 
 function normalizeSearchResult(result) {
-  const symbol = String(result?.symbol || '').trim().toUpperCase();
+  const symbol = String(result?.symbol || '')
+    .trim()
+    .toUpperCase();
   if (!SYMBOL_PATTERN.test(symbol)) return null;
-  const quoteType = String(result?.quoteType || '').trim().toUpperCase();
+  const quoteType = String(result?.quoteType || '')
+    .trim()
+    .toUpperCase();
   return {
     ticker: symbol,
     quoteSymbol: symbol,
     name: String(result?.shortname || result?.longname || symbol).trim(),
     exchange: String(result?.exchange || result?.fullExchangeName || '').trim() || 'Yahoo',
-    currency: String(result?.currency || '').trim().toUpperCase() || null,
+    currency:
+      String(result?.currency || '')
+        .trim()
+        .toUpperCase() || null,
     assetClass: quoteType === 'ETF' || quoteType === 'MUTUALFUND' ? 'ETF' : 'Stock',
     market: 'Yahoo search',
   };
@@ -158,31 +175,34 @@ export async function fetchYahooQuotes(values, options = {}) {
     throw requestError('Quote lookup is unavailable', 503);
   }
 
-  const results = await Promise.all(symbols.map(async (symbol) => {
-    const cached = cache.get(symbol);
-    if (cached && now - cached.cachedAt < cacheTtlMs) {
-      return { quote: cached.quote };
-    }
+  const results = await Promise.all(
+    symbols.map(async (symbol) => {
+      const cached = cache.get(symbol);
+      if (cached && now - cached.cachedAt < cacheTtlMs) {
+        return { quote: cached.quote };
+      }
 
-    try {
-      const quote = await fetchOneQuote(symbol, { fetchImpl, timeoutMs, now });
-      cache.set(symbol, { quote, cachedAt: now });
-      return { quote };
-    } catch (error) {
-      return {
-        error: {
-          symbol,
-          message: error?.name === 'AbortError'
-            ? 'Yahoo quote request timed out'
-            : String(error?.message || 'Yahoo quote request failed'),
-        },
-      };
-    }
-  }));
+      try {
+        const quote = await fetchOneQuote(symbol, { fetchImpl, timeoutMs, now });
+        cache.set(symbol, { quote, cachedAt: now });
+        return { quote };
+      } catch (error) {
+        return {
+          error: {
+            symbol,
+            message:
+              error?.name === 'AbortError'
+                ? 'Yahoo quote request timed out'
+                : String(error?.message || 'Yahoo quote request failed'),
+          },
+        };
+      }
+    }),
+  );
 
   return {
-    quotes: results.flatMap((result) => result.quote ? [result.quote] : []),
-    errors: results.flatMap((result) => result.error ? [result.error] : []),
+    quotes: results.flatMap((result) => (result.quote ? [result.quote] : [])),
+    errors: results.flatMap((result) => (result.error ? [result.error] : [])),
     source: 'yahoo-unofficial',
     fetchedAt: new Date(now).toISOString(),
   };

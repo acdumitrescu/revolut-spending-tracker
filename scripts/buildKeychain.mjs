@@ -9,9 +9,21 @@ await fs.mkdir(directory, { recursive: true, mode: 0o700 });
 const output = path.join(directory, 'ssb-keychain');
 const next = path.join(directory, 'ssb-keychain.next');
 await new Promise((resolve, reject) => {
-  const child = spawn('/usr/bin/swiftc', [path.join(root, 'scripts', 'keychain-helper.swift'), '-module-cache-path', path.join(directory, 'module-cache'), '-o', next], { stdio: 'inherit' });
+  const child = spawn(
+    '/usr/bin/swiftc',
+    [
+      path.join(root, 'scripts', 'keychain-helper.swift'),
+      '-module-cache-path',
+      path.join(directory, 'module-cache'),
+      '-o',
+      next,
+    ],
+    { stdio: 'inherit' },
+  );
   child.on('error', reject);
-  child.on('exit', (code) => code === 0 ? resolve() : reject(new Error('Keychain helper compilation failed')));
+  child.on('exit', (code) =>
+    code === 0 ? resolve() : reject(new Error('Keychain helper compilation failed')),
+  );
 });
 await fs.chmod(next, 0o700);
 await fs.rename(next, output);

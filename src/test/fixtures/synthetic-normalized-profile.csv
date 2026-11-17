@@ -1,0 +1,4 @@
+Date,Description,Amount,Category,Subcategory,Flow,Type,Currency,Reference
+2026-05-02,Synthetic Employer,4200.00,Income,Salary,Credit,bank transfer,RON,normalized-1
+2026-05-03,Synthetic Grocer,-87.45,Food,Groceries,Debit,card payment,RON,normalized-2
+2026-05-04,Synthetic Cafe,-3.20,Food,Coffee,Debit,card payment,EUR,normalized-3

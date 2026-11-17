@@ -1,0 +1,68 @@
+{
+  "transactions": [
+    {
+      "date": "2025-03-02",
+      "desc": "Synthetic Grocer One",
+      "cat": "Groceries",
+      "sub": "Supermarket",
+      "amt": -42.15,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2025-03",
+      "currency": "RON",
+      "ref": "FAKE-REF-0001",
+      "source": "synthetic-statement.csv"
+    },
+    {
+      "date": "2025-03-05",
+      "desc": "Synthetic Employer Ltd",
+      "cat": "Income",
+      "sub": "Income",
+      "amt": 3210.5,
+      "flow": "Credit",
+      "type": "Transfer",
+      "ym": "2025-03",
+      "currency": "RON"
+    },
+    {
+      "date": "2025-04-11",
+      "desc": "Synthetic Cafe Two",
+      "cat": "Restaurants",
+      "sub": "Coffee",
+      "amt": -7.8,
+      "flow": "Debit",
+      "type": "Card Payment",
+      "ym": "2025-04",
+      "currency": "EUR"
+    }
+  ],
+  "customVendors": {
+    "Synthetic Grocer One": ["Groceries", "Supermarket"]
+  },
+  "accounts": [
+    {
+      "id": "acc-fake-checking",
+      "name": "Fake Checking",
+      "balances": { "2025-03": 1500.25, "2025-04": 1650.75 },
+      "monthlyContribution": 0
+    },
+    {
+      "id": "acc-fake-savings",
+      "name": "Fake Savings",
+      "balances": { "2025-04": 4000 },
+      "monthlyContribution": 250
+    }
+  ],
+  "budgets": {
+    "2025-04": { "Groceries": 600, "Restaurants": 150 }
+  },
+  "goals": [
+    {
+      "id": "goal-fake-1",
+      "name": "Synthetic Holiday",
+      "targetAmount": 2500,
+      "targetMonth": "2026-06"
+    }
+  ],
+  "lastUpdated": 1741000000000
+}
