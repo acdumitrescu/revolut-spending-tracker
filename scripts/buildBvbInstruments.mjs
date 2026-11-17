@@ -8,14 +8,25 @@ const sharesUrl = 'https://www.bvb.ro/financialinstruments/markets/shares';
 const outputFile = path.join(repoRoot, 'src/lib/bvbInstruments.json');
 
 function decodeHtml(value) {
-  return String(value || '')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, ' ')
-    .replace(/<[^>]+>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  // Strip tags until none are left (a single pass can leave a tag rebuilt from split pieces),
+  // then drop any stray '<'. The output is plain text for a JSON file, never HTML.
+  let text = String(value || '');
+  let previous;
+  do {
+    previous = text;
+    text = text.replace(/<[^>]*>/g, '');
+  } while (text !== previous);
+  return (
+    text
+      .replace(/</g, '')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&nbsp;/g, ' ')
+      // Decode &amp; last so "&amp;quot;" becomes "&quot;", not '"'.
+      .replace(/&amp;/g, '&')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
 }
 
 function parseInstruments(html, market) {

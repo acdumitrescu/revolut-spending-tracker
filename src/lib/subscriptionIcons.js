@@ -185,9 +185,20 @@ export const NO_ICON = 'none';
 
 // Returns { kind: 'image', src } | { kind: 'brand', key, hex, path } | null (letter fallback).
 // An explicit record.icon wins; an empty one auto-matches by name; NO_ICON forces the letter.
+// Uploaded icons are stored as the PNG data URL imageFileToIcon makes. Anything else that claims
+// to be an image (another scheme, SVG, stray characters) is not rendered.
+const SAFE_ICON_DATA_URL = /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/;
+
+export function safeIconSrc(src) {
+  return typeof src === 'string' && SAFE_ICON_DATA_URL.test(src) ? src : null;
+}
+
 export function resolveSubscriptionIcon(record) {
   const icon = record.icon || '';
-  if (icon.startsWith('data:image/')) return { kind: 'image', src: icon };
+  if (icon.startsWith('data:image/')) {
+    const src = safeIconSrc(icon);
+    return src ? { kind: 'image', src } : null;
+  }
   if (icon === NO_ICON) return null;
   let key = BUNDLED_ICONS[icon] ? icon : null;
   if (!key && !icon) {

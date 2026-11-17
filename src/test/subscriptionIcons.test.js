@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { NO_ICON, resolveSubscriptionIcon } from '../lib/subscriptionIcons';
+import { NO_ICON, resolveSubscriptionIcon, safeIconSrc } from '../lib/subscriptionIcons';
 import { SubscriptionSchema } from '../lib/validation';
 
 const base = {
@@ -45,6 +45,37 @@ describe('subscription icons', () => {
     ).toBe(false);
     expect(SubscriptionSchema.safeParse({ ...base, name: 'X', icon: 'spotify' }).success).toBe(
       true,
+    );
+  });
+});
+
+describe('safeIconSrc', () => {
+  it('accepts the base64 PNG, JPEG and WebP data URLs the app creates', () => {
+    for (const src of [
+      'data:image/png;base64,iVBORw0KGgo=',
+      'data:image/jpeg;base64,/9j/4AAQ',
+      'data:image/webp;base64,UklGRg==',
+    ])
+      expect(safeIconSrc(src)).toBe(src);
+  });
+
+  it('refuses other schemes, SVG, non-base64 and trailing junk', () => {
+    for (const src of [
+      'javascript:alert(1)',
+      'https://example.com/icon.png',
+      'data:image/svg+xml;base64,PHN2Zz4=',
+      'data:text/html;base64,PGI+',
+      'data:image/png,<svg onload=alert(1)>',
+      'data:image/png;base64,AAAA"><script>',
+      undefined,
+      42,
+    ])
+      expect(safeIconSrc(src)).toBeNull();
+  });
+
+  it('turns an unsafe stored image icon into no icon instead of rendering it', () => {
+    expect(resolveSubscriptionIcon({ name: 'X', icon: 'data:image/svg+xml;base64,PHN2Zz4=' })).toBe(
+      null,
     );
   });
 });

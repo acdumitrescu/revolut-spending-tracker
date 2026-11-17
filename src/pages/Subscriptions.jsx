@@ -14,6 +14,7 @@ import {
   NO_ICON,
   imageFileToIcon,
   resolveSubscriptionIcon,
+  safeIconSrc,
 } from '../lib/subscriptionIcons';
 import DetectedRecurring from '../components/DetectedRecurring';
 import './Subscriptions.css';
@@ -31,10 +32,11 @@ function SubscriptionAvatar({ record }) {
   const fallback = {
     background: `hsl(${[...record.name].reduce((hue, char) => hue + char.charCodeAt(0), 0) % 360} 55% 40%)`,
   };
-  if (icon?.kind === 'image')
+  const imageSrc = icon?.kind === 'image' ? safeIconSrc(icon.src) : null;
+  if (imageSrc)
     return (
       <span className="subscription-avatar has-icon" aria-hidden="true">
-        <img src={icon.src} alt="" />
+        <img src={imageSrc} alt="" />
       </span>
     );
   if (icon?.kind === 'brand')
