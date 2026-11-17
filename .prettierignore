@@ -8,3 +8,12 @@ exports
 imports
 tmp-data
 XTB
+src/lib/vendorKnowledge.compiled.json
+src/lib/vendorRules.json
+src/data/*.json
+package-lock.json
+backend/package-lock.json
+coverage
+dist-e2e
+test-results
+playwright-report

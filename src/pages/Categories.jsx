@@ -10,12 +10,16 @@ export default function Categories() {
   const txns = data.transactions;
   const displayCurrency = data.displayCurrency;
   const selectorOptions = { displayCurrency, fxRates: data.fxRates };
-  
+
   if (txns.length === 0) {
     return (
       <div>
         <h2 style={{ marginBottom: '20px' }}>Categories</h2>
-        <EmptyState icon={Tags} title="No category insights yet" description="Import transactions to see how your spending is distributed." />
+        <EmptyState
+          icon={Tags}
+          title="No category insights yet"
+          description="Import transactions to see how your spending is distributed."
+        />
       </div>
     );
   }
@@ -28,22 +32,30 @@ export default function Categories() {
     return (
       <div>
         <h2 style={{ marginBottom: '20px' }}>Categories</h2>
-        <EmptyState icon={Tags} title="No expense categories found" description="The current data does not contain recognizable expense categories." actionLabel="Review vendor mappings" actionTo="/app/insights/vendors" />
+        <EmptyState
+          icon={Tags}
+          title="No expense categories found"
+          description="The current data does not contain recognizable expense categories."
+          actionLabel="Review vendor mappings"
+          actionTo="/app/insights/vendors"
+        />
       </div>
     );
   }
 
   const chartData = {
-    labels: sortedCats.map(c => c[0]),
-    datasets: [{
-      label: 'Spend',
-      data: sortedCats.map(c => c[1]),
-      backgroundColor: sortedCats.map(c => getColorForCategory(c[0])),
-      borderColor: '#FFFFFF',
-      borderWidth: 2,
-      borderRadius: 6,
-      barPercentage: 0.7,
-    }]
+    labels: sortedCats.map((c) => c[0]),
+    datasets: [
+      {
+        label: 'Spend',
+        data: sortedCats.map((c) => c[1]),
+        backgroundColor: sortedCats.map((c) => getColorForCategory(c[0])),
+        borderColor: '#FFFFFF',
+        borderWidth: 2,
+        borderRadius: 6,
+        barPercentage: 0.7,
+      },
+    ],
   };
 
   return (
@@ -51,7 +63,14 @@ export default function Categories() {
       <h2 style={{ marginBottom: '20px' }}>Categories</h2>
       <div className="card">
         <div className="card-title">Total Spend by Category</div>
-        <ChartWrapper type="bar" data={chartData} height={400} horizontal showLegend={false} currency={displayCurrency} />
+        <ChartWrapper
+          type="bar"
+          data={chartData}
+          height={400}
+          horizontal
+          showLegend={false}
+          currency={displayCurrency}
+        />
       </div>
     </div>
   );

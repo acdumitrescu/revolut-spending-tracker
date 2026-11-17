@@ -24,7 +24,7 @@ function datedFilename(extension) {
 export function exportJsonBackup(persistedState) {
   downloadBlob(
     new Blob([serializeBackupState(persistedState)], { type: 'application/json' }),
-    datedFilename('json')
+    datedFilename('json'),
   );
 }
 
@@ -56,19 +56,23 @@ export async function exportExcelWorkbook(data) {
   data.transactions.forEach((transaction) => transactionSheet.addRow(transaction));
 
   const accountsSheet = workbook.addWorksheet('Accounts');
-  const accountMonths = [...new Set(data.accounts.flatMap((account) => Object.keys(account.balances)))].sort();
+  const accountMonths = [
+    ...new Set(data.accounts.flatMap((account) => Object.keys(account.balances))),
+  ].sort();
   accountsSheet.columns = [
     { header: 'Account', key: 'name', width: 24 },
     { header: 'Group', key: 'group', width: 18 },
     { header: 'Currency', key: 'currency', width: 12 },
     ...accountMonths.map((month) => ({ header: month, key: month, width: 14 })),
   ];
-  data.accounts.forEach((account) => accountsSheet.addRow({
-    name: account.name,
-    group: account.group,
-    currency: account.currency || BASE_CURRENCY,
-    ...account.balances,
-  }));
+  data.accounts.forEach((account) =>
+    accountsSheet.addRow({
+      name: account.name,
+      group: account.group,
+      currency: account.currency || BASE_CURRENCY,
+      ...account.balances,
+    }),
+  );
 
   const accountNotesSheet = workbook.addWorksheet('Account Notes');
   accountNotesSheet.columns = [
@@ -96,27 +100,73 @@ export async function exportExcelWorkbook(data) {
     { header: 'Notes', key: 'notes', width: 48 },
   ];
   const credit = getCreditOverview(data);
-  [...credit.cards, ...credit.vendors, ...credit.plans].forEach((record) => creditSheet.addRow(record));
+  [...credit.cards, ...credit.vendors, ...credit.plans].forEach((record) =>
+    creditSheet.addRow(record),
+  );
   const purchasesSheet = workbook.addWorksheet('Card Purchases');
   purchasesSheet.columns = [
-    ['Account', 'account'], ['Currency', 'currency'], ['Purchase', 'name'], ['Status', 'status'],
-    ['Original Price', 'initialCost'], ['Total Repayment', 'totalCost'], ['Still Owed', 'remainingBalance'],
-    ['Per Instalment', 'instalmentAmount'], ['Total Months', 'totalMonths'], ['Months Remaining', 'remainingMonths'],
-    ['Archived At', 'archivedAt'], ['Notes', 'notes'],
+    ['Account', 'account'],
+    ['Currency', 'currency'],
+    ['Purchase', 'name'],
+    ['Status', 'status'],
+    ['Original Price', 'initialCost'],
+    ['Total Repayment', 'totalCost'],
+    ['Still Owed', 'remainingBalance'],
+    ['Per Instalment', 'instalmentAmount'],
+    ['Total Months', 'totalMonths'],
+    ['Months Remaining', 'remainingMonths'],
+    ['Archived At', 'archivedAt'],
+    ['Notes', 'notes'],
   ].map(([header, key]) => ({ header, key, width: 24 }));
-  credit.cards.forEach((card) => card.purchases.forEach((purchase) => purchasesSheet.addRow({
-    ...purchase, account: card.name, currency: card.currency,
-    archivedAt: purchase.archivedAt === null ? '' : new Date(purchase.archivedAt).toISOString(),
-  })));
+  credit.cards.forEach((card) =>
+    card.purchases.forEach((purchase) =>
+      purchasesSheet.addRow({
+        ...purchase,
+        account: card.name,
+        currency: card.currency,
+        archivedAt: purchase.archivedAt === null ? '' : new Date(purchase.archivedAt).toISOString(),
+      }),
+    ),
+  );
 
   const incomeSheet = workbook.addWorksheet('Income Receipts');
-  incomeSheet.columns = [['Date','date'], ['Source','source'], ['Type','kind'], ['Amount','amount'], ['Currency','currency'], ['Received In','receivedIn'], ['Notes','notes']].map(([header,key]) => ({header,key,width:24}));
-  (data.moneyFlow?.incomes || []).forEach(row => incomeSheet.addRow({...row, amount:row.amountMinor / 100, receivedIn:row.receivedIn.label}));
+  incomeSheet.columns = [
+    ['Date', 'date'],
+    ['Source', 'source'],
+    ['Type', 'kind'],
+    ['Amount', 'amount'],
+    ['Currency', 'currency'],
+    ['Received In', 'receivedIn'],
+    ['Notes', 'notes'],
+  ].map(([header, key]) => ({ header, key, width: 24 }));
+  (data.moneyFlow?.incomes || []).forEach((row) =>
+    incomeSheet.addRow({ ...row, amount: row.amountMinor / 100, receivedIn: row.receivedIn.label }),
+  );
   const allocationSheet = workbook.addWorksheet('Income Allocations');
-  allocationSheet.columns = [['Date','date'], ['Income Source','source'], ['From','from'], ['To','to'], ['Status','status'], ['Amount Sent','amount'], ['Sent Currency','currency'], ['Amount Arriving','received'], ['Arriving Currency','receivedCurrency'], ['Notes','notes']].map(([header,key]) => ({header,key,width:24}));
-  (data.moneyFlow?.transfers || []).forEach(row => {
-    const income = data.moneyFlow.incomes.find(item => item.id === row.incomeId);
-    allocationSheet.addRow({...row, source:income?.source, from:income?.receivedIn.label, to:row.destination.label, amount:row.amountMinor / 100, currency:income?.currency, received:row.receivedMinor / 100, receivedCurrency:row.destination.currency});
+  allocationSheet.columns = [
+    ['Date', 'date'],
+    ['Income Source', 'source'],
+    ['From', 'from'],
+    ['To', 'to'],
+    ['Status', 'status'],
+    ['Amount Sent', 'amount'],
+    ['Sent Currency', 'currency'],
+    ['Amount Arriving', 'received'],
+    ['Arriving Currency', 'receivedCurrency'],
+    ['Notes', 'notes'],
+  ].map(([header, key]) => ({ header, key, width: 24 }));
+  (data.moneyFlow?.transfers || []).forEach((row) => {
+    const income = data.moneyFlow.incomes.find((item) => item.id === row.incomeId);
+    allocationSheet.addRow({
+      ...row,
+      source: income?.source,
+      from: income?.receivedIn.label,
+      to: row.destination.label,
+      amount: row.amountMinor / 100,
+      currency: income?.currency,
+      received: row.receivedMinor / 100,
+      receivedCurrency: row.destination.currency,
+    });
   });
 
   const vendorSheet = workbook.addWorksheet('Custom Vendors');
@@ -145,7 +195,9 @@ export async function exportExcelWorkbook(data) {
 
   const buffer = await workbook.xlsx.writeBuffer();
   downloadBlob(
-    new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
-    datedFilename('xlsx')
+    new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }),
+    datedFilename('xlsx'),
   );
 }

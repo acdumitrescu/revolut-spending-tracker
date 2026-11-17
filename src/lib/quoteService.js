@@ -4,15 +4,25 @@ import { getSyncAuthorizationHeaders } from './serverSync';
 const YAHOO_SYMBOL_PATTERN = /^[A-Z0-9.^=-]{1,32}$/;
 
 export function isYahooQuoteSymbol(symbol) {
-  return YAHOO_SYMBOL_PATTERN.test(String(symbol || '').trim().toUpperCase());
+  return YAHOO_SYMBOL_PATTERN.test(
+    String(symbol || '')
+      .trim()
+      .toUpperCase(),
+  );
 }
 
 function normalizeSymbols(symbols) {
-  const normalized = [...new Set(
-    symbols
-      .map((symbol) => String(symbol || '').trim().toUpperCase())
-      .filter(Boolean)
-  )];
+  const normalized = [
+    ...new Set(
+      symbols
+        .map((symbol) =>
+          String(symbol || '')
+            .trim()
+            .toUpperCase(),
+        )
+        .filter(Boolean),
+    ),
+  ];
   const invalidSymbol = normalized.find((symbol) => !isYahooQuoteSymbol(symbol));
   if (invalidSymbol) throw new Error(`Invalid Yahoo quote symbol: ${invalidSymbol}`);
   return normalized;

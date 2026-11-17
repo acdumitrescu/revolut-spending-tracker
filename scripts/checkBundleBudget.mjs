@@ -10,7 +10,10 @@ for (const fileName of await readdir(assetsDir)) {
   if (!fileName.endsWith('.js')) continue;
   const bytes = (await stat(path.join(assetsDir, fileName))).size;
   const limit = fileName.startsWith('exceljs.') ? LAZY_EXPORT_LIMIT_BYTES : DEFAULT_LIMIT_BYTES;
-  if (bytes > limit) failures.push(`${fileName}: ${(bytes / 1024).toFixed(1)} KiB exceeds ${(limit / 1024).toFixed(0)} KiB`);
+  if (bytes > limit)
+    failures.push(
+      `${fileName}: ${(bytes / 1024).toFixed(1)} KiB exceeds ${(limit / 1024).toFixed(0)} KiB`,
+    );
 }
 
 if (failures.length) {

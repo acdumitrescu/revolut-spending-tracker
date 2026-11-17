@@ -21,13 +21,19 @@ const APPROVED_FUZZY_TAGS = new Set([
   'travel',
 ]);
 
-const LOW_CONFIDENCE_TAGS = new Set(['delivery', 'grocery', 'fuel', 'telecom', 'pharmacy', 'courier']);
+const LOW_CONFIDENCE_TAGS = new Set([
+  'delivery',
+  'grocery',
+  'fuel',
+  'telecom',
+  'pharmacy',
+  'courier',
+]);
 const RISKY_SHORT_ALIAS_TAGS = new Set(['fuel', 'telecom', 'transport', 'taxi', 'delivery']);
 const LEGAL_SUFFIX_PATTERN = /\b(srl|sa|sas|inc|corp|co|company|ltd|llc|gmbh|bv|plc|pte|kg|sro)\b/g;
-const PAYMENT_NOISE_PATTERN = /\b(pos|terminal|payment|purchase|card|visa|mastercard|debit|credit|tranzactie|transaction)\b/g;
-const CATEGORY_NORMALIZATION = new Map([
-  ['Telecom', 'Utilities'],
-]);
+const PAYMENT_NOISE_PATTERN =
+  /\b(pos|terminal|payment|purchase|card|visa|mastercard|debit|credit|tranzactie|transaction)\b/g;
+const CATEGORY_NORMALIZATION = new Map([['Telecom', 'Utilities']]);
 const FUZZY_SCORE_THRESHOLD = 0.12;
 const FUZZY_SCORE_GAP_THRESHOLD = 0.03;
 const SUGGESTION_SCORE_THRESHOLD = 0.24;
@@ -57,7 +63,7 @@ function uniqueSorted(values) {
 
 function mergeScore(record) {
   const sourceScore = SOURCE_PRIORITY[record.sourceType] || 0;
-  return (sourceScore * 10000) + (record.priority || 0);
+  return sourceScore * 10000 + (record.priority || 0);
 }
 
 function prefersShortBoundary(alias) {
@@ -86,9 +92,11 @@ function compareRecordsForMatch(a, b) {
 }
 
 function isRiskyShortAlias(alias, record) {
-  return alias.length < 4
-    && !alias.includes(' ')
-    && record.tags?.some((tag) => RISKY_SHORT_ALIAS_TAGS.has(tag));
+  return (
+    alias.length < 4 &&
+    !alias.includes(' ') &&
+    record.tags?.some((tag) => RISKY_SHORT_ALIAS_TAGS.has(tag))
+  );
 }
 
 function sanitizeRecord(rawRecord, sourceType) {
@@ -96,26 +104,44 @@ function sanitizeRecord(rawRecord, sourceType) {
   const aliases = uniqueSorted(
     [canonicalName, ...(rawRecord.aliases || [])]
       .map((alias) => String(alias || '').trim())
-      .filter(Boolean)
+      .filter(Boolean),
   );
   const normalizedAliases = uniqueSorted(aliases.map(normalizeVendorKey).filter(Boolean));
-  const familyAliases = uniqueSorted((rawRecord.familyAliases || []).map(normalizeVendorKey).filter(Boolean));
-  const fallbackKeywords = uniqueSorted((rawRecord.fallbackKeywords || []).map(normalizeVendorKey).filter(Boolean));
+  const familyAliases = uniqueSorted(
+    (rawRecord.familyAliases || []).map(normalizeVendorKey).filter(Boolean),
+  );
+  const fallbackKeywords = uniqueSorted(
+    (rawRecord.fallbackKeywords || []).map(normalizeVendorKey).filter(Boolean),
+  );
 
   return {
     id: String(rawRecord.id || '').trim(),
     canonicalName,
     aliases,
     normalizedAliases,
-    countryCodes: uniqueSorted((rawRecord.countryCodes || []).map((code) => String(code || '').trim().toUpperCase()).filter(Boolean)),
-    regions: uniqueSorted((rawRecord.regions || ['Global']).map((region) => String(region || '').trim()).filter(Boolean)),
+    countryCodes: uniqueSorted(
+      (rawRecord.countryCodes || [])
+        .map((code) =>
+          String(code || '')
+            .trim()
+            .toUpperCase(),
+        )
+        .filter(Boolean),
+    ),
+    regions: uniqueSorted(
+      (rawRecord.regions || ['Global'])
+        .map((region) => String(region || '').trim())
+        .filter(Boolean),
+    ),
     category: normalizeCategory(rawRecord.category),
     subcategory: String(rawRecord.subcategory || 'Other').trim(),
     sourceType,
     sourceEvidence: [sourceType],
     priority: Number.isFinite(rawRecord.priority) ? rawRecord.priority : 0,
     confidenceHint: rawRecord.confidenceHint || 'medium',
-    tags: uniqueSorted((rawRecord.tags || []).map((tag) => String(tag || '').trim()).filter(Boolean)),
+    tags: uniqueSorted(
+      (rawRecord.tags || []).map((tag) => String(tag || '').trim()).filter(Boolean),
+    ),
     family: rawRecord.family ? String(rawRecord.family).trim() : null,
     familyAliases,
     fallbackKeywords,
@@ -183,9 +209,7 @@ export function vendorMatchType(normalizedDescription, vendor) {
     return 'none';
   }
 
-  return hasTokenBoundary(normalizedDescription, normalizedVendor)
-    ? 'contains'
-    : 'none';
+  return hasTokenBoundary(normalizedDescription, normalizedVendor) ? 'contains' : 'none';
 }
 
 function buildFuzzyDocs(record) {
@@ -195,7 +219,11 @@ function buildFuzzyDocs(record) {
       record,
       alias,
       canonicalKey: normalizeVendorKey(record.canonicalName),
-      searchText: uniqueSorted([alias, normalizeVendorKey(record.canonicalName), ...record.familyAliases]).join(' '),
+      searchText: uniqueSorted([
+        alias,
+        normalizeVendorKey(record.canonicalName),
+        ...record.familyAliases,
+      ]).join(' '),
     }));
 }
 
@@ -260,7 +288,7 @@ function toMatchResult(record, matchedAlias, matchSource, confidence, matchStrat
     matchedVendor: record.canonicalName,
     matchedAlias,
     matchedVendorId: record.id,
-    matchedRegion: record.regions?.includes('RO') ? 'RO' : (record.regions?.[0] || 'Global'),
+    matchedRegion: record.regions?.includes('RO') ? 'RO' : record.regions?.[0] || 'Global',
     matchSource,
     matchStrategy,
     confidence,
@@ -268,7 +296,9 @@ function toMatchResult(record, matchedAlias, matchSource, confidence, matchStrat
 }
 
 function sortCustomVendorMappings(vendors) {
-  return Object.entries(vendors).sort((a, b) => normalizeVendorKey(b[0]).length - normalizeVendorKey(a[0]).length);
+  return Object.entries(vendors).sort(
+    (a, b) => normalizeVendorKey(b[0]).length - normalizeVendorKey(a[0]).length,
+  );
 }
 
 function getNextDistinctFuzzyResult(results, recordId) {
@@ -282,7 +312,7 @@ function canUseFuzzyCandidate(result, results, normalizedDescription) {
 
   const nextResult = getNextDistinctFuzzyResult(results.slice(1), result.item.record.id);
   if (nextResult?.item && typeof nextResult.score === 'number') {
-    if ((nextResult.score - result.score) < FUZZY_SCORE_GAP_THRESHOLD) return false;
+    if (nextResult.score - result.score < FUZZY_SCORE_GAP_THRESHOLD) return false;
   }
 
   const { alias, record } = result.item;
@@ -298,7 +328,12 @@ function buildSuggestions(results, limit = 3) {
   const seen = new Set();
 
   for (const result of results) {
-    if (!result?.item || typeof result.score !== 'number' || result.score > SUGGESTION_SCORE_THRESHOLD) continue;
+    if (
+      !result?.item ||
+      typeof result.score !== 'number' ||
+      result.score > SUGGESTION_SCORE_THRESHOLD
+    )
+      continue;
     const key = `${result.item.record.id}:${result.item.alias}`;
     if (seen.has(key)) continue;
     seen.add(key);
@@ -371,7 +406,7 @@ export function createVendorMatcher(knowledge) {
           entry.alias,
           'built-in-contains',
           entry.record.confidenceHint === 'high' ? 'medium' : entry.record.confidenceHint,
-          'boundary'
+          'boundary',
         );
       }
     }

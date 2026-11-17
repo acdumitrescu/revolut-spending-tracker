@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { analyzeTransactionImport, categorizeTransaction, categorizeTransactionDetailed, parseCSV, txKey, mergeTransactions } from '../lib/csvParser';
+import {
+  analyzeTransactionImport,
+  categorizeTransaction,
+  categorizeTransactionDetailed,
+  parseCSV,
+  txKey,
+  mergeTransactions,
+} from '../lib/csvParser';
 import personalFixture from './fixtures/synthetic-personal-profile.csv?raw';
 import businessFixture from './fixtures/synthetic-business-profile.csv?raw';
 import localizedExpenseFixture from './fixtures/synthetic-business-expense-ro.csv?raw';
@@ -35,7 +42,9 @@ describe('categorizeTransaction', () => {
   });
 
   it('lets custom vendor overrides win over strong built-in aliases', () => {
-    const [cat, sub] = categorizeTransaction('Uber Eats', -22, { 'uber eats': ['CustomFood', 'Manual'] });
+    const [cat, sub] = categorizeTransaction('Uber Eats', -22, {
+      'uber eats': ['CustomFood', 'Manual'],
+    });
     expect(cat).toBe('CustomFood');
     expect(sub).toBe('Manual');
   });
@@ -91,7 +100,9 @@ describe('categorizeTransaction', () => {
 
 describe('categorizeTransactionDetailed', () => {
   it('returns custom override metadata when a custom vendor wins', () => {
-    const result = categorizeTransactionDetailed('Uber Eats', -20, { 'uber eats': ['Food', 'Manual'] });
+    const result = categorizeTransactionDetailed('Uber Eats', -20, {
+      'uber eats': ['Food', 'Manual'],
+    });
     expect(result.category).toBe('Food');
     expect(result.matchSource).toBe('custom');
     expect(result.confidence).toBe('high');
@@ -137,7 +148,15 @@ describe('categorizeTransactionDetailed', () => {
 
 describe('txKey', () => {
   it('produces a unique key from transaction fields', () => {
-    const t = { date: '2024-01-15', desc: 'Uber', amt: -15, type: 'TOP_UP', flow: 'Debit', currency: 'RON', ref: 'abc' };
+    const t = {
+      date: '2024-01-15',
+      desc: 'Uber',
+      amt: -15,
+      type: 'TOP_UP',
+      flow: 'Debit',
+      currency: 'RON',
+      ref: 'abc',
+    };
     expect(txKey(t)).toBe('2024-01-15|Uber|-15|TOP_UP|Debit|RON|abc');
   });
 
@@ -172,12 +191,16 @@ describe('parseCSV', () => {
     ];
 
     for (const fixture of cases) {
-      const result = await parseCSV(new File([fixture.contents], fixture.name, { type: 'text/csv' }));
+      const result = await parseCSV(
+        new File([fixture.contents], fixture.name, { type: 'text/csv' }),
+      );
       expect(result.summary.detectedProfileId).toBe(fixture.profile);
       expect(result.transactions.map((transaction) => transaction.cat)).toEqual(fixture.categories);
     }
 
-    const localized = await parseCSV(new File([localizedExpenseFixture], 'expense-ro.csv', { type: 'text/csv' }));
+    const localized = await parseCSV(
+      new File([localizedExpenseFixture], 'expense-ro.csv', { type: 'text/csv' }),
+    );
     expect(localized.transactions[0]).toMatchObject({ currency: 'RON', amt: -24.5 });
     expect(localized.summary.validationCategories['multiple-amount-sources']).toBe(1);
   });
@@ -312,7 +335,9 @@ describe('parseCSV', () => {
     const result = await parseCSV(file);
 
     expect(result.summary.detectedProfileId).toBe('revolut-business-expense');
-    expect(result.summary.warnings.some((warning) => warning.includes('payment and original amount'))).toBe(true);
+    expect(
+      result.summary.warnings.some((warning) => warning.includes('payment and original amount')),
+    ).toBe(true);
     expect(result.transactions[0].currency).toBe('RON');
     expect(result.transactions[0].amt).toBe(-24.5);
     expect(result.transactions[0].cat).toBe('Food & Dining');
@@ -346,7 +371,11 @@ describe('parseCSV', () => {
     const result = await parseCSV(file);
 
     expect(result.summary.processedRows).toBe(1);
-    expect(result.summary.warnings.some((warning) => warning.includes('Partially recognized header set'))).toBe(true);
+    expect(
+      result.summary.warnings.some((warning) =>
+        warning.includes('Partially recognized header set'),
+      ),
+    ).toBe(true);
   });
 
   it('surfaces structural CSV parser warnings for review', async () => {
@@ -364,51 +393,35 @@ describe('parseCSV', () => {
 
 describe('mergeTransactions', () => {
   it('merges new transactions into existing', () => {
-    const existing = [
-      { date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' },
-    ];
-    const newTxns = [
-      { date: '2024-01-02', desc: 'B', amt: -20, type: 'Y', ym: '2024-01' },
-    ];
+    const existing = [{ date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' }];
+    const newTxns = [{ date: '2024-01-02', desc: 'B', amt: -20, type: 'Y', ym: '2024-01' }];
     const result = mergeTransactions(existing, newTxns);
     expect(result).toHaveLength(2);
   });
 
   it('deduplicates identical transactions', () => {
-    const existing = [
-      { date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' },
-    ];
-    const newTxns = [
-      { date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' },
-    ];
+    const existing = [{ date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' }];
+    const newTxns = [{ date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' }];
     const result = mergeTransactions(existing, newTxns);
     expect(result).toHaveLength(1);
   });
 
   it('sorts by date', () => {
-    const existing = [
-      { date: '2024-03-01', desc: 'C', amt: -30, type: 'Z', ym: '2024-03' },
-    ];
-    const newTxns = [
-      { date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' },
-    ];
+    const existing = [{ date: '2024-03-01', desc: 'C', amt: -30, type: 'Z', ym: '2024-03' }];
+    const newTxns = [{ date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' }];
     const result = mergeTransactions(existing, newTxns);
     expect(result[0].date).toBe('2024-01-01');
     expect(result[1].date).toBe('2024-03-01');
   });
 
   it('handles empty existing array', () => {
-    const newTxns = [
-      { date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' },
-    ];
+    const newTxns = [{ date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' }];
     const result = mergeTransactions([], newTxns);
     expect(result).toHaveLength(1);
   });
 
   it('handles empty new array', () => {
-    const existing = [
-      { date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' },
-    ];
+    const existing = [{ date: '2024-01-01', desc: 'A', amt: -10, type: 'X', ym: '2024-01' }];
     const result = mergeTransactions(existing, []);
     expect(result).toHaveLength(1);
   });

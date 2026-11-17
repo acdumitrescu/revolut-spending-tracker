@@ -8,8 +8,26 @@ function Loader() {
   const { addTransactions } = useAppContext();
 
   const transactions = [
-    { date: '2024-01-01', ym: '2024-01', desc: 'Salary', cat: 'Income', sub: 'Income', amt: 5000, flow: 'Credit', type: 'Bank Transfer' },
-    { date: '2024-03-01', ym: '2024-03', desc: 'Groceries', cat: 'Groceries', sub: 'Food', amt: -100, flow: 'Debit', type: 'Card Payment' },
+    {
+      date: '2024-01-01',
+      ym: '2024-01',
+      desc: 'Salary',
+      cat: 'Income',
+      sub: 'Income',
+      amt: 5000,
+      flow: 'Credit',
+      type: 'Bank Transfer',
+    },
+    {
+      date: '2024-03-01',
+      ym: '2024-03',
+      desc: 'Groceries',
+      cat: 'Groceries',
+      sub: 'Food',
+      amt: -100,
+      flow: 'Debit',
+      type: 'Card Payment',
+    },
   ];
 
   return (
@@ -27,7 +45,7 @@ describe('Monthly page', () => {
           <Loader />
           <Monthly />
         </MemoryRouter>
-      </AppProvider>
+      </AppProvider>,
     );
 
     act(() => {

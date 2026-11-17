@@ -38,8 +38,10 @@ describe('ImportWorkspace server backup controls', () => {
   it('creates an on-demand backup and shows its private filename', async () => {
     render(
       <ToastProvider>
-        <MemoryRouter><ImportWorkspace /></MemoryRouter>
-      </ToastProvider>
+        <MemoryRouter>
+          <ImportWorkspace />
+        </MemoryRouter>
+      </ToastProvider>,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /create backup now/i }));

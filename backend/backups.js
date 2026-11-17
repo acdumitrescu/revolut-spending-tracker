@@ -16,7 +16,12 @@ function validatePortableState(data, maxPayloadBytes) {
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     throw httpError('Request body must include a data object');
   }
-  if (data.schemaVersion !== 1 || !data.data || typeof data.data !== 'object' || Array.isArray(data.data)) {
+  if (
+    data.schemaVersion !== 1 ||
+    !data.data ||
+    typeof data.data !== 'object' ||
+    Array.isArray(data.data)
+  ) {
     throw httpError('Backup data must be a versioned SimpleSafeBanking app state');
   }
   if (!Array.isArray(data.data.transactions) || !Array.isArray(data.data.accounts)) {
@@ -65,9 +70,10 @@ export async function writePortableBackup({
   validatePortableState(data, maxPayloadBytes);
 
   const batchId = reason === 'import' ? safeBatchId(importBatchId) : null;
-  const filename = reason === 'import'
-    ? `simple_safe_banking_backup_import_${batchId}.json`
-    : `simple_safe_banking_backup_manual_${timestampForFilename(now)}_${randomUUID().slice(0, 8)}.json`;
+  const filename =
+    reason === 'import'
+      ? `simple_safe_banking_backup_import_${batchId}.json`
+      : `simple_safe_banking_backup_manual_${timestampForFilename(now)}_${randomUUID().slice(0, 8)}.json`;
   const targetPath = path.join(configuredDir, filename);
   const metadata = { filename, createdAt: now.toISOString(), reason, importBatchId: batchId };
 

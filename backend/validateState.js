@@ -2,7 +2,8 @@ import { PersistedAppStateSchema } from './appStateSchema.js';
 
 export function validateState(value) {
   const parsed = PersistedAppStateSchema.safeParse(value);
-  if (!parsed.success) throw Object.assign(new Error('Invalid versioned app state'), { status: 400 });
+  if (!parsed.success)
+    throw Object.assign(new Error('Invalid versioned app state'), { status: 400 });
   // Never silently discard unknown imported fields or accept prototype keys.
   function inspect(raw, clean) {
     if (!raw || typeof raw !== 'object') return;

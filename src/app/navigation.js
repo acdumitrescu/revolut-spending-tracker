@@ -36,9 +36,19 @@ export const APP_HUBS = [
     icon: ListChecks,
     matchPaths: ['/app/activity'],
     children: [
-      { id: 'transactions', label: 'Transactions', to: '/app/activity/transactions', icon: ReceiptText },
+      {
+        id: 'transactions',
+        label: 'Transactions',
+        to: '/app/activity/transactions',
+        icon: ReceiptText,
+      },
       { id: 'monthly', label: 'Monthly', to: '/app/activity/monthly', icon: CalendarDays },
-      { id: 'subscriptions', label: 'Subscriptions', to: '/app/activity/subscriptions', icon: Repeat2 },
+      {
+        id: 'subscriptions',
+        label: 'Subscriptions',
+        to: '/app/activity/subscriptions',
+        icon: Repeat2,
+      },
     ],
   },
   {
@@ -81,7 +91,12 @@ export const APP_HUBS = [
       { id: 'balances', label: 'Balances', to: '/app/accounts/balances', icon: WalletCards },
       { id: 'income', label: 'Income & allocation', to: '/app/accounts/income', icon: Waypoints },
       { id: 'credit', label: 'Credit', to: '/app/accounts/credit', icon: CreditCard },
-      { id: 'portfolio', label: 'Portfolio', to: '/app/accounts/portfolio', icon: ChartNoAxesCombined },
+      {
+        id: 'portfolio',
+        label: 'Portfolio',
+        to: '/app/accounts/portfolio',
+        icon: ChartNoAxesCombined,
+      },
     ],
   },
 ];
@@ -102,7 +117,11 @@ export const LEGACY_APP_ROUTES = {
 };
 
 export function getActiveHub(pathname) {
-  return APP_HUBS.find((hub) => hub.matchPaths.some((path) => (
-    path === '/app' ? pathname === path : pathname.startsWith(path)
-  ))) || null;
+  return (
+    APP_HUBS.find((hub) =>
+      hub.matchPaths.some((path) =>
+        path === '/app' ? pathname === path : pathname.startsWith(path),
+      ),
+    ) || null
+  );
 }

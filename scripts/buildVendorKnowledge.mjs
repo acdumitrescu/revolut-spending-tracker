@@ -29,4 +29,6 @@ async function buildVendorKnowledge() {
 }
 
 const compiled = await buildVendorKnowledge();
-console.log(`Compiled ${compiled.records.length} vendor knowledge records to ${path.relative(repoRoot, outputFile)}`);
+console.log(
+  `Compiled ${compiled.records.length} vendor knowledge records to ${path.relative(repoRoot, outputFile)}`,
+);

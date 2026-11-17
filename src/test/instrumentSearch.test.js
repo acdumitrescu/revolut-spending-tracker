@@ -3,20 +3,27 @@ import { getLocalInstrumentCatalogSummary, searchLocalInstruments } from '../lib
 
 describe('local instrument search', () => {
   it('finds BVB shares by company name and returns the Yahoo symbol', () => {
-    expect(searchLocalInstruments('transilvania')).toContainEqual(expect.objectContaining({
-      ticker: 'TLV',
-      quoteSymbol: 'TLV.RO',
-      exchange: 'BVB',
-      currency: 'RON',
-    }));
+    expect(searchLocalInstruments('transilvania')).toContainEqual(
+      expect.objectContaining({
+        ticker: 'TLV',
+        quoteSymbol: 'TLV.RO',
+        exchange: 'BVB',
+        currency: 'RON',
+      }),
+    );
   });
 
   it('finds curated global stocks and ETFs by ticker', () => {
     expect(searchLocalInstruments('aapl')[0]).toMatchObject({
-      ticker: 'AAPL', quoteSymbol: 'AAPL', assetClass: 'Stock', currency: 'USD',
+      ticker: 'AAPL',
+      quoteSymbol: 'AAPL',
+      assetClass: 'Stock',
+      currency: 'USD',
     });
     expect(searchLocalInstruments('vanguard total world')[0]).toMatchObject({
-      ticker: 'VT', assetClass: 'ETF', currency: 'USD',
+      ticker: 'VT',
+      assetClass: 'ETF',
+      currency: 'USD',
     });
   });
 
