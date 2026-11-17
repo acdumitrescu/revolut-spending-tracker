@@ -21,7 +21,7 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             backend/package-lock.json
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v7
       - run: npm ci
       - run: npm ci --prefix backend
       - run: npm run check
