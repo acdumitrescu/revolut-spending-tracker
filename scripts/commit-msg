@@ -1,0 +1,17 @@
+#!/bin/sh
+# Rejects commit messages that carry AI/assistant attribution (policy in AGENTS.md).
+# Installed by scripts/install-git-hooks.sh.
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel)"
+[ -f "$ROOT/scripts/git-privacy-guards.sh" ] || exit 0
+. "$ROOT/scripts/git-privacy-guards.sh"
+
+msg_file="${1:-}"
+[ -n "$msg_file" ] && [ -f "$msg_file" ] || exit 0
+
+if grep -v '^#' "$msg_file" | ssb_message_has_ai_attribution; then
+  echo 'Blocked commit: the message contains AI/assistant attribution (a Co-Authored-By trailer naming an AI tool, or a "Generated with Claude Code" line).' >&2
+  echo 'Remove that line from the commit message and commit again. See "Commit attribution" in AGENTS.md.' >&2
+  exit 1
+fi

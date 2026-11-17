@@ -64,6 +64,14 @@ Always check:
 
 If staged files look like personal finance data, backups, or local notes, stop and remove them from staging.
 
+## Commit attribution
+
+- Commit messages must not contain AI/assistant co-author trailers (for example `Co-Authored-By: Claude ...`, or any `Co-Authored-By:` naming Anthropic, Copilot, ChatGPT, OpenAI, Codex, or Gemini) or "Generated with Claude Code" lines.
+- PR descriptions and issues must not contain AI attribution lines either.
+- When cherry-picking or rebasing, strip such lines from the resulting messages.
+- This is enforced by the `commit-msg` hook (blocks the commit) and the `pre-push` hook (blocks outgoing history that contains it).
+- `SSB_ALLOW_AI_ATTRIBUTION=1` bypasses only the `pre-push` check. It exists solely for pushing pre-existing history to remotes that already contain it; never use it for new commits.
+
 ## Agent behavior requirement
 
 Any agent working in this repository must follow these rules and prioritize privacy over convenience.

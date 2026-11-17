@@ -211,3 +211,90 @@ describe('Git privacy guards', () => {
     expect(result.stderr).toMatch(/refusing to guess a public baseline/i);
   });
 });
+
+describe('AI attribution policy', () => {
+  let repo;
+  const repoGit = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8' }).trim();
+  const runCommitMsg = (message) => {
+    const file = path.join(repo, 'COMMIT_MSG_TEST');
+    fs.writeFileSync(file, message);
+    return spawnSync(path.join(repo, 'scripts/commit-msg'), [file], {
+      cwd: repo,
+      encoding: 'utf8',
+    });
+  };
+  const runPush = (lines, env = {}) =>
+    spawnSync(path.join(repo, 'scripts/pre-push'), ['origin', 'synthetic://no-network'], {
+      cwd: repo,
+      encoding: 'utf8',
+      input: `${lines.join('\n')}\n`,
+      env: { ...process.env, ...env },
+    });
+  const commitIn = (message) => {
+    fs.writeFileSync(path.join(repo, 'f.txt'), `${message}\n${Math.random()}\n`);
+    repoGit('add', '-A');
+    repoGit('commit', '-m', message, '--quiet', '--no-verify');
+    return repoGit('rev-parse', 'HEAD');
+  };
+
+  beforeAll(() => {
+    repo = fs.mkdtempSync(path.join(os.tmpdir(), 'ssb-ai-attribution-'));
+    fs.mkdirSync(path.join(repo, 'scripts'), { recursive: true });
+    for (const file of ['git-privacy-guards.sh', 'pre-push', 'commit-msg', 'privacy-scan.sh']) {
+      fs.copyFileSync(path.join(repoRoot, 'scripts', file), path.join(repo, 'scripts', file));
+      fs.chmodSync(path.join(repo, 'scripts', file), 0o755);
+    }
+    repoGit('init', '-b', 'main', '--quiet');
+    repoGit('config', 'user.name', 'Synthetic Test');
+    repoGit('config', 'user.email', 'synthetic@example.invalid');
+    commitIn('baseline');
+  });
+
+  const rejected = [
+    'Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>',
+    'co-authored-by: Someone <bot@anthropic.com>',
+    'Co-authored-by: GitHub Copilot <copilot@github.com>',
+    'Co-Authored-By: ChatGPT <chatgpt@openai.com>',
+    'Co-Authored-By: Codex <codex@openai.com>',
+    'Co-Authored-By: Gemini <gemini@google.com>',
+    '\u{1F916} Generated with [Claude Code](https://claude.com/claude-code)',
+    'Generated with Claude Code',
+  ];
+
+  it.each(rejected)('commit-msg rejects: %s', (line) => {
+    const result = runCommitMsg(`Add feature\n\nBody text.\n\n${line}\n`);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toMatch(/AI\/assistant attribution/);
+  });
+
+  it('commit-msg accepts normal messages, human co-authors, and ignores comment lines', () => {
+    expect(runCommitMsg('Fix rounding in budget totals\n\nDetails.\n').status).toBe(0);
+    expect(
+      runCommitMsg('Pair work\n\nCo-Authored-By: Ada Lovelace <ada@example.org>\n').status,
+    ).toBe(0);
+    expect(
+      runCommitMsg('Normal\n\n# Co-Authored-By: Claude <noreply@anthropic.com>\n').status,
+    ).toBe(0);
+  });
+
+  it('pre-push accepts a clean outgoing commit', () => {
+    const clean = commitIn('Clean change');
+    const result = runPush([`refs/heads/main ${clean} refs/heads/main ${zeroOid}`]);
+    expect(result.status).toBe(0);
+  });
+
+  it('pre-push refuses outgoing history with the trailer and honours the escape hatch', () => {
+    const base = repoGit('rev-parse', 'HEAD');
+    const bad = commitIn('Add thing\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>');
+    const tip = commitIn('Later clean change');
+    const line = `refs/heads/main ${tip} refs/heads/main ${base}`;
+
+    const result = runPush([line]);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toMatch(/AI attribution/);
+    expect(result.stderr).toContain(bad.slice(0, 7));
+
+    expect(runPush([line], { SSB_ALLOW_AI_ATTRIBUTION: '1' }).status).toBe(0);
+    expect(runPush([`(delete) ${zeroOid} refs/heads/main ${tip}`]).status).toBe(0);
+  });
+});

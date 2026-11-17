@@ -64,3 +64,9 @@ if [ -f "$SCRIPT_DIR/pre-commit" ]; then
   chmod +x "$HOOKS_DIR/pre-commit"
   printf 'Installed pre-commit hook at %s\n' "$HOOKS_DIR/pre-commit"
 fi
+
+if [ -f "$SCRIPT_DIR/commit-msg" ]; then
+  cp "$SCRIPT_DIR/commit-msg" "$HOOKS_DIR/commit-msg"
+  chmod +x "$HOOKS_DIR/commit-msg"
+  printf 'Installed commit-msg hook at %s\n' "$HOOKS_DIR/commit-msg"
+fi
